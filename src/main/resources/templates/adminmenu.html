@@ -1,0 +1,17 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Home</title>
+</head>
+
+<body>
+    <div th:replace="header :: header"></div>
+    <h2>Login succeeded</h2>
+    <p>この画面はログイン済みでないと見られません。</p>
+    <a th:href="@{/logout}">Logout</a>
+    <div th:replace="footer :: footer"></div>
+</body>
+
+</html>

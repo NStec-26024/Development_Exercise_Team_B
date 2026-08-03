@@ -1,0 +1,16 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <header style="background: #00ff73; color: rgb(29, 28, 28); padding: 10px">
+      <h1>My Application</h1>
+      <nav>
+        <a th:href="@{/login}" style="color: white; margin-right: 10px"
+          >Login</a
+        >
+        <span sec:authprize="hasRole('ROLE_USER')">
+          <a th:href="@{/register}" style="color: white">Register</a>
+        </span>
+      </nav>
+    </header>
+  </body>
+</html>
