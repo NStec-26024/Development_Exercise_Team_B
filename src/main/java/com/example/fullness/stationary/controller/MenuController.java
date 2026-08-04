@@ -10,6 +10,6 @@ public class MenuController {
 
     @GetMapping
     public String adminRoot() {
-        return "adminmenu";
+        return "admin/menu";
     }
 }

@@ -1,0 +1,102 @@
+/* ==========================================
+画面全体のベース設定（Flexboxレイアウト）
+========================================== */
+html,
+body {
+    height: 100%;
+    /* 画面全体の高さを100%確保 */
+    margin: 0;
+    /* 無駄な余白をリセット */
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+    background-color: #ffffff;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    /* 上から下に要素を並べる */
+}
+
+/* ==========================================
+（中央エリア）
+========================================== */
+.main-content {
+    flex: 1;
+    /* 余った縦のスペースをすべて埋めて、フッターを下に押し出す */
+    text-align: center;
+    padding: 40px 0;
+}
+
+.menu-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.menu-image {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+}
+
+/* ==========================================
+フッター（下部共通部品）のデザイン
+========================================== */
+/* ==========================================
+ヘッダー（上部共通部品）のデザイン
+========================================== */
+.site-header {
+    border-bottom: 3px solid #009944;
+    /* 緑の太線 */
+    padding: 15px 0;
+    text-align: center;
+}
+
+.site-header h1 {
+    color: #009944;
+    margin: 0 0 10px 0;
+    font-size: 24px;
+}
+
+.site-header nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.site-header nav a {
+    color: #009944;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* ログアウトボタンだけ四角枠をつける */
+.site-header nav a.logout-btn {
+    border: 1px solid #009944;
+    padding: 5px 15px;
+    border-radius: 4px;
+}
+
+.site-footer {
+    border-top: 3px solid #009944;
+    /* 緑の太線 */
+    padding: 20px 0;
+    text-align: center;
+    color: #009944;
+    font-weight: bold;
+}
+
+.header-logged-in {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.site-header nav a.login-link-btn {
+    border: 1px solid #009944;
+    padding: 5px 15px;
+    border-radius: 4px;
+    display: inline-block;
+}

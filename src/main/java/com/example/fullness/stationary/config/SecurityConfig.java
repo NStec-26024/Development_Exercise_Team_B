@@ -5,7 +5,7 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity; // 💡 追加
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,17 +20,20 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/", "/register", "/login", "/css/**", "/js/**")
+                                                // 💡 "/admin" と ログイン画面、静的ファイルは誰でも見られる
+                                                .requestMatchers("/admin", "/admin/login", "/css/**", "/js/**", "/",
+                                                                "/error")
                                                 .permitAll()
+                                                // 💡 それ以外のURL（/admin/menu など）はログイン必須にする
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
-                                                .loginPage("/login")
-                                                .loginProcessingUrl("/login")
-                                                .defaultSuccessUrl("/home", true)
+                                                .loginPage("/admin/login")
+                                                .loginProcessingUrl("/admin/login")
+                                                .defaultSuccessUrl("/admin/menu", true) // 💡 成功時はメニュー画面へ飛ばす
                                                 .permitAll())
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")
-                                                .logoutSuccessUrl("/login?logout")
+                                                .logoutSuccessUrl("/admin/login?logout")
                                                 .permitAll())
                                 .csrf(csrf -> csrf.disable());
 

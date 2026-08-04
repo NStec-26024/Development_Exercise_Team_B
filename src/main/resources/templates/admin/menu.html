@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>メニュー</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <!-- 上部ヘッダー -->
+    <div th:replace="~{common/header :: header}"></div>
+
+    <!-- メイン -->
+    <main class="main-content">
+        <img th:src="@{/images/menu-sample.png}" alt="メニュー画像" class="menu-image">
+    </main>
+
+    <!-- 下部フッター -->
+    <div th:replace="~{common/footer :: footer}"></div>
+
+</body>
+
+</html>

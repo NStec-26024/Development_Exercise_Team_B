@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!-- 💡 xmlns:sec の値を正しい定義に修正しました -->
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta charset="UTF-8">
+</head>
+
+<body>
+
+  <header th:fragment="header" class="site-header">
+    <h1>フルネス文具 管理画面</h1>
+    <nav>
+      <!-- ログイン時のみ表示 -->
+      <span sec:authorize="isAuthenticated()" class="header-logged-in">
+        <a th:href="@{/admin/item}">商品情報メンテナンス</a>
+        <a th:href="@{/admin/category}">商品カテゴリ登録</a>
+        <a th:href="@{/admin/register}">アカウント登録</a>
+        <a th:href="@{/logout}" class="logout-btn">ログアウト</a>
+      </span>
+
+      <!-- 未ログイン時のみ表示 -->
+      <span sec:authorize="isAnonymous()">
+        <a th:href="@{/admin/login}" class="logout-btn login-link-btn">ログイン</a>
+      </span>
+    </nav>
+  </header>
+
+</body>
+
+</html>
