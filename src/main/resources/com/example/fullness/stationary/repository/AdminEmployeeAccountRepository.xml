@@ -3,7 +3,7 @@
     "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-    <mapper namespace="com.example.fullness.stationary.repository.EmployeeAccountRepository">
+    <mapper namespace="com.example.fullness.stationary.repository.AdminEmployeeAccountRepository">
 
         <resultMap id="employeeAccountResult" type="EmployeeAccount">
         <id property="id" column="id" />

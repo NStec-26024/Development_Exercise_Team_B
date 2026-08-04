@@ -11,39 +11,39 @@ import com.example.fullness.stationary.repository.AdminEmployeeAccountRepository
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
 @Service
-public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountService{
+public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountService {
 
     @Autowired
     AdminEmployeeAccountRepository adminEmployeeAccountRepository;
 
-    @Autowired
-    EmployeeAccount employeeAccount;
+    // @Autowired
+    // EmployeeAccount employeeAccount;
 
     @Override
-    public void insertEmployeeAccount(EmployeeAccount employeeAccount){
+    public void insertEmployeeAccount(EmployeeAccount employeeAccount) {
         adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
     }
 
     @Override
-    public List<Employee> selectEmployeeNameWithEmployeeAccount(){
-       return adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
+    public List<Employee> selectEmployeeNameWithEmployeeAccount() {
+        return adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
     }
 
     @Override
-    public Employee selectNotHasEmployeeAccount(int id){
+    public Employee selectNotHasEmployeeAccount(int id) {
         return adminEmployeeAccountRepository.selectNotHasEmployeeAccount(id);
 
     }
-    
+
     @Override
-    public boolean selectAccountName(String accountName){
-        employeeAccount=adminEmployeeAccountRepository.selectAccountName(accountName);
-        if(employeeAccount != null){
+    public boolean selectAccountName(String accountName) {
+        EmployeeAccount employeeAccount = new EmployeeAccount();
+        employeeAccount = adminEmployeeAccountRepository.selectAccountName(accountName);
+        if (employeeAccount != null) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
-    
 
 }

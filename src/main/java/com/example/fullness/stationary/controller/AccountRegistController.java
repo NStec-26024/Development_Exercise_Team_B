@@ -31,6 +31,9 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 public class AccountRegistController {
 
     @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
     AdminEmployeeAccountService adminEmployeeAccountService;
 
     @ModelAttribute
@@ -72,7 +75,7 @@ public class AccountRegistController {
 
             return "admin/employeeAccount/EmployeeAccountInsertInput";
         } else {
-            return "redirect;admin/employeeAccount/confirm";
+            return "redirect:admin/account/getconfirm";
         }
     }
 
@@ -94,10 +97,10 @@ public class AccountRegistController {
                 form.getPassword() == null || form.getPassword().isEmpty()) {
 
             model.addAttribute("message", "入力情報が見つかりません。再度入力してください");
-            return "redirect:redirect:/admin/form";
+            return "redirect:/admin/account/form";
         }
 
-        return "admin/employeeAccount/confituhrm";
+        return "admin/employeeAccount/EmployeeAccountInsertCheck";
     }
 
     /*
@@ -114,12 +117,30 @@ public class AccountRegistController {
      * 例外処理でメッセージ設定、Javaのlogにエラーを記録
      */
     @PostMapping("/confirm")
-    public String regist(@ModelAttribute("accountRegistForm") Model model, AccountRegistFrom form,
+    public String regist(@ModelAttribute("accountRegistForm") AccountRegistFrom form, Model model,
             RedirectAttributes redirectAttributes) {
         try {
+            if (!adminEmployeeAccountService.selectAccountName(form.getName())) {
+                model.addAttribute("message", "このアカウント名は既に使用されています");
 
+                return "redirect:/admin/employeeAccount/EmployeeAccountInsertInput";
+            }
+
+            String encodePassword = passwordEncoder.encode(form.getPassword());
+
+            EmployeeAccount employeeAccount = new EmployeeAccount();
+            employeeAccount.setEmployeeId(form.getEmployeeId());
+            employeeAccount.setName(form.getName());
+            employeeAccount.setPassword(encodePassword);
+
+            adminEmployeeAccountService.insertEmployeeAccount(employeeAccount);
+
+            return "redirect:/admin/employeeAccount/complete";
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
+
+            model.addAttribute("message", "登録処理に失敗しました。管理者に連絡してください");
+            return null;
         }
     }
 
@@ -128,8 +149,12 @@ public class AccountRegistController {
      * ・セッションの破棄
      * ・メニュー画面へのリダイレクト
      */
+    @GetMapping("/cancel")
+    public String cancel(SessionStatus sessionStatus) {
+        sessionStatus.setComplete();
+        return "redirect:/menu";
+    }
 
-    @GetMapping("/")
     /*
      * セッション削除
      * 完了画面表示
