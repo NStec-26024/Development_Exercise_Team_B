@@ -3,7 +3,7 @@
 
 <head>
      <meta charset="UTF-8">
-    <title>アカウント登録(入力)</title>
+    <title>担当者アカウント登録(入力)</title>
 
     <style>
 /* リセット */
@@ -19,7 +19,7 @@ html,body { height:100%; margin:0; font-family:"Noto Sans JP", "Helvetica Neue",
 .page-title{font-size:32px;margin: 28px 0 20px;font-weight:700;}
 /* / フォームパネル（中央配置） / */
 
-.form-panel{
+.form-panel,table{
 
 width:100%;
 
@@ -65,7 +65,7 @@ margin: 12px 0;}
 
 .form-row textarea{
 
-width:220px; 
+width:200px; 
 /* / ← ここでサイズ調整 / */
 
 max-width:100%;
@@ -83,12 +83,13 @@ background:#fff;
 outline:none;
 
 flex:0 0 auto; 
+align-items: left;
 /* / flexで大きくならないようにする / */
 }
 /* / ボタンエリア / */
 .form-actions{margin-top:20px;display:flex;gap:18px;justify-content:center;align-items:center;}
 /* / キャンセルリンク / */
-.link-cancel{color:var(--green);text-decoration:none;font-weight:600;padding:8px 18px;}
+.link-cancel{color:var(--green);text-decoration:none;font-weight:600;padding:8px 0px;}
 /* / 完了ボタン（白地＋緑枠→hoverで緑塗り） */ 
 
 .btn-primary{
@@ -103,9 +104,11 @@ padding:8px 18px;
 
 border-radius:6px;
 
-font-weight:700;
+font-weight:800;
 
 cursor:pointer;
+
+font-size: 15px;
 
 }
 
@@ -152,7 +155,7 @@ color:#fff;
             <div class="form-actions">
                 <a th:href="@{/admin/account/form}" class="link-cancel" >キャンセル</a> 
                 
-                <button type="submit" name="confirm" method="post" class="btn-primary">完了</button>
+                <button type="submit" name="completeButton" method="post" class="btn-primary">完了</button>
                 </div>
                 
 
