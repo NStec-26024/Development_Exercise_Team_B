@@ -15,6 +15,10 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
 
     @Autowired
     AdminEmployeeAccountRepository adminEmployeeAccountRepository;
+
+    @Autowired
+    EmployeeAccount employeeAccount;
+
     @Override
     public void insertEmployeeAccount(EmployeeAccount employeeAccount){
         adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
@@ -30,5 +34,16 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
         return adminEmployeeAccountRepository.selectNotHasEmployeeAccount(id);
 
     }
+    
+    @Override
+    public boolean selectAccountName(String accountName){
+        employeeAccount=adminEmployeeAccountRepository.selectAccountName(accountName);
+        if(employeeAccount != null){
+            return false;
+        }else{
+            return true;
+        }
+    }
+    
 
 }

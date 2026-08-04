@@ -16,6 +16,7 @@ public interface AdminEmployeeAccountRepository {
 
     public Employee selectNotHasEmployeeAccount(int id);
 
-    
+    public EmployeeAccount selectAccountName(String accountName);
+
 
 }

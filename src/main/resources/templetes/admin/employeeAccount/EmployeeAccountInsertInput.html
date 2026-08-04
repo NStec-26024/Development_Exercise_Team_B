@@ -2,33 +2,166 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
+     <meta charset="UTF-8">
     <title>アカウント登録(入力)</title>
+
+    <style>
+/* リセット */
+
+*{ box-sizing: border-box; }
+html,body { height:100%; margin:0; font-family:"Noto Sans JP", "Helvetica Neue", Arial, sans-serif; color:#222; }
+
+/* /* カラー / */
+:root{--green: #0f8a54;--muted: #666;}
+/* / ページ全体 / */
+.container{max-width:1000px;margin: 0 auto 48px;padding: 0 20px;text-align:center;}
+/* / ページタイトル / */
+.page-title{font-size:32px;margin: 28px 0 20px;font-weight:700;}
+/* / フォームパネル（中央配置） / */
+
+.form-panel{
+
+width:100%;
+
+max-width:520px;
+
+margin: 0 auto;
+
+padding: 28px 20px;
+
+background:#fff;
+
+border-radius:6px;
+
+display:flex;
+
+flex-direction:column;
+ /* / 各行を縦に積む / */
+
+align-items:center; 
+/* / 各行自体を中央に寄せる / */
+}
+/* / 各行：ラベル＋入力の塊を中央に / */
+
+.form-row{
+
+display:flex;
+/* / 中身の幅だけになり中央に寄せやすい / */
+align-items:center;
+margin: 12px 0;}
+/* / ラベル / */
+.form-row label{
+    flex: 0 0 140px;
+    width:140px;
+    text-align:right;
+    margin-right:16px;
+    color:var(--muted);
+    font-size:16px;}
+/* / 入力欄（小さめに）/ */
+
+.form-row input,
+
+.form-row select,
+
+.form-row textarea{
+
+width:220px; 
+/* / ← ここでサイズ調整 / */
+
+max-width:100%;
+
+padding:8px 10px;
+
+font-size:14px;
+
+border:1px solid #cfcfcf;
+
+border-radius:4px;
+
+background:#fff;
+
+outline:none;
+
+flex:0 0 auto; 
+/* / flexで大きくならないようにする / */
+}
+/* / ボタンエリア / */
+.form-actions{margin-top:20px;display:flex;gap:18px;justify-content:center;align-items:center;}
+/* / キャンセルリンク / */
+.link-cancel{color:var(--green);text-decoration:none;font-weight:600;padding:8px 18px;}
+/* / 完了ボタン（白地＋緑枠→hoverで緑塗り） */ 
+
+.btn-primary{
+
+background:#fff;
+
+color:var(--green);
+
+border:2px solid var(--green);
+
+padding:8px 18px;
+
+border-radius:6px;
+
+font-weight:700;
+
+cursor:pointer;
+
+}
+
+.btn-primary:hover{
+
+background:var(--green);
+
+color:#fff;
+
+}
+</style>
 </head>
 
 <body>
-    <form th:action="@{/confirm}" method="post" th:object="${employeeAccount}">
+    <div th:replace="~{admin/common/header :: header}"></div>
+    <main class="container">
+    <h1 class="page-title">
+        アカウント登録(入力)
+    </h1>
+    
+    <form th:action="@{/admin/account/confirm}" method="post" th:object="${employeeAccount}">
+        <div class="form-row">
+   
         <label for="empNameLabel">社員名</label>
         <select id="selectEmpName" name="empName">
                     <option th:each="empName : ${empNameList}"
-                         th:text="${category.name}">
+                        th:field="*{empName}" th:text="${empName}">
                     </option>
         </select>
-        <input type="text" th:field="*{name}" placeholder="社員名">
-            </div>
-            <div>
-                <label for="accountNameLabel">アカウント名</label>
-                <input type="text" th:field="*{name}" placeholder="社員名">
-            </div>
-            <div>
-                <label for="selectCategoryId">商品カテゴリ：</label>
-                <select id="selectCategoryId" name="categoryId">
-                    <option th:each="category : ${itemCategorys}" th:selected="${category.id == itemForm.categoryId}"
-                        th:value="${category.id}" th:text="${category.name}">
-                    </option>
-                </select>
-            </div>
+        </div>
         
+        <div class="form-row">
 
+                <label for="accountNameLabel">アカウント名</label>
+                <input type="text" th:field="*{accountName}">
+        </div>
+        <div class="form-row">
+        
+                <label for="passwordLabel">パスワード</label>
+                <input type="password" th:field="*{password}">
+        </div>
+                
+      
+            <div class="form-actions">
+                <a th:href="@{/admin/account/form}" class="link-cancel" >キャンセル</a> 
+                
+                <button type="submit" name="confirm" method="post" class="btn-primary">完了</button>
+                </div>
+                
 
     </form>
+    </main>
+        <span th:each="error : ${#fields.detailedErrors()}"> 
+          <span th:text="${error.message}"></span><br/> 
+        </span>
+    </div>
+     <div th:replace="~{admin/common/footer :: footer}"></div>
 </body>
+</html>
