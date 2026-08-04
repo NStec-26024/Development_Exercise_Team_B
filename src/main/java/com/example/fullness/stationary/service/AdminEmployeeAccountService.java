@@ -13,4 +13,6 @@ public interface AdminEmployeeAccountService {
 
     public Employee selectNotHasEmployeeAccount(int id);
 
+    public boolean selectAccountName(String accountName);
+
 }
