@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
+<html xmlns:th="http://thymeleaf.org" xmlns:sec="http://thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
-    <title>メニュー</title>
+    <title>ログイン</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
@@ -14,22 +14,37 @@
 
     <!-- メイン -->
     <main class="main-content">
-        <p>ログイン画面</p>
-        <form th:action="@{/admin/login}" method="post">
+        <h2>ログイン画面</h2>
 
-            <!-- 💡 point2: ユーザー名の入力欄。name属性は必ず "username" にします -->
+        <form th:action="@{/admin/login}" th:object="${loginForm}" method="post">
+            <div th:if="${timeoutMessage != null or securityErrorMessage != null or #fields.hasErrors()}"
+                class="error-message" style="margin-bottom: 20px; font-weight: bold; font-size: 16px;">
+                <div th:if="${timeoutMessage != null}">
+                    <p th:text="${timeoutMessage}"></p>
+                </div>
+                <div th:if="${securityErrorMessage != null}">
+                    <p th:text="${securityErrorMessage}"></p>
+                </div>
+                <div th:if="${#fields.hasErrors()}">
+                    <p th:each="err : ${#fields.errors('name')}" th:text="${err}"></p>
+                    <p th:each="err : ${#fields.errors('password')}" th:text="${err}"></p>
+                </div>
+            </div>
+
+            <!-- ユーザー名の入力欄 -->
             <div>
                 <label for="username">ユーザー名：</label>
-                <input type="text" id="username" name="username" required />
+                <input type="text" id="username" th:field="*{name}" th:errorclass="is-error" />
             </div>
 
-            <!-- 💡 point3: パスワードの入力欄。name属性は必ず "password" にします -->
+            <!-- パスワードの入力欄 -->
             <div>
                 <label for="password">パスワード：</label>
-                <input type="password" id="password" name="password" required />
+                <input type="password" id="password" th:field="*{password}" th:errorclass="is-error" />
             </div>
 
-            <!-- 💡 point4: 送信ボタン -->
+
+            <!-- 送信ボタン -->
             <div>
                 <button type="submit">ログイン</button>
             </div>
