@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>メニュー</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <!-- 上部ヘッダー -->
+    <div th:replace="~{admin/common/header :: header}"></div>
+
+    <!-- メイン -->
+    <main class="main-content">
+        <p>ログイン画面</p>
+        <form th:action="@{/admin/login}" method="post">
+
+            <!-- 💡 point2: ユーザー名の入力欄。name属性は必ず "username" にします -->
+            <div>
+                <label for="username">ユーザー名：</label>
+                <input type="text" id="username" name="username" required />
+            </div>
+
+            <!-- 💡 point3: パスワードの入力欄。name属性は必ず "password" にします -->
+            <div>
+                <label for="password">パスワード：</label>
+                <input type="password" id="password" name="password" required />
+            </div>
+
+            <!-- 💡 point4: 送信ボタン -->
+            <div>
+                <button type="submit">ログイン</button>
+            </div>
+
+        </form>
+    </main>
+
+    <!-- 下部フッター -->
+    <div th:replace="~{admin/common/footer :: footer}"></div>
+
+</body>
+
+</html>

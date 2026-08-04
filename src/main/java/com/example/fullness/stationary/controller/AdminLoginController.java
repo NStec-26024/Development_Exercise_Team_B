@@ -6,10 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/admin")
-public class MenuController {
-
-    @GetMapping
-    public String adminRoot() {
-        return "admin/menu";
+public class AdminLoginController {
+    @GetMapping("/login")
+    public String adminLogin() {
+        return "admin/login";
     }
 }

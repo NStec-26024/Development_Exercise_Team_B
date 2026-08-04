@@ -5,7 +5,7 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity; // 💡 追加
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,20 +20,19 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 .authorizeHttpRequests(auth -> auth
-                                                // 💡 "/admin" と ログイン画面、静的ファイルは誰でも見られる
                                                 .requestMatchers("/admin", "/admin/login", "/css/**", "/js/**", "/",
                                                                 "/error")
                                                 .permitAll()
-                                                // 💡 それ以外のURL（/admin/menu など）はログイン必須にする
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/admin/login")
                                                 .loginProcessingUrl("/admin/login")
-                                                .defaultSuccessUrl("/admin/menu", true) // 💡 成功時はメニュー画面へ飛ばす
+                                                .defaultSuccessUrl("/admin/menu", true)
                                                 .permitAll())
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")
-                                                .logoutSuccessUrl("/admin/login?logout")
+                                                .logoutSuccessUrl("/admin/login")
                                                 .permitAll())
                                 .csrf(csrf -> csrf.disable());
 
@@ -46,9 +45,8 @@ public class SecurityConfig {
 
                 manager.setUsersByUsernameQuery(
                                 "SELECT name, password, TRUE as enabled FROM employee_account WHERE name = ?");
-
                 manager.setAuthoritiesByUsernameQuery(
-                                "SELECT name, 'ROLE_USER' as authority FROM employee_account WHERE name = ?");
+                                "SELECT name, 'ROLE_ADMIN' as authority FROM employee_account WHERE name = ?");
 
                 return manager;
         }

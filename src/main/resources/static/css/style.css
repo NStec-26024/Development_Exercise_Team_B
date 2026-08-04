@@ -60,9 +60,10 @@ body {
 
 .site-header nav {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     gap: 20px;
+    padding-right: 30px;
 }
 
 .site-header nav a {
@@ -91,7 +92,7 @@ body {
     display: flex;
     gap: 20px;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
 }
 
 .site-header nav a.login-link-btn {
