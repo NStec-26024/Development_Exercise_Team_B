@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>アカウント登録(入力)</title>
+</head>
+
+<body>
+    <form th:action="@{/confirm}" method="post" th:object="${employeeAccount}">
+        <label for="empNameLabel">社員名</label>
+        <select id="selectEmpName" name="empName">
+                    <option th:each="empName : ${empNameList}"
+                         th:text="${category.name}">
+                    </option>
+        </select>
+        <input type="text" th:field="*{name}" placeholder="社員名">
+            </div>
+            <div>
+                <label for="accountNameLabel">アカウント名</label>
+                <input type="text" th:field="*{name}" placeholder="社員名">
+            </div>
+            <div>
+                <label for="selectCategoryId">商品カテゴリ：</label>
+                <select id="selectCategoryId" name="categoryId">
+                    <option th:each="category : ${itemCategorys}" th:selected="${category.id == itemForm.categoryId}"
+                        th:value="${category.id}" th:text="${category.name}">
+                    </option>
+                </select>
+            </div>
+        
+
+
+    </form>
+</body>

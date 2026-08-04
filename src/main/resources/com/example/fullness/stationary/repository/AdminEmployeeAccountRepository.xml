@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+    "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="com.example.fullness.stationary.repository.EmployeeAccountRepository">
+
+        <resultMap id="employeeAccountResult" type="EmployeeAccount">
+        <id property="id" column="id" />
+        <result property="employeeId" column="employee_id" />
+        <result property="name" column="name" />
+        <result property="password" column="password" />
+        <association property="employee" javaType="Employee">
+            <id property="id" column="employee_id" />
+            <result property="departmentId" column="department_id" />
+            <result property="name" column="employee_name" />
+            <result property="nameKana" column="name_kana" />
+        </association>
+        </resultMap>
+        
+        <select id="selectEmployeeNameWithEmployeeAccount" resultMap="employeeAccountResult">
+            <![CDATA[
+               SELECT e.name
+               FROM
+               employee e
+               LEFT OUTER JOIN
+               employee_account a
+               ON e.id = a.employee.id
+               WHERE
+               a.id IS NULL
+            ]]>
+        </select>
+
+        <insert id="insertEmployeeAccount" parameterType="EmployeeAccount">
+        <selectKey keyProperty="id" resultType="int" order="BEFORE">
+            <![CDATA[
+                select nextval('seq_employee_account_id')
+            ]]>
+        </selectKey>
+        <![CDATA[
+            INSERT INTO employee_account (id, employee_id, name, password)VALUES(#{id}, #{employee_id},#{name},#{password})
+        ]]>
+    </insert>
+
+    <select id="selectNotHasEmployeeAccount" resultMap="employeeAccountResult">
+        <![CDATA[
+                SELECT e.name
+                FROM
+                employee e
+                LEFT OUTER JOIN
+                employee_account a
+                ON e.id = a.employee_id
+                WHERE
+                a.id IS NULL
+                AND
+                e.id = #{employeeId}
+            ]]>
+    </select>
+
+    </mapper>
