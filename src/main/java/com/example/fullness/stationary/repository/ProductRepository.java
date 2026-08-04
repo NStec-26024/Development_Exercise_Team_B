@@ -37,4 +37,6 @@ public interface ProductRepository {
 
         /** 商品情報更新（商品名・単価・カテゴリ・画像URL） */
         int update(Product product);
+
+        int deleteById(@Param("id") Integer id);
 }

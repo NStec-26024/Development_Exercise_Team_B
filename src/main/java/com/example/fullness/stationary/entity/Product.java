@@ -1,7 +1,6 @@
 package com.example.fullness.stationary.entity;
 
 import java.io.Serializable;
-import java.util.List;
 
 import lombok.Data;
 
@@ -11,11 +10,18 @@ import lombok.Data;
  */
 @Data
 public class Product implements Serializable {
-    private Integer id;
-    private String name;
-    private Integer price;
-    private Integer categoryId;
-    private String imageUrl;
+    Integer id;
+    Integer productCategoryId;
+    String name;
+    Integer price;
+    String imageUrl;
+    Integer deleteFlag;
 
     private ProductStock productStock;
+    // Join用
+    private String categoryName;
+
+    public boolean isDeleted() {
+        return deleteFlag != null && deleteFlag == 1;
+    }
 }

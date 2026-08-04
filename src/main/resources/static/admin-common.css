@@ -1,0 +1,79 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'MS PGothic', 'Hiragino Kaku Gothic ProN',
+        'Meiryo', sans-serif;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+
+/* こんてな */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    border: 2px solid #333;
+}
+
+/* ヘッダー */
+.header {
+    background: linear-gradient(to bottom, #ffffff 0%, #e8e8e8 100%);
+    padding: 15px;
+    text-align: center;
+    border-bottom: 3px solid #2d5e2d;
+}
+
+.header-title {
+    color: #2d5e2d;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.header-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    font-size: 14px;
+    flex-wrap: wrap;
+}
+
+.header-nav a {
+    color: #2d5e2d;
+    text-decoration: underline;
+}
+
+.header-nav a:hover {
+    color: #1a3a1a;
+}
+
+.loggout-link {
+    color: #000 !important;
+    border: 1px solid #000;
+    padding: 2px 8px;
+    text-decoration: none !important;
+}
+
+.loggout-link:hover {
+    background-color: #f0f0f0;
+}
+
+/* メインコンテンツ
+ */
+.main-content {
+    padding: 30px;
+    background-color: #f5f5f5;
+    min-height: 500px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #333;
+    font-weight: bold;
+}
