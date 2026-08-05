@@ -49,35 +49,41 @@ public class AccountRegistController {
             model.addAttribute("accountRegistForm", new AccountRegistForm());
         }
 
-        try {
-            List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+        // try {
+        List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
 
-            if (empNameList.isEmpty()) {
-                model.addAttribute("infoMessage", "アカウント登録可能な社員が存在しません");
-            } else {
-                model.addAttribute("empName", empNameList);
-            }
-        } catch (Exception e) {
-            model.addAttribute("errMessage", "社員情報の取得に失敗しました");
+        if (empNameList.isEmpty()) {
+            model.addAttribute("infoMessage", "アカウント登録可能な社員が存在しません");
+        } else {
+            model.addAttribute("empName", empNameList);
         }
+        // } catch (Exception e) {
+        // model.addAttribute("errMessage", "社員情報の取得に失敗しました");
+        // }
         return "admin/employeeAccount/EmployeeAccountInsertInput";
     }
 
+    // 「 社員情報の取得に失敗しました」はエラー画面での表示だと思うので多分消す(exeptionHandlerがやってくれる)
     @PostMapping("/postconfirm")
     public String checkInput(
             @Validated @ModelAttribute("accountRegistForm") AccountRegistForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
-            try {
-                List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
-                model.addAttribute("empName", empNameList);
 
-            } catch (Exception e) {
-                model.addAttribute("errMessage", "社員情報の取得に失敗しました");
-            }
+            // try {
+            // List<String> empNameList =
+            // adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+            // model.addAttribute("empName", empNameList);
+
+            // } catch (Exception e) {
+            // model.addAttribute("errMessage", "社員情報の取得に失敗しました");
+            // }
+
+            // エラーがあったらインプット画面に飛ぶだけでOKみたいです
 
             return "admin/employeeAccount/EmployeeAccountInsertInput";
         } else {
-            return "redirect:/admin/account/getconfirm";
+            // model.addAtributeする必要があるかわからないです
+            return "redirect:/admin/account/confirm";
         }
     }
 
@@ -88,7 +94,8 @@ public class AccountRegistController {
      */
 
     @GetMapping("/confirm")
-    public String confirm(Model model, @ModelAttribute("accountRegistForm") AccountRegistForm form) {
+    public String confirm(Model model, @ModelAttribute("accountRegistForm") AccountRegistForm form,
+            RedirectAttributes redirectAttributes) {
         /*
          * null:データそのものがない
          * isEmpty:文字数０文字の空っぽ(String)
@@ -98,7 +105,7 @@ public class AccountRegistController {
                 form.getName() == null || form.getName().isEmpty() ||
                 form.getPassword() == null || form.getPassword().isEmpty()) {
 
-            model.addAttribute("message", "入力情報が見つかりません。再度入力してください");
+            redirectAttributes.addFlashAttribute("infoMessage", "入力情報が見つかりません。再度入力してください");
             return "redirect:/admin/account/form";
         }
 
@@ -118,35 +125,38 @@ public class AccountRegistController {
      * ・登録失敗/DB登録エラー
      * 例外処理でメッセージ設定、Javaのlogにエラーを記録
      */
+
+    // 登録処理失敗はたぶん消す(ExeptionHandlerがやってくれる)
     @PostMapping("/postcomplete")
     public String regist(@ModelAttribute("accountRegistForm") AccountRegistForm form, Model model,
             RedirectAttributes redirectAttributes) {
-        try {
-            if (!adminEmployeeAccountService.selectAccountName(form.getName())) {
-                model.addAttribute("message", "このアカウント名は既に使用されています");
+        // try {
+        if (!adminEmployeeAccountService.selectAccountName(form.getName())) {
+            redirectAttributes.addFlashAttribute("infoMessage", "このアカウント名は既に使用されています");
 
-                return "redirect:/admin/account/form";
-            }
-
-            String encodePassword = passwordEncoder.encode(form.getPassword());
-
-            // EmployeeAccount employeeAccount = new EmployeeAccount();
-            // employeeAccount.setEmployeeId(form.getEmployeeId());
-            // employeeAccount.setName(form.getName());
-            // employeeAccount.setPassword(encodePassword);
-
-            int accountId = adminEmployeeAccountService
-                    .insertEmployeeAccount(formToEntity.formToEntity(form, encodePassword));
-            String name = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccountId(accountId);
-            redirectAttributes.addFlashAttribute("empName", name);
-
-            return "redirect:/admin/account/complete";
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            model.addAttribute("message", "登録処理に失敗しました。管理者に連絡してください");
-            return null;
+            return "redirect:/admin/account/form";
         }
+
+        String encodePassword = passwordEncoder.encode(form.getPassword());
+
+        // EmployeeAccount employeeAccount = new EmployeeAccount();
+        // employeeAccount.setEmployeeId(form.getEmployeeId());
+        // employeeAccount.setName(form.getName());
+        // employeeAccount.setPassword(encodePassword);
+
+        // helperに移行しました（FormToEntity)
+        int accountId = adminEmployeeAccountService
+                .insertEmployeeAccount(formToEntity.formToEntity(form, encodePassword));
+        String name = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccountId(accountId);
+        redirectAttributes.addFlashAttribute("empName", name);
+
+        return "redirect:/admin/account/complete";
+        // } catch (Exception e) {
+        // e.printStackTrace();
+
+        // model.addAttribute("message", "登録処理に失敗しました。管理者に連絡してください");
+        // return null;
+        // }
     }
 
     /*
@@ -165,9 +175,15 @@ public class AccountRegistController {
      * 完了画面表示
      */
     @GetMapping("/complete")
-    public String complete(SessionStatus sessionStatus, Model model) {
+    public String complete(SessionStatus sessionStatus, Model model, RedirectAttributes redirectAttributes) {
+        // if (redirectAttributes.getAttribute())) {
+
+        // model.addAttribute("infoMessage", "不正なアクセスです");
+        // return "redirect:/admin/account/form";
+        // }
+
         sessionStatus.setComplete();
-        return "admin/employeeAccount/complete";
+        return "admin/employeeAccount/EmployeeAccountComplete";
     }
 
 }

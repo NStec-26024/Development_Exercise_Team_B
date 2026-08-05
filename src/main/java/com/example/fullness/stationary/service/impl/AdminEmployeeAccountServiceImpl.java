@@ -1,13 +1,12 @@
 package com.example.fullness.stationary.service.impl;
 
-import java.sql.SQLException;
 import java.util.List;
 
+import org.codehaus.groovy.tools.shell.util.MessageSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.fullness.stationary.entity.Employee;
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.repository.AdminEmployeeAccountRepository;
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
@@ -19,18 +18,17 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
     @Autowired
     AdminEmployeeAccountRepository adminEmployeeAccountRepository;
 
+    @Autowired
+    MessageSource messageSource;
+
     // @Autowired
     // EmployeeAccount employeeAccount;
 
     @Override
-    public int insertEmployeeAccount(EmployeeAccount employeeAccount) throws BusinessException {
-        try {
-            int id = adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
-            return id;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new BusinessException(msg);
-        }
+    public int insertEmployeeAccount(EmployeeAccount employeeAccount) {
+        int id = adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
+        return id;
+
     }
 
     @Override
