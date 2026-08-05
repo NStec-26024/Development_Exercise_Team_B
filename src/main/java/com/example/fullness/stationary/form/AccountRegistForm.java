@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class AccountRegistFrom implements Serializable {
+public class AccountRegistForm implements Serializable {
 
     private Integer id;
 

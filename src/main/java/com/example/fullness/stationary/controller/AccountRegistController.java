@@ -20,9 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.example.fullness.stationary.entity.Employee;
-import com.example.fullness.stationary.entity.EmployeeAccount;
-import com.example.fullness.stationary.form.AccountRegistFrom;
+import com.example.fullness.stationary.form.AccountRegistForm;
+import com.example.fullness.stationary.helper.FormToEntity;
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
 @Controller
@@ -36,24 +35,27 @@ public class AccountRegistController {
     @Autowired
     AdminEmployeeAccountService adminEmployeeAccountService;
 
+    @Autowired
+    FormToEntity formToEntity;
+
     @ModelAttribute
-    public AccountRegistFrom setUpFrom() {
-        return new AccountRegistFrom();
+    public AccountRegistForm setUpForm() {
+        return new AccountRegistForm();
     }
 
     @GetMapping("/form")
     public String showInput(Model model) {
         if (!model.containsAttribute("accountRegistForm")) {
-            model.addAttribute("accountRegistForm", new AccountRegistFrom());
+            model.addAttribute("accountRegistForm", new AccountRegistForm());
         }
 
         try {
-            List<Employee> employee = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+            List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
 
-            if (employee.isEmpty()) {
+            if (empNameList.isEmpty()) {
                 model.addAttribute("infoMessage", "アカウント登録可能な社員が存在しません");
             } else {
-                model.addAttribute("employee", employee);
+                model.addAttribute("empName", empNameList);
             }
         } catch (Exception e) {
             model.addAttribute("errMessage", "社員情報の取得に失敗しました");
@@ -63,11 +65,11 @@ public class AccountRegistController {
 
     @PostMapping("/postconfirm")
     public String checkInput(
-            @Validated @ModelAttribute("accountRegistForm") AccountRegistFrom form, BindingResult result, Model model) {
+            @Validated @ModelAttribute("accountRegistForm") AccountRegistForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
             try {
-                List<Employee> employee = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
-                model.addAttribute("employee", employee);
+                List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+                model.addAttribute("empName", empNameList);
 
             } catch (Exception e) {
                 model.addAttribute("errMessage", "社員情報の取得に失敗しました");
@@ -85,8 +87,8 @@ public class AccountRegistController {
      * 中身あるなら確認画面表示
      */
 
-    @GetMapping("/getconfirm")
-    public String confirm(Model model, @ModelAttribute("accountRegistForm") AccountRegistFrom form) {
+    @GetMapping("/confirm")
+    public String confirm(Model model, @ModelAttribute("accountRegistForm") AccountRegistForm form) {
         /*
          * null:データそのものがない
          * isEmpty:文字数０文字の空っぽ(String)
@@ -116,26 +118,29 @@ public class AccountRegistController {
      * ・登録失敗/DB登録エラー
      * 例外処理でメッセージ設定、Javaのlogにエラーを記録
      */
-    @PostMapping("/confirm")
-    public String regist(@ModelAttribute("accountRegistForm") AccountRegistFrom form, Model model,
+    @PostMapping("/postcomplete")
+    public String regist(@ModelAttribute("accountRegistForm") AccountRegistForm form, Model model,
             RedirectAttributes redirectAttributes) {
         try {
             if (!adminEmployeeAccountService.selectAccountName(form.getName())) {
                 model.addAttribute("message", "このアカウント名は既に使用されています");
 
-                return "redirect:/admin/employeeAccount/EmployeeAccountInsertInput";
+                return "redirect:/admin/account/form";
             }
 
             String encodePassword = passwordEncoder.encode(form.getPassword());
 
-            EmployeeAccount employeeAccount = new EmployeeAccount();
-            employeeAccount.setEmployeeId(form.getEmployeeId());
-            employeeAccount.setName(form.getName());
-            employeeAccount.setPassword(encodePassword);
+            // EmployeeAccount employeeAccount = new EmployeeAccount();
+            // employeeAccount.setEmployeeId(form.getEmployeeId());
+            // employeeAccount.setName(form.getName());
+            // employeeAccount.setPassword(encodePassword);
 
-            adminEmployeeAccountService.insertEmployeeAccount(employeeAccount);
+            int accountId = adminEmployeeAccountService
+                    .insertEmployeeAccount(formToEntity.formToEntity(form, encodePassword));
+            String name = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccountId(accountId);
+            redirectAttributes.addFlashAttribute("empName", name);
 
-            return "redirect:/admin/employeeAccount/complete";
+            return "redirect:/admin/account/complete";
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -152,7 +157,7 @@ public class AccountRegistController {
     @GetMapping("/cancel")
     public String cancel(SessionStatus sessionStatus) {
         sessionStatus.setComplete();
-        return "redirect:/menu";
+        return "redirect:/admin";
     }
 
     /*
@@ -160,7 +165,7 @@ public class AccountRegistController {
      * 完了画面表示
      */
     @GetMapping("/complete")
-    public String complete(SessionStatus sessionStatus) {
+    public String complete(SessionStatus sessionStatus, Model model) {
         sessionStatus.setComplete();
         return "admin/employeeAccount/complete";
     }

@@ -38,7 +38,10 @@
             ]]>
         </selectKey>
         <![CDATA[
-            INSERT INTO employee_account (id, employee_id, name, password)VALUES(#{id}, #{employee_id},#{name},#{password})
+            INSERT INTO 
+            employee_account (id, employee_id, name, password)
+            VALUES(#{id}, #{employee_id},#{name},#{password})
+            RETURNING id
         ]]>
     </insert>
 
@@ -64,6 +67,17 @@
                 WHERE name=#{name}
             ]]>
     </select>
+
+    <select id="selectEmployeeNameWithEmployeeAccountId" resultMap="employeeAccountResult">
+        <![CDATA[
+                SELECT e.name
+                FROM employee e
+                JOIN employee_account a
+                ON e.id=a.employee_id
+                WHERE a.id=#{id}
+            ]]>
+    </select>
+
 
 
 

@@ -1,9 +1,11 @@
 package com.example.fullness.stationary.service.impl;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.Employee;
 import com.example.fullness.stationary.entity.EmployeeAccount;
@@ -11,6 +13,7 @@ import com.example.fullness.stationary.repository.AdminEmployeeAccountRepository
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
 @Service
+@Transactional
 public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountService {
 
     @Autowired
@@ -20,17 +23,23 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
     // EmployeeAccount employeeAccount;
 
     @Override
-    public void insertEmployeeAccount(EmployeeAccount employeeAccount) {
-        adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
+    public int insertEmployeeAccount(EmployeeAccount employeeAccount) throws BusinessException {
+        try {
+            int id = adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
+            return id;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new BusinessException(msg);
+        }
     }
 
     @Override
-    public List<Employee> selectEmployeeNameWithEmployeeAccount() {
+    public List<String> selectEmployeeNameWithEmployeeAccount() {
         return adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
     }
 
     @Override
-    public Employee selectNotHasEmployeeAccount(int id) {
+    public String selectNotHasEmployeeAccount(int id) {
         return adminEmployeeAccountRepository.selectNotHasEmployeeAccount(id);
 
     }
@@ -44,6 +53,13 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
         } else {
             return true;
         }
+
+    }
+
+    @Override
+    public String selectEmployeeNameWithEmployeeAccountId(int id) {
+        String name = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(id);
+        return name;
     }
 
 }
