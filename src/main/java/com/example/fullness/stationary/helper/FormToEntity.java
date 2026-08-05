@@ -1,8 +1,11 @@
 package com.example.fullness.stationary.helper;
 
+import org.springframework.stereotype.Component;
+
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.form.AccountRegistForm;
 
+@Component
 public class FormToEntity {
 
     public EmployeeAccount formToEntity(AccountRegistForm form, String encodePassword) {

@@ -70,9 +70,8 @@ public class AccountRegistController {
         if (result.hasErrors()) {
 
             // try {
-            // List<String> empNameList =
-            // adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
-            // model.addAttribute("empName", empNameList);
+            List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+            model.addAttribute("empName", empNameList);
 
             // } catch (Exception e) {
             // model.addAttribute("errMessage", "社員情報の取得に失敗しました");
@@ -80,6 +79,7 @@ public class AccountRegistController {
 
             // エラーがあったらインプット画面に飛ぶだけでOKみたいです
 
+            model.addAttribute("accountRegistForm", form);
             return "admin/employeeAccount/EmployeeAccountInsertInput";
         } else {
             // model.addAtributeする必要があるかわからないです

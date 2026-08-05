@@ -1,8 +1,6 @@
 package com.example.fullness.stationary.service.impl;
 
 import java.util.List;
-
-import org.codehaus.groovy.tools.shell.util.MessageSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +14,7 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountService {
 
     @Autowired
-    AdminEmployeeAccountRepository adminEmployeeAccountRepository;
-
-    @Autowired
-    MessageSource messageSource;
+    AdminEmployeeAccountRepository adminEmployeeAccountRepository;;
 
     // @Autowired
     // EmployeeAccount employeeAccount;
