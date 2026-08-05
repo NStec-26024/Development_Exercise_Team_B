@@ -32,7 +32,7 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
     }
 
     @Override
-    public String selectNotHasEmployeeAccount(int id) {
+    public EmployeeAccount selectNotHasEmployeeAccount(int id) {
         return adminEmployeeAccountRepository.selectNotHasEmployeeAccount(id);
 
     }
@@ -50,9 +50,9 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
     }
 
     @Override
-    public String selectEmployeeNameWithEmployeeAccountId(int id) {
-        String name = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(id);
-        return name;
+    public EmployeeAccount selectEmployeeNameWithEmployeeAccountId(int id) {
+        return adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(id);
+
     }
 
 }

@@ -173,28 +173,28 @@
             <table>
                 <tr>
                     <td>社員名</td>
-                    <td><span th:text="*{employeeId}"></span></td>
+                    <td><span th:text="${employeeName}"></span></td>
                 </tr>
                 <tr>
                     <td>アカウント名</td>
-                    <td><span th:text="*{accountName}"></span></td>
+                    <td><span th:text="*{name}"></span></td>
                 </tr>
                 <tr>
                     <td>パスワード</td>
-                    <td><span th:text="${#strings.repeat('*', employeeAccount.password.length())}">**********</span>
+                    <td><span th:text="${#strings.repeat('*', __*{password.length()}__)}">**********</span>
                     </td>
                 </tr>
             </table>
 
-            <input type="hidden" th:field="*{empName}">
-            <input type="hidden" th:field="*{accountName}">
+            <input type="hidden" th:field="*{employeeId}">
+            <input type="hidden" th:field="*{name}">
             <input type="hidden" th:field="*{password}">
 
 
             <div class="form-actions">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <a th:href="@{/admin/account/form}" class="link-cancel">キャンセル</a>
-                <button th:formaction="@{/admin/account/form}" type="submit" name="backButton" method="get"
+                <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+                <a th:href="@{/admin}" class="link-cancel">キャンセル</a>
+                <button th:formaction="@{/admin/account/form}" th:formmethod="get" type="submit" name="backButton"
                     class="btn-primary">戻る</button>
                 <button type="submit" name="registerButton" class="btn-primary">登録</button>
             </div>

@@ -10,10 +10,10 @@ public interface AdminEmployeeAccountService {
 
     public List<EmployeeAccount> selectEmployeeNameWithEmployeeAccount();
 
-    public String selectNotHasEmployeeAccount(int id);
+    public EmployeeAccount selectNotHasEmployeeAccount(int id);
 
     public boolean selectAccountName(String accountName);
 
-    public String selectEmployeeNameWithEmployeeAccountId(int id);
+    public EmployeeAccount selectEmployeeNameWithEmployeeAccountId(int id);
 
 }

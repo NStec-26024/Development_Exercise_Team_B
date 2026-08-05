@@ -46,12 +46,10 @@ public class AccountRegistController {
 
     @GetMapping("/form")
     public String showInput(Model model) {
-        if (!model.containsAttribute("accountRegistForm")) {
-            model.addAttribute("accountRegistForm", new AccountRegistForm());
-        }
-
-        // try {
         List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+        // if (!model.containsAttribute("accountRegistForm")) {
+        // model.addAttribute("accountRegistForm", new AccountRegistForm());
+        // }
 
         if (empNameList.isEmpty()) {
             model.addAttribute("infoMessage", "アカウント登録可能な社員が存在しません");
@@ -79,14 +77,18 @@ public class AccountRegistController {
             // model.addAttribute("errMessage", "社員情報の取得に失敗しました");
             // }
 
-            // エラーがあったらインプット画面に飛ぶだけでOKみたいです
-
-            model.addAttribute("accountRegistForm", accountRegistForm);
-            return "admin/employeeAccount/EmployeeAccountInsertInput";
+            redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
+            redirectAttributes.addFlashAttribute(
+                    BindingResult.MODEL_KEY_PREFIX + "accountRegistForm", result);
+            return "redirect:form";
         } else {
             // 追加
+
             redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
-            // model.addAtributeする必要があるかわからないです
+            EmployeeAccount employeeAccount = adminEmployeeAccountService
+                    .selectNotHasEmployeeAccount(accountRegistForm.getEmployeeId());
+            redirectAttributes.addFlashAttribute("employeeName", employeeAccount.getName());
+
             return "redirect:/admin/account/confirm";
         }
     }
@@ -112,10 +114,6 @@ public class AccountRegistController {
             redirectAttributes.addFlashAttribute("infoMessage", "入力情報が見つかりません。再度入力してください");
             return "redirect:/admin/account/form";
         }
-
-        // 追加
-        List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
-        model.addAttribute("empName", empNameList);
 
         return "admin/employeeAccount/EmployeeAccountInsertCheck";
     }
@@ -155,8 +153,9 @@ public class AccountRegistController {
         // helperに移行しました（FormToEntity)
         int accountId = adminEmployeeAccountService
                 .insertEmployeeAccount(formToEntity.formToEntity(form, encodePassword));
-        String name = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccountId(accountId);
-        redirectAttributes.addFlashAttribute("empName", name);
+        EmployeeAccount employeeAccount = adminEmployeeAccountService
+                .selectEmployeeNameWithEmployeeAccountId(accountId);
+        redirectAttributes.addFlashAttribute("empName", employeeAccount);
 
         return "redirect:/admin/account/complete";
         // } catch (Exception e) {
