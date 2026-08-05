@@ -1,16 +1,11 @@
 create table department(
-  id integer,
+  id serial,
   name VARCHAR(100),
   primary key (id)
 );
 
-create sequence seq_department_id
-    start with 101
-    increment by  1
-    maxvalue 2147483647;
-
 create table employee(
-  id integer,
+  id serial,
   department_id integer,
   name VARCHAR(100),
   name_kana VARCHAR(100),
@@ -18,40 +13,23 @@ create table employee(
   FOREIGN key (department_id) REFERENCES department(id)
 );
 
-create sequence seq_employee_id
-    start with 1001
-    increment by  1
-    maxvalue 2147483647;
-
 create table employee_account(
-    id integer,
+    id serial,
     employee_id integer,
     name VARCHAR(20),
-    password VARCHAR(200),
+    password VARCHAR(255),
     primary key (id) ,
     FOREIGN key (employee_id) REFERENCES employee(id)
 );
 
-create sequence seq_employee_account_id
-    start with 1
-    increment by 1
-    maxvalue 2147483647;
-
-
 create table product_category(
-    id integer,
-    name VARCHAR(20),
+    id serial,
+    name VARCHAR(30),
     primary key (id)
 );
 
-
--- create sequence seq_product_category_id
---     start with 1
---     increment by 1
---     as integer;
-
 create table product(
-    id integer,
+    id serial,
     product_category_id integer,
     name VARCHAR(20),
     price integer,
@@ -61,38 +39,22 @@ create table product(
     FOREIGN key (product_category_id) REFERENCES product_category(id)
 );
 
-create sequence seq_product_id
-    start with 1
-    increment by 1
-    maxvalue 2147483647;
-
 create table product_stock(
-    id integer,
+    id serial,
     product_id integer,
     quantity integer,
     primary key (id),
     FOREIGN key (product_id) REFERENCES product(id)
 );
 
-create sequence seq_product_stock_id
-    start with 1
-    increment by 1
-    maxvalue 2147483647;
-
 CREATE TABLE order_status (
-  id integer,
+  id serial,
   name VARCHAR(100),
   primary key (id)
 );
 
-create sequence seq_order_status_id
-    start with 1
-    increment by 1
-    maxvalue 2147483647;
-
-
 CREATE TABLE customer (
-  id integer,
+  id serial,
   name VARCHAR(20),
   name_kana VARCHAR(20),
   address1 VARCHAR(100),
@@ -100,29 +62,19 @@ CREATE TABLE customer (
   phone_number VARCHAR(20),
   mail_address  VARCHAR(200),
   username VARCHAR(30),
-  password VARCHAR(200),
+  password VARCHAR(255),
   register_date TIMESTAMP,
   primary key (id)
 );
 
-create sequence seq_customer_id
-    start with 1
-    increment by 1
-    maxvalue 2147483647;
-
 CREATE TABLE payment_method (
-  id integer,
+  id serial,
   name VARCHAR(100),
   primary key (id)
 );
 
-create sequence seq_payment_method_id
-    start with 1
-    increment by 1
-    maxvalue 2147483647;
-
 CREATE TABLE orders (
-  id integer,
+  id serial,
   customer_id integer,
   order_status_id integer,
   payment_method_id integer,
@@ -134,27 +86,17 @@ CREATE TABLE orders (
   FOREIGN KEY (payment_method_id) REFERENCES payment_method(id)
 );
 
-create sequence seq_orders_id
-    start with 1
-    increment by 1
-    maxvalue 2147483647;
-
 CREATE TABLE order_detail (
-  id integer,
+  id serial,
   order_id integer,
   product_id integer,
   customer_id integer,
+  unit_price integer,
   count integer,
   primary key (id),
   FOREIGN KEY (order_id) REFERENCES orders(id),
   FOREIGN KEY (product_id) REFERENCES product(id),
   FOREIGN KEY (customer_id) REFERENCES customer(id)
 );
-
-create sequence seq_order_detail
-    start with 1
-    increment by 1
-    maxvalue 2147483647;
-
 
 

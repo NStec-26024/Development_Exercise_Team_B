@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 /**
- * * システム内の例外発生を検知し、エラーログを一元記録するアスペクトクラス。
+ * システム内の例外発生を検知し、エラーログを一元記録するアスペクトクラス。
  * 
  */
 @Slf4j
