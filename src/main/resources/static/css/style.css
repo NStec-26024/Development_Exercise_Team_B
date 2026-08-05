@@ -120,3 +120,59 @@ body {
     border: 1px solid #dc3545 !important;
     background-color: #fff8f8;
 }
+
+/* =========================================================================
+   管理画面専用 システムエラー用スタイル
+   ========================================================================= */
+
+.system-error-container {
+    max-width: 800px;
+    margin: 80px auto;
+    padding: 0 20px;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+}
+
+.system-error-title {
+    font-size: 32px;
+    color: #333333;
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+}
+
+.system-error-box {
+    background-color: #f8d7da;
+    /* 薄いピンク背景 */
+    color: #721c24;
+    /* 濃い赤色の文字 */
+    padding: 30px 40px;
+    border-radius: 4px;
+    margin-bottom: 30px;
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.system-error-box p {
+    margin: 0;
+}
+
+/* リンクエリアの配置 */
+.system-error-link-area {
+    text-align: left;
+    padding-left: 5px;
+}
+
+/* 「» メニュー画面に戻る」の緑色リンク */
+.system-error-back-link {
+    color: #28a745;
+    /* ヘッダーの文字色に合わせた緑色 */
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.system-error-back-link:hover {
+    text-decoration: underline;
+    /* マウスホバー時に下線を表示 */
+}

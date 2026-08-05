@@ -1,10 +1,12 @@
 package com.example.fullness.stationary.config;
 
+import java.io.IOException;
+
 import javax.sql.DataSource;
 
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,8 +14,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.fullness.stationary.security.CustomAuthenticationFailureHandler;
+import com.example.fullness.stationary.security.SessionLockFilter;
 import com.example.fullness.stationary.service.LoginAttemptService;
 
 @Configuration
@@ -27,78 +31,92 @@ public class SecurityConfig {
         }
 
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                        CustomAuthenticationFailureHandler failureHandler) throws Exception {
-                http
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/admin", "/admin/login", "/css/**", "/js/**", "/",
-                                                                "/images/**",
-                                                                "/error")
-                                                .permitAll()
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                                .anyRequest().authenticated())
-                                .formLogin(form -> form
-                                                .loginPage("/admin/login")
-                                                .loginProcessingUrl("/admin/login-auth")
-                                                .usernameParameter("name")
-                                                .passwordParameter("password")
-                                                .successHandler((request, response, authentication) -> {
-                                                        request.changeSessionId();
-                                                        String username = authentication.getName();
-                                                        loginAttemptService.loginSucceeded(username);
-                                                        response.sendRedirect("/admin");
-                                                })
-                                                .failureHandler(failureHandler)
-                                                .permitAll())
-                                // ★修正①：ログアウト成功時にリダイレクトではなく、コントローラーへ「フォワード」する
-                                .logout(logout -> logout
-                                                .logoutUrl("/logout")
-                                                .logoutSuccessHandler((request, response, authentication) -> {
-                                                        // 新しい空のセッションを作成してメッセージを入れる
-                                                        request.getSession(true).setAttribute("logoutFlag", true);
-                                                        request.getRequestDispatcher("/admin/login").forward(request,
-                                                                        response);
-                                                })
-                                                .invalidateHttpSession(true)
-                                                .deleteCookies("JSESSIONID")
-                                                .permitAll())
-                                .csrf(csrf -> csrf.disable())
-                                // ★修正②：セッション切れの際もURLを変えず、ハンドラーを使って「フォワード」する
-                                .sessionManagement(session -> session
-                                                .invalidSessionStrategy((request, response) -> {
-                                                        request.getSession(true).setAttribute("timeoutFlag", true);
-                                                        request.getRequestDispatcher("/admin/login").forward(request,
-                                                                        response);
-                                                })
-                                                .sessionConcurrency(concurrency -> concurrency
-                                                                .maximumSessions(1)
-                                                                .maxSessionsPreventsLogin(false)
-                                                                .expiredSessionStrategy(event -> {
-                                                                        event.getRequest().getSession(true)
-                                                                                        .setAttribute("timeoutFlag",
-                                                                                                        true);
-                                                                        event.getRequest()
-                                                                                        .getRequestDispatcher(
-                                                                                                        "/admin/login")
-                                                                                        .forward(event.getRequest(),
-                                                                                                        event.getResponse());
-                                                                })));
+        public SecurityFilterChain securityFilterChain(
+                        HttpSecurity http,
+                        CustomAuthenticationFailureHandler failureHandler,
+                        MessageSource messageSource) throws Exception {
+
+                // 認可設定
+                http.authorizeHttpRequests(auth -> auth
+                                .requestMatchers(
+                                                "/admin",
+                                                "/admin/login",
+                                                "/admin/login-auth",
+                                                "/admin/error",
+                                                "/css/**",
+                                                "/js/**",
+                                                "/",
+                                                "/images/**")
+                                .permitAll()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .anyRequest().authenticated());
+
+                // ロック判定フィルターを認証前に追加
+                http.addFilterBefore(
+                                new SessionLockFilter(loginAttemptService, messageSource),
+                                UsernamePasswordAuthenticationFilter.class);
+
+                // ログイン設定
+                http.formLogin(form -> form
+                                .loginPage("/admin/login")
+                                .loginProcessingUrl("/admin/login-auth")
+                                .usernameParameter("name")
+                                .passwordParameter("password")
+                                .successHandler((request, response, authentication) -> {
+                                        loginAttemptService.loginSucceeded(authentication.getName());
+                                        request.changeSessionId();
+                                        response.sendRedirect("/admin");
+                                })
+                                .failureHandler(failureHandler)
+                                .permitAll());
+
+                // ログアウト設定
+                http.logout(logout -> logout
+                                .logoutUrl("/logout")
+                                .logoutSuccessHandler((request, response, authentication) -> {
+                                        response.sendRedirect("/admin");
+                                })
+                                .invalidateHttpSession(true)
+                                .deleteCookies("JSESSIONID")
+                                .permitAll());
+
+                // セッション管理
+                http.sessionManagement(session -> session
+                                .invalidSessionStrategy((request, response) -> {
+                                        String path = request.getServletPath();
+                                        if (!path.startsWith("/admin/login")) {
+                                                request.getSession(true).setAttribute("timeoutFlag", true);
+                                        }
+
+                                        response.sendRedirect("/admin/login");
+                                })
+                                .sessionConcurrency(concurrency -> concurrency
+                                                .maximumSessions(1)
+                                                .maxSessionsPreventsLogin(false)
+                                                .expiredSessionStrategy(event -> {
+                                                        String path = event.getRequest().getServletPath();
+
+                                                        if (!path.startsWith("/admin/login")) {
+                                                                event.getRequest().getSession(true)
+                                                                                .setAttribute("timeoutFlag", true);
+                                                        }
+
+                                                        try {
+                                                                event.getResponse().sendRedirect("/admin/login");
+                                                        } catch (IOException e) {
+                                                                throw new RuntimeException(e);
+                                                        }
+                                                })));
+
+                // CSRF 無効化
+                http.csrf(csrf -> csrf.disable());
 
                 return http.build();
         }
 
         @Bean
         public UserDetailsService userDetailsService(DataSource dataSource) {
-                JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource) {
-                        @Override
-                        public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(
-                                        String username) {
-                                if (loginAttemptService.isBlocked(username)) {
-                                        throw new LockedException("Account is locked");
-                                }
-                                return super.loadUserByUsername(username);
-                        }
-                };
+                JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
 
                 manager.setUsersByUsernameQuery(
                                 "SELECT name, password, TRUE as enabled FROM employee_account WHERE name = ?");

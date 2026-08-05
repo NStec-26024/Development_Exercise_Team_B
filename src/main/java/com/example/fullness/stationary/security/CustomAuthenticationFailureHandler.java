@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
 import com.example.fullness.stationary.service.LoginAttemptService;
 import org.springframework.context.MessageSource;
@@ -15,6 +16,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
+/**
+ * ログイン認証失敗時の処理をカスタムするハンドラー。
+ * ログイン失敗回数の記録、ロック判定、エラーメッセージの設定を行う。
+ */
+@Slf4j
 @Component
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
@@ -24,48 +30,50 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
     public CustomAuthenticationFailureHandler(MessageSource messageSource, LoginAttemptService loginAttemptService) {
         this.messageSource = messageSource;
         this.loginAttemptService = loginAttemptService;
-        // ログイン画面へ遷移するように設定
         setDefaultFailureUrl("/admin/login");
     }
 
+    /**
+     * 認証失敗時にロック判定・失敗回数加算・メッセージ設定を行い、
+     * 必要に応じて LockedException を発生させる。
+     */
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException exception) throws IOException, ServletException {
 
-        String username = request.getParameter("name");
+        HttpSession session = request.getSession(true);
+        String accountName = request.getParameter("name");
         AuthenticationException targetException = exception;
 
-        if (username != null) {
-            if (loginAttemptService.isBlocked(username)) {
-                // すでにロック状態のユーザーがアクセスしてきた場合
-                targetException = new LockedException("Account is locked");
-            } else {
-                // 通常のパスワードミスなどの場合、カウントを進める
-                loginAttemptService.loginFailed(username);
+        if (accountName != null && !accountName.isBlank() && loginAttemptService.isBlocked(accountName)) {
+            targetException = new LockedException("Account is locked due to multiple failed attempts");
+            log.warn("[AUDIT] ロック中ログイン試行: account={}, sessionId={}", accountName, session.getId());
+        } else {
+            loginAttemptService.loginFailed(accountName);
 
-                // 今回のミスで5回目に達した場合、例外を LockedException に差し替える
-                if (loginAttemptService.isBlocked(username)) {
-                    targetException = new LockedException("Account is locked");
-                }
+            if (accountName != null && !accountName.isBlank() && loginAttemptService.isBlocked(accountName)) {
+                targetException = new LockedException("Account is locked due to multiple failed attempts");
+                log.warn("[AUDIT] アカウントロック発生: account={}, sessionId={}", accountName, session.getId());
+            } else {
+                log.warn("[AUDIT] ログイン失敗: account={}, sessionId={}", accountName, session.getId());
             }
         }
 
-        HttpSession session = request.getSession();
         if (session.getAttribute("loginErrorMessage") == null) {
+            String rawName = request.getParameter("name");
+            session.setAttribute("loginName", rawName);
             String msgKey = "com.example.fullness.stationary.security.bad_credentials";
 
             if (targetException instanceof LockedException) {
-                // ロック時用のエラーメッセージキーに分岐
                 msgKey = "com.example.fullness.stationary.security.locked";
             } else if (targetException.getCause() instanceof CannotGetJdbcConnectionException) {
                 msgKey = "com.example.fullness.stationary.security.db_error";
             }
 
-            String errorMessage = messageSource.getMessage(msgKey, null, Locale.JAPAN);
-            session.setAttribute("loginErrorMessage", errorMessage);
+            session.setAttribute("loginErrorMessage",
+                    messageSource.getMessage(msgKey, null, Locale.JAPAN));
         }
 
-        // setDefaultFailureUrl("/admin/login") に基づいてログイン画面に遷移します
         super.onAuthenticationFailure(request, response, targetException);
     }
 }
