@@ -8,7 +8,7 @@ public interface AdminEmployeeAccountService {
 
     public int insertEmployeeAccount(EmployeeAccount employeeAccount);
 
-    public List<String> selectEmployeeNameWithEmployeeAccount();
+    public List<EmployeeAccount> selectEmployeeNameWithEmployeeAccount();
 
     public String selectNotHasEmployeeAccount(int id);
 
