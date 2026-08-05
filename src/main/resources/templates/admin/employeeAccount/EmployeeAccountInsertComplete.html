@@ -141,10 +141,14 @@
         </h1>
         <p><span th:text="${empName}"></span>さんのアカウント登録が完了しました</p>
         <div class="form-actions">
-            <button th:onclick="@{/admin}" type="submit" name="menuButton" method="get"
-                class="btn-primary">メニューへ</button>
-            <button th:onclick="@{/admin/account/form}" type="submit" name="backButton" method="get"
-                class="btn-primary">入力に戻る</button>
+            <form th:action="@{/admin}" method="get" style="display: inline;">
+                <button th:onclick="@{/admin}" type="submit" name="menuButton" method="get"
+                    class="btn-primary">メニューへ</button>
+            </form>
+            <form th:action="@{/admin/account/form}" method="get" style="display: inline;">
+                <button th:onclick="@{/admin/account/form}" type="submit" name="backButton" method="get"
+                    class="btn-primary">入力に戻る</button>
+            </form>
         </div>
 
     </main>

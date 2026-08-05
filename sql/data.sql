@@ -56,7 +56,7 @@ WITH
                 FROM inserted_category WHERE name = '文具' UNION ALL
             SELECT product_category_id, '鉛筆', 113, 'black_pen.jpg', 0
                 FROM inserted_category WHERE name = '文具' UNION ALL
-            SELECT product_category_id, '油性ボールペン(黒)', 114, 'black_pen_0.jpg', 0
+            SELECT product_category_id, '油性ボールペン(黒)', 114, 'black_pen_o.jpg', 0
                 FROM inserted_category WHERE name = '文具' UNION ALL
             SELECT product_category_id, '水性ボールペン(黒)', 115, 'black_pen_w.jpg', 0
                 FROM inserted_category WHERE name = '文具' UNION ALL
