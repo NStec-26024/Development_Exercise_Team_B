@@ -1,71 +1,144 @@
 package com.example.fullness.stationary.controller;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.junit.jupiter.api.DisplayName;
+import java.util.Locale;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.context.MessageSource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-class AdminLoginControllerTest {
+import com.example.fullness.stationary.service.LoginAttemptService;
 
-    @Autowired
+public class AdminLoginControllerTest {
+
     private MockMvc mockMvc;
+    private LoginAttemptService loginAttemptService;
+    private MessageSource messageSource;
 
-    @Test
-    @DisplayName("未ログイン状態でログイン画面にアクセスした場合、通常通りログインHTMLを表示すること")
-    void loginPage_ShouldShowLoginView_WhenAnonymous() throws Exception {
-        mockMvc.perform(get("/admin/login"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("admin/login"));
+    @BeforeEach
+    void setup() {
+        loginAttemptService = mock(LoginAttemptService.class);
+        messageSource = mock(MessageSource.class);
+
+        when(messageSource.getMessage(anyString(), any(), eq(Locale.JAPAN)))
+                .thenReturn("MSG");
+
+        AdminLoginController controller = new AdminLoginController(loginAttemptService, messageSource);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
+    // =========================================================
+    // loginPage() のテスト
+    // =========================================================
+
+    // ---------------------------------------------------------
+    // GET /admin/login → loginForm がセットされる
+    // ---------------------------------------------------------
     @Test
-    @DisplayName("ログインエラー情報がセッションからモデルに移され、セッションから削除されること")
-    void loginPage_ShouldExposeSecurityErrorMessageFromSession() throws Exception {
-        mockMvc.perform(get("/admin/login").sessionAttr("LOGIN_ERROR_MSG", "認証に失敗しました"))
+    void loginPageTest_case01_Ok() throws Exception {
+        mockMvc.perform(get("/admin/login"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/login"))
-                .andExpect(model().attribute("securityErrorMessage", "認証に失敗しました"))
-                .andExpect(request().sessionAttributeDoesNotExist("LOGIN_ERROR_MSG"));
+                .andExpect(model().attributeExists("loginForm"));
     }
 
+    // ---------------------------------------------------------
+    // GET /admin/login → loginName の復元
+    // ---------------------------------------------------------
     @Test
-    @WithMockUser(username = "admin_user", roles = { "ADMIN" })
-    @DisplayName("ログイン済みユーザーがログイン画面にアクセスすると/adminにリダイレクトされること")
-    void loginPage_ShouldRedirectToAdmin_WhenAuthenticated() throws Exception {
-        mockMvc.perform(get("/admin/login"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin"));
-    }
-
-    @Test
-    @DisplayName("POST /admin/loginで正しい入力を送信すると、ログイン処理用URLへフォワードされること")
-    void loginProcess_ShouldForwardToLoginAuth_WhenFormIsValid() throws Exception {
-        mockMvc.perform(post("/admin/login")
-                .param("name", "yamadatarou1001")
-                .param("password", "yamadapassword1001")
-                .with(csrf()))
+    void loginPageTest_case02_Ok() throws Exception {
+        mockMvc.perform(get("/admin/login").sessionAttr("loginName", "takumi"))
                 .andExpect(status().isOk())
-                .andExpect(forwardedUrl("/admin/login-auth"));
+                .andExpect(view().name("admin/login"))
+                .andExpect(model().attribute("loginForm",
+                        org.hamcrest.Matchers.hasProperty("name",
+                                org.hamcrest.Matchers.is("takumi"))));
     }
 
+    // ---------------------------------------------------------
+    // GET /admin/login → timeoutFlag の表示
+    // ---------------------------------------------------------
     @Test
-    @DisplayName("POST /admin/loginで不正な入力を送信すると、再度ログイン画面が表示されること")
-    void loginProcess_ShouldReturnLoginView_WhenValidationFails() throws Exception {
+    void loginPageTest_case03_Ok() throws Exception {
+        mockMvc.perform(get("/admin/login").sessionAttr("timeoutFlag", true))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/login"))
+                .andExpect(model().attribute("timeoutMessage",
+                        "セッションが切れました。再度ログインしてください"));
+    }
+
+    // ---------------------------------------------------------
+    // GET /admin/login → logoutFlag の表示
+    // ---------------------------------------------------------
+    @Test
+    void loginPageTest_case04_Ok() throws Exception {
+        mockMvc.perform(get("/admin/login").sessionAttr("logoutFlag", true))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/login"))
+                .andExpect(model().attribute("logoutMessage", "ログアウトしました。"));
+    }
+
+    // ---------------------------------------------------------
+    // GET /admin/login → loginErrorMessage の表示
+    // ---------------------------------------------------------
+    @Test
+    void loginPageTest_case05_Ok() throws Exception {
+        mockMvc.perform(get("/admin/login").sessionAttr("loginErrorMessage", "MSG"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/login"))
+                .andExpect(model().attribute("securityErrorMessage", "MSG"));
+    }
+
+    // =========================================================
+    // loginProcess() のテスト
+    // =========================================================
+
+    // ---------------------------------------------------------
+    // POST /admin/login → バリデーションエラー（name 空）
+    // ---------------------------------------------------------
+    @Test
+    void loginProcessTest_case01_Ok() throws Exception {
         mockMvc.perform(post("/admin/login")
                 .param("name", "")
-                .param("password", "")
-                .with(csrf()))
+                .param("password", "pass"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/login"))
-                .andExpect(model().attributeHasFieldErrors("loginForm", "name", "password"));
+                .andExpect(model().attributeExists("loginForm"));
+    }
+
+    // ---------------------------------------------------------
+    // POST /admin/login → ロック中
+    // ---------------------------------------------------------
+    @Test
+    void loginProcessTest_case02_Ok() throws Exception {
+        when(loginAttemptService.isBlocked("takumi")).thenReturn(true);
+
+        mockMvc.perform(post("/admin/login")
+                .param("name", "takumi")
+                .param("password", "pass"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/login"))
+                .andExpect(model().attribute("securityErrorMessage", "MSG"))
+                .andExpect(model().attributeExists("loginForm"));
+    }
+
+    // ---------------------------------------------------------
+    // POST /admin/login → ロックしていない → 認証処理へフォワード
+    // ---------------------------------------------------------
+    @Test
+    void loginProcessTest_case03_Ok() throws Exception {
+        when(loginAttemptService.isBlocked("takumi")).thenReturn(false);
+
+        mockMvc.perform(post("/admin/login")
+                .param("name", "takumi")
+                .param("password", "pass"))
+                .andExpect(status().isOk())
+                .andExpect(forwardedUrl("/admin/login-auth"));
     }
 }

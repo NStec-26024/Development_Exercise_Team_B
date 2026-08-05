@@ -88,7 +88,7 @@ public class AdminLoginController {
     private void handleLoginMessages(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession(false);
 
-        LoginForm loginForm = new LoginForm(); // ★ まず空のフォームを作る
+        LoginForm loginForm = new LoginForm();
 
         if (session != null) {
 
@@ -111,7 +111,7 @@ public class AdminLoginController {
             String savedName = (String) session.getAttribute("loginName");
             if (savedName != null) {
                 loginForm.setName(savedName);
-                session.removeAttribute("loginName"); // 復元後に削除
+                session.removeAttribute("loginName");
             }
         }
 
