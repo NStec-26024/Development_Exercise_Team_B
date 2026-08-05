@@ -77,7 +77,7 @@ public class AccountRegistController {
 
             return "admin/employeeAccount/EmployeeAccountInsertInput";
         } else {
-            return "redirect:admin/account/getconfirm";
+            return "redirect:/admin/account/getconfirm";
         }
     }
 
