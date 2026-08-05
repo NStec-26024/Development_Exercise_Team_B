@@ -14,7 +14,7 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountService {
 
     @Autowired
-    AdminEmployeeAccountRepository adminEmployeeAccountRepository;;
+    AdminEmployeeAccountRepository adminEmployeeAccountRepository;
 
     // @Autowired
     // EmployeeAccount employeeAccount;
@@ -27,7 +27,7 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
     }
 
     @Override
-    public List<String> selectEmployeeNameWithEmployeeAccount() {
+    public List<EmployeeAccount> selectEmployeeNameWithEmployeeAccount() {
         return adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
     }
 

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.form.AccountRegistForm;
 import com.example.fullness.stationary.helper.FormToEntity;
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
@@ -50,7 +51,7 @@ public class AccountRegistController {
         }
 
         // try {
-        List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+        List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
 
         if (empNameList.isEmpty()) {
             model.addAttribute("infoMessage", "アカウント登録可能な社員が存在しません");
@@ -70,7 +71,7 @@ public class AccountRegistController {
         if (result.hasErrors()) {
 
             // try {
-            List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+            List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
             model.addAttribute("empName", empNameList);
 
             // } catch (Exception e) {

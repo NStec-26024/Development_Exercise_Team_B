@@ -169,11 +169,11 @@
         <h1 class="page-title">
             アカウント登録(確認)
         </h1>
-        <form th:action="@{/admin/account/postcomplete}" method="post" th:object="${employeeAccount}">
+        <form th:action="@{/admin/account/postcomplete}" method="post" th:object="${accountRegistForm}">
             <table>
                 <tr>
                     <td>社員名</td>
-                    <td><span th:text="*{empName}"></span></td>
+                    <td><span th:text="*{employeeId}"></span></td>
                 </tr>
                 <tr>
                     <td>アカウント名</td>
