@@ -67,8 +67,8 @@ public class AccountRegistController {
     // 「 社員情報の取得に失敗しました」はエラー画面での表示だと思うので多分消す(exeptionHandlerがやってくれる)
     @PostMapping("/postconfirm")
     public String checkInput(
-            @Validated @ModelAttribute("accountRegistForm") AccountRegistForm form, BindingResult result, Model model,
-            RedirectAttributes redirectAttributes) {
+            @Validated @ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm, BindingResult result,
+            Model model, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
 
             // try {
@@ -81,9 +81,11 @@ public class AccountRegistController {
 
             // エラーがあったらインプット画面に飛ぶだけでOKみたいです
 
-            redirectAttributes.addFlashAttribute("accountRegistForm", form);
-            return "redirect:/admin/account/form";
+            model.addAttribute("accountRegistForm", accountRegistForm);
+            return "admin/employeeAccount/EmployeeAccountInsertInput";
         } else {
+            // 追加
+            redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
             // model.addAtributeする必要があるかわからないです
             return "redirect:/admin/account/confirm";
         }
@@ -110,6 +112,10 @@ public class AccountRegistController {
             redirectAttributes.addFlashAttribute("infoMessage", "入力情報が見つかりません。再度入力してください");
             return "redirect:/admin/account/form";
         }
+
+        // 追加
+        List<String> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+        model.addAttribute("empName", empNameList);
 
         return "admin/employeeAccount/EmployeeAccountInsertCheck";
     }
