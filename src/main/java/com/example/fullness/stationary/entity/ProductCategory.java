@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ProductCategory {
-    private int Integer;
+    private int id;
     private String name;
 }
