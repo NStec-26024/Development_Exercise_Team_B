@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>担当者アカウント登録(確認)</title>
+
+    <style>
+        /* リセット */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+            /* color: #222; */
+            color: black;
+        }
+
+        /* /* カラー / */
+        :root {
+            --green: #0f8a54;
+            /* --muted: black; */
+        }
+
+        /* / ページ全体 / */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto 48px;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        /* / ページタイトル / */
+        .page-title {
+            font-size: 32px;
+            margin: 28px 0 20px;
+            font-weight: 700;
+        }
+
+        /* / フォームパネル（中央配置） / */
+        .form-panel {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 28px 20px;
+            background: #fff;
+            border-radius: 6px;
+            /* 角を少し丸める */
+            display: flex;
+            flex-direction: column;
+            /* / 各行を縦に積む / */
+            align-items: center;
+            /* / 各行自体を中央に寄せる / */
+        }
+
+        /* / 各行：ラベル＋入力の塊を中央に / */
+        .form-row {
+            display: flex;
+            align-items: center;
+            /* / 中身の幅だけになり中央に寄せやすい / */
+            margin: 4px 0;
+        }
+
+
+        /* 確認画面のテーブルレイアウト調整 */
+        table {
+            width: 100%;
+            max-width: 400px;
+            /* 中央に寄せるための幅 */
+            margin: 0 auto 20px;
+            /* 中央配置％下の余白 */
+            border-collapse: collapse;
+        }
+
+        /* 左側のセル（社員名などのラベル）を右詰めにする */
+        table tr td:first-child {
+            width: 140px;
+            /* 入力画面のラベル幅(140px)と合わせる */
+            text-align: right;
+            /* 文字を右詰め */
+            padding-right: 16px;
+            /* 入力画面のmargin-right(16px)と合わせる */
+            font-size: 16px;
+        }
+
+        /* 右側のセル（反映されたデータ）を左詰めにする */
+        table tr td:last-child {
+            text-align: left;
+            /* 文字を左詰め */
+            padding: 8px 10px;
+            font-size: 16px;
+        }
+
+        /* / ラベル / */
+        .form-row label {
+            flex: 0 0 140px;
+            width: 140px;
+            text-align: right;
+            margin-right: 16px;
+            /* color: var(--muted); */
+            color: black;
+            font-size: 16px;
+        }
+
+        /* / 入力欄（小さめに）/ */
+        .form-row input,
+        .form-row select,
+
+        .form-row textarea {
+            width: 200px;
+            /* / ← ここでサイズ調整 / */
+            max-width: 100%;
+            padding: 8px 10px;
+            font-size: 14px;
+            border: 1px solid #cfcfcf;
+            border-radius: 4px;
+            background: #fff;
+            outline: none;
+            flex: 0 0 auto;
+            align-items: left;
+            /* / flexで大きくならないようにする / */
+        }
+
+        /* / ボタンエリア / */
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* / キャンセルリンク / */
+        .link-cancel {
+            color: var(--green);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 0px;
+        }
+
+        /* / 完了ボタン（白地＋緑枠→hoverで緑塗り） */
+        .btn-primary {
+            background: #fff;
+            color: var(--green);
+            border: 2px solid var(--green);
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn-primary:hover {
+            background: var(--green);
+            color: #fff;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div th:replace="~{admin/common/header :: header}"></div>
+    <main class="container">
+        <h1 class="page-title">
+            アカウント登録(確認)
+        </h1>
+        <form th:action="@{/admin/account/complete}" method="post" th:object="${employeeAccount}">
+            <table>
+                <tr>
+                    <td>社員名</td>
+                    <td><span th:text="*{empName}"></span></td>
+                </tr>
+                <tr>
+                    <td>アカウント名</td>
+                    <td><span th:text="*{accountName}"></span></td>
+                </tr>
+                <tr>
+                    <td>パスワード</td>
+                    <td><span th:text="${#strings.repeat('*', employeeAccount.password.length())}">**********</span>
+                    </td>
+                </tr>
+            </table>
+
+            <input type="hidden" th:field="*{empName}">
+            <input type="hidden" th:field="*{accountName}">
+            <input type="hidden" th:field="*{password}">
+
+
+            <div class="form-actions">
+                <a th:href="@{/admin/account/form}" class="link-cancel">キャンセル</a>
+                <button th:formaction="@{/admin/account/form}" type="submit" name="backButton" method="get"
+                    class="btn-primary">戻る</button>
+                <button type="submit" name="registerButton" method="post" class="btn-primary">登録</button>
+            </div>
+
+        </form>
+    </main>
+    <span th:each="error : ${#fields.detailedErrors()}">
+        <span th:text="${error.message}"></span><br />
+    </span>
+    </div>
+    <div th:replace="~{admin/common/footer :: footer}"></div>
+</body>
+
+</html>
