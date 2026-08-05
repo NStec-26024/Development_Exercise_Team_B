@@ -20,7 +20,7 @@
         
         <select id="selectEmployeeNameWithEmployeeAccount" resultMap="employeeAccountResult">
             <![CDATA[
-               SELECT e.name ,e.id
+               SELECT e.id, e.name 
                FROM
                employee e
                LEFT OUTER JOIN
@@ -32,22 +32,22 @@
         </select>
 
         <insert id="insertEmployeeAccount" parameterType="EmployeeAccount">
-        <selectKey keyProperty="id" resultType="int" order="BEFORE">
+        <!-- <selectKey keyProperty="id" resultType="int" order="BEFORE">
             <![CDATA[
                 select nextval('seq_employee_account_id')
             ]]>
-        </selectKey>
+        </selectKey> -->
         <![CDATA[
             INSERT INTO 
-            employee_account (id, employee_id, name, password)
-            VALUES(#{id}, #{employee_id},#{name},#{password})
+            employee_account (employee_id, name, password)
+            VALUES(#{employeeId},#{name},#{password})
             RETURNING id
         ]]>
     </insert>
 
     <select id="selectNotHasEmployeeAccount" resultMap="employeeAccountResult">
         <![CDATA[
-                SELECT e.name,
+                SELECT e.name, 
                 a.employee_id
                 FROM
                 employee e

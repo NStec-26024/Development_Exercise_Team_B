@@ -47,6 +47,9 @@ public class AccountRegistController {
     @GetMapping("/form")
     public String showInput(Model model) {
         List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+
+        // if (!model.containsAttribute("empName")) {
+        // model.addAttribute("accountRegistForm", new AccountRegistForm());
         // if (!model.containsAttribute("accountRegistForm")) {
         // model.addAttribute("accountRegistForm", new AccountRegistForm());
         // }
@@ -56,9 +59,8 @@ public class AccountRegistController {
         } else {
             model.addAttribute("empName", empNameList);
         }
-        // } catch (Exception e) {
-        // model.addAttribute("errMessage", "社員情報の取得に失敗しました");
         // }
+
         return "admin/employeeAccount/EmployeeAccountInsertInput";
     }
 
@@ -73,14 +75,11 @@ public class AccountRegistController {
             List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
             redirectAttributes.addFlashAttribute("empName", empNameList);
 
-            // } catch (Exception e) {
-            // model.addAttribute("errMessage", "社員情報の取得に失敗しました");
-            // }
-
             redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
             redirectAttributes.addFlashAttribute(
                     BindingResult.MODEL_KEY_PREFIX + "accountRegistForm", result);
             return "redirect:form";
+
         } else {
             // 追加
 
@@ -134,23 +133,20 @@ public class AccountRegistController {
 
     // 登録処理失敗はたぶん消す(ExeptionHandlerがやってくれる)
     @PostMapping("/postcomplete")
-    public String regist(@ModelAttribute("accountRegistForm") AccountRegistForm form, Model model,
+    public String regist(@SessionAttribute("accountRegistForm") AccountRegistForm form, Model model,
             RedirectAttributes redirectAttributes) {
-        // try {
+        // 重複チェック
         if (!adminEmployeeAccountService.selectAccountName(form.getName())) {
+            List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+            redirectAttributes.addFlashAttribute("empName", empNameList);
             redirectAttributes.addFlashAttribute("infoMessage", "このアカウント名は既に使用されています");
 
             return "redirect:/admin/account/form";
         }
 
+        // パスワードのハッシュ化
         String encodePassword = passwordEncoder.encode(form.getPassword());
-
-        // EmployeeAccount employeeAccount = new EmployeeAccount();
-        // employeeAccount.setEmployeeId(form.getEmployeeId());
-        // employeeAccount.setName(form.getName());
-        // employeeAccount.setPassword(encodePassword);
-
-        // helperに移行しました（FormToEntity)
+        // DBへのインサート処理
         int accountId = adminEmployeeAccountService
                 .insertEmployeeAccount(formToEntity.formToEntity(form, encodePassword));
         EmployeeAccount employeeAccount = adminEmployeeAccountService
@@ -158,12 +154,7 @@ public class AccountRegistController {
         redirectAttributes.addFlashAttribute("empName", employeeAccount);
 
         return "redirect:/admin/account/complete";
-        // } catch (Exception e) {
-        // e.printStackTrace();
 
-        // model.addAttribute("message", "登録処理に失敗しました。管理者に連絡してください");
-        // return null;
-        // }
     }
 
     /*
