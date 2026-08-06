@@ -8,7 +8,6 @@ import java.util.List;
 
 /**
  * 商品カテゴリ情報を取得するための Mapper インターフェース。
- * UC12（商品修正）で必要な参照機能のみを保持する。
  */
 @Mapper
 public interface ProductCategoryRepository {

@@ -8,10 +8,8 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * 商品情報を永続化層から取得するための Mapper インターフェース。
+ * 商品情報を永続化層から取得・更新するための Mapper インターフェース。
  * MyBatis による SQL 実装を前提とする。
- * UC12（商品修正）で必要な参照・更新機能のみを保持する。
- * 商品マッパー
  */
 @Mapper
 public interface ProductRepository {

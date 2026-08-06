@@ -1,13 +1,19 @@
-// package com.example.fullness.stationary;
+package com.example.fullness.stationary;
 
-// import org.junit.jupiter.api.Test;
-// import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
-// @SpringBootTest
-// class FullnessStationaryApplicationTests {
+/**
+ * Spring Boot のコンテキスト読み込みを確認するためのテストクラス。
+ */
+@SpringBootTest
+class FullnessStationaryApplicationTests {
 
-// @Test
-// void contextLoads() {
-// }
+	/**
+	 * アプリケーションコンテキストが正常に読み込まれることを確認する。
+	 */
+	@Test
+	void contextLoads() {
+	}
 
-// }
+}

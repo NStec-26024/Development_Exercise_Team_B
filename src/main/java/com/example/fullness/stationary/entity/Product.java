@@ -16,7 +16,6 @@ public class Product implements Serializable {
     private Integer categoryId;
     private Integer stock;
     private String imageUrl;
-    private String description;
 
     private ProductStock productStock;
     // Join用

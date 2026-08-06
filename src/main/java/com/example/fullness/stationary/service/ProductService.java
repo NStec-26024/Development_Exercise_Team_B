@@ -11,6 +11,14 @@ import org.springframework.ui.Model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 商品関連のビジネスロジックを提供するサービスクラス。
+ *
+ * <p>
+ * カテゴリ取得、商品検索（全件・カテゴリ別）、およびページング情報の
+ * モデルへの設定を担当します。リポジトリ呼び出しで例外が発生した場合は
+ * 空の結果を返すか、モデルにエラーメッセージを設定して呼び出し元に通知します。
+ */
 @Service
 public class ProductService {
 
@@ -25,6 +33,8 @@ public class ProductService {
 
     /**
      * ★ 全カテゴリを取得（プルダウン表示用）
+     *
+     * @return 取得したカテゴリのリスト。リポジトリが null を返すか例外発生時は空リストを返す。
      */
     public List<ProductCategory> getAllCategories() {
         try {
@@ -53,6 +63,9 @@ public class ProductService {
 
     /**
      * ★ カテゴリIDからカテゴリ名を取得
+     *
+     * @param categoryId カテゴリID（null または 0 の場合は null を返す）
+     * @return カテゴリ名。該当なしまたは例外時は null。
      */
     public String getCategoryName(Integer categoryId) {
         if (categoryId == null || categoryId == 0) {
@@ -71,6 +84,15 @@ public class ProductService {
 
     /**
      * ★ 全商品を検索してModelに設定（初期表示用）
+     *
+     * <p>
+     * 指定ページのオフセットと件数を計算して商品を取得し、結果があれば
+     * ページング情報を `model` に追加する。商品が見つからない場合は情報メッセージを
+     * `model` に設定して false を返す。例外発生時は `errorMessage` を設定して false を返す。
+     *
+     * @param page  表示するページ番号（1 始まり。1 未満なら 1 として扱う）
+     * @param model Spring の `Model`（結果・メッセージを格納）
+     * @return 商品が存在してページング情報を設定した場合は true、そうでなければ false
      */
     public boolean searchAllProductsAndSetModel(int page, Model model) {
         try {
@@ -124,6 +146,16 @@ public class ProductService {
 
     /**
      * ★ カテゴリ別商品を検索してModelに設定
+     *
+     * <p>
+     * `categoryId` が null または 0 の場合は全商品検索にフォールバックする。カテゴリ別に
+     * 商品を取得し、結果に応じて `model` にページング情報または情報メッセージを設定する。
+     * 例外時は `errorMessage` を設定して false を返す。
+     *
+     * @param categoryId 対象カテゴリの ID（0 は全カテゴリ扱い）
+     * @param page       表示するページ番号（1 始まり）
+     * @param model      Spring の `Model`（結果・メッセージを格納）
+     * @return 商品が存在してページング情報を設定した場合は true、そうでなければ false
      */
     public boolean searchProductsByCategoryAndSetModel(Integer categoryId, int page, Model model) {
         try {
@@ -189,6 +221,17 @@ public class ProductService {
 
     /**
      * ★ ページング情報をModelに設定
+     *
+     * <p>
+     * 与えられた商品リストおよび総件数から総ページ数を計算し、ページング関連の属性を
+     * `model` に追加するユーティリティメソッド。
+     *
+     * @param model        Spring の `Model`（属性を設定）
+     * @param products     現在ページの表示商品リスト
+     * @param currentPage  現在のページ番号
+     * @param totalCount   総件数
+     * @param categoryId   選択カテゴリID（カテゴリ検索時）、ない場合は null
+     * @param categoryName 選択カテゴリ名（カテゴリ検索時）、ない場合は null
      */
     private void setPagenationInfo(Model model, List<Product> products,
             int currentPage, int totalCount,
