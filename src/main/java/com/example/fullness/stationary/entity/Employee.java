@@ -7,9 +7,9 @@ import lombok.Data;
 @Data
 public class Employee implements Serializable {
 
-    private int id;
+    private Integer id;
 
-    private int departmentId;
+    private Integer departmentId;
 
     private String name;
 
