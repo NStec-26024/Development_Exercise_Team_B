@@ -31,9 +31,9 @@
                 <span th:text="${infoMessage}"></span>
             </div>
 
-            <!-- 検索フォーム（POSTで/admin/productへ送信） -->
+            <!-- 検索フォーム（GETで/admin/productへ送信） -->
             <div class="search-form-wrapper">
-                <form th:action="@{/admin/product}" method="post" class="search-form">
+                <form th:action="@{/admin/product}" method="get" class="search-form">
                     <div class="form-group">
                         <select id="category" name="category" class="form-select">
                             <!-- ★ 全カテゴリ表示オプション -->
@@ -120,7 +120,7 @@
                 </div>
 
                 <!-- ========================================
-                     ページネーション（POSTで/admin/productへ送信）
+                     ページネーション（GETで/admin/productへ送信）
                 ======================================== -->
                 <div th:if="${totalPages > 1}" class="pagination">
                     <!-- 最初へ -->

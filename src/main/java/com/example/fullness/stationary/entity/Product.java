@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 import lombok.Data;
 
+/**
+ * 商品を表すエンティティクラス。
+ * 商品ID、名前、価格、カテゴリ、在庫、画像 URL などを保持する。
+ */
 @Data
 public class Product implements Serializable {
     private Integer id;
@@ -12,7 +16,6 @@ public class Product implements Serializable {
     private Integer categoryId;
     private Integer stock;
     private String imageUrl;
-    private String description;
 
     // ★ カテゴリ名を追加（JOIN時に使用）
     private String categoryName;
