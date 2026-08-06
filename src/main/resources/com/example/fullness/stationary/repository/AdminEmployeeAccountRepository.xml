@@ -48,7 +48,8 @@
     <select id="selectNotHasEmployeeAccount" resultMap="employeeAccountResult">
         <![CDATA[
                 SELECT e.name, 
-                a.employee_id
+                a.employee_id,
+                e.id
                 FROM
                 employee e
                 LEFT OUTER JOIN
