@@ -4,14 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import com.example.fullness.stationary.entity.EmployeeAccount;
-
-import jakarta.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -23,7 +20,7 @@ public class AdminEmployeeAccountRepositoryTest {
     @Test
     public void InsertEmployeeAccountTest() {
         EmployeeAccount employeeAccount = new EmployeeAccount();
-        employeeAccount.setEmployeeId(1002);
+        employeeAccount.setEmployeeId(2);
         employeeAccount.setName("asdfgh");
         employeeAccount.setPassword("sadfghgf");
         adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
