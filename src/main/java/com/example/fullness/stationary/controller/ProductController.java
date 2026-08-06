@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 管理画面向けの商品操作を担当するコントローラクラス。
+ *
+ * <p>
+ * 商品検索画面の表示、カテゴリによる検索条件の受け渡し、各種リダイレクト（編集・削除・追加）を提供します。
+ */
 @Controller
 @RequestMapping("/admin")
 public class ProductController {
@@ -16,6 +22,13 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    /**
+     * リクエストパラメータのカテゴリID文字列を解析して Integer に変換します。
+     * 空文字または変換不可な値は 0 を返し、コントローラ側で「全カテゴリ扱い」として扱います。
+     *
+     * @param category カテゴリIDを表す文字列（nullable）
+     * @return 変換後のカテゴリID（不正な場合は 0）
+     */
     private Integer parseCategoryId(String category) {
         if (category == null || category.trim().isEmpty()) {
             return 0;
@@ -28,15 +41,29 @@ public class ProductController {
     }
 
     /**
-     * 商品検索画面表示（GET）
+     * 商品検索画面を表示するエンドポイント（GET）。
+     *
+     * <p>
+     * クエリパラメータ `category` と `page` を受け取り、カテゴリ一覧をモデルに追加した上で
+     * `ProductService` による検索処理を呼び出す。検索結果は `Model` に格納され、ビュー
+     * `admin/product/search` を返す。
+     *
+     * @param category カテゴリID の文字列（省略可）
+     * @param page     表示するページ番号（省略時は 1）
+     * @param model    結果を格納する Spring の Model
+     * @return 表示するテンプレート名（admin/product/search）
      */
     @GetMapping("/product")
     public String productSearchPage(
             @RequestParam(name = "category", required = false, defaultValue = "") String category,
+            @RequestParam(name = "categoryId", required = false, defaultValue = "") String categoryIdParam,
             @RequestParam(name = "page", defaultValue = "1") int page,
             Model model) {
 
-        Integer categoryId = parseCategoryId(category);
+        String selectedCategory = (category == null || category.trim().isEmpty())
+                ? categoryIdParam
+                : category;
+        Integer categoryId = parseCategoryId(selectedCategory);
         System.out.println("=== GET /admin/product ===");
         System.out.println("categoryId: " + categoryId + ", page: " + page);
 
@@ -52,39 +79,17 @@ public class ProductController {
             productService.searchProductsByCategoryAndSetModel(categoryId, page, model);
         }
 
-        return "admin/product-search";
+        return "admin/product/search";
     }
 
     /**
-     * カテゴリ検索（POST）
+     * 編集ページへのリダイレクトを行うエンドポイント。
+     *
+     * @param id         編集対象の商品ID
+     * @param categoryId 検索時のカテゴリID（リダイレクト先に付与）
+     * @param page       検索時のページ番号（リダイレクト先に付与）
+     * @return 編集画面へのリダイレクト URL
      */
-    @PostMapping("/product")
-    public String searchProductsByCategory(
-            @RequestParam(name = "category", required = false, defaultValue = "") String category,
-            @RequestParam(name = "page", defaultValue = "1") int page,
-            Model model) {
-
-        Integer categoryId = parseCategoryId(category);
-        System.out.println("=== POST /admin/product ===");
-        System.out.println("categoryId: " + categoryId);
-        System.out.println("page: " + page);
-
-        // カテゴリ一覧を取得
-        List<ProductCategory> categories = productService.getAllCategories();
-        model.addAttribute("categories", categories);
-
-        // ★ categoryId が 0 なら全商品、それ以外はカテゴリ別
-        if (categoryId == null || categoryId == 0) {
-            System.out.println("検索モード: 全商品");
-            productService.searchAllProductsAndSetModel(page, model);
-        } else {
-            System.out.println("検索モード: カテゴリID=" + categoryId);
-            productService.searchProductsByCategoryAndSetModel(categoryId, page, model);
-        }
-
-        return "admin/product-search";
-    }
-
     @GetMapping("/product/edit/{id}")
     public String editProduct(
             @PathVariable Integer id,
@@ -96,6 +101,14 @@ public class ProductController {
                 + "&page=" + page;
     }
 
+    /**
+     * 削除確認ページへのリダイレクトを行うエンドポイント。
+     *
+     * @param id         削除対象の商品ID
+     * @param categoryId 検索時のカテゴリID（リダイレクト先に付与）
+     * @param page       検索時のページ番号（リダイレクト先に付与）
+     * @return 削除確認画面へのリダイレクト URL
+     */
     @GetMapping("/product/delete/{id}")
     public String deleteProduct(
             @PathVariable Integer id,
@@ -107,6 +120,12 @@ public class ProductController {
                 + "&page=" + page;
     }
 
+    /**
+     * 追加画面へのリダイレクトを行うエンドポイント。
+     *
+     * @param category カテゴリID の文字列（省略可）。指定がある場合はリダイレクト URL に付与する。
+     * @return 追加画面へのリダイレクト URL
+     */
     @GetMapping("/product/add")
     public String addProduct(
             @RequestParam(name = "category", required = false, defaultValue = "") String category) {

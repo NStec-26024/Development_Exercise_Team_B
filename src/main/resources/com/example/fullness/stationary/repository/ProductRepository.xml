@@ -20,8 +20,8 @@
                 p.name,
                 p.price,
                 p.product_category_id,
-                p.image_url,
-                pc.name AS category_name
+                p.image_url AS imageUrl,
+                pc.name AS categoryName
             FROM 
                 product p
             LEFT JOIN 
@@ -52,8 +52,8 @@
                 p.name,
                 p.price,
                 p.product_category_id,
-                p.image_url,
-                pc.name AS category_name
+                p.image_url AS imageUrl,
+                pc.name AS categoryName
             FROM 
                 product p
             LEFT JOIN 
@@ -74,8 +74,8 @@
                 p.name,
                 p.price,
                 p.product_category_id,
-                p.image_url,
-                pc.name AS category_name
+                p.image_url AS imageUrl,
+                pc.name AS categoryName
             FROM 
                 product p
             LEFT JOIN 

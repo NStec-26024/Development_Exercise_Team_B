@@ -7,6 +7,9 @@ import org.apache.ibatis.annotations.Param;
 
 import com.example.fullness.stationary.entity.ProductCategory;
 
+/**
+ * 商品カテゴリ情報を取得するための Mapper インターフェース。
+ */
 @Mapper
 public interface ProductCategoryRepository {
 
@@ -24,9 +27,5 @@ public interface ProductCategoryRepository {
      * @return カテゴリ情報
      */
     ProductCategory findById(@Param("id") Integer id);
-
-    /**
-     * カテゴリに紐づく商品の件数を取得
-     */
 
 }
