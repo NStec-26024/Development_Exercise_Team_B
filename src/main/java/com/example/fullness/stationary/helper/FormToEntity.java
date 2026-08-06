@@ -12,7 +12,7 @@ import com.example.fullness.stationary.form.AccountRegistForm;
 public class FormToEntity {
 
     /**
-     * 入力データが入ったFormとハッシュ化されたパスワードを基に、社員アカウントEntityを生成
+     * 入力データが入ったFormとハッシュ化されたパスワードを基に社員アカウントEntityを生成
      * 
      * @param accountRegistForm 入力データが入ったForm
      * @param encodePassword    ハッシュ化されたパスワード
@@ -27,6 +27,12 @@ public class FormToEntity {
         return employeeAccount;
     }
 
+    /**
+     * 入力データが入ったFormを基に社員アカウントEntityを生成
+     * 
+     * @param accountRegistForm 入力データが入ったForm
+     * @return 社員アカウントEntity
+     */
     public EmployeeAccount formToEntity(AccountRegistForm accountRegistForm) {
         EmployeeAccount employeeAccount = new EmployeeAccount();
         employeeAccount.setEmployeeId(accountRegistForm.getEmployeeId());

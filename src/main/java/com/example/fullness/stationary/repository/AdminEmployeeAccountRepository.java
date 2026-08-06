@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.example.fullness.stationary.entity.EmployeeAccount;
 
 /**
- * 社員アカウント情報に関するデータベースアクセスを制御するマッパーインターフェース。
+ * 社員アカウント情報に関するデータベースアクセスを制御するマッパーインターフェース
  */
 @Mapper
 public interface AdminEmployeeAccountRepository {
