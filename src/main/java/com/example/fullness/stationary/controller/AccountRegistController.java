@@ -121,7 +121,7 @@ public class AccountRegistController {
 
     // 登録処理失敗はたぶん消す(ExeptionHandlerがやってくれる)
     @PostMapping("/postcomplete")
-    public String regist(@SessionAttribute("accountRegistForm") AccountRegistForm form,
+    public String regist(AccountRegistForm form,
             RedirectAttributes redirectAttributes) {
         // 重複チェック
         if (!adminEmployeeAccountService.selectAccountName(form.getName())) {
@@ -150,9 +150,10 @@ public class AccountRegistController {
      * ・セッションの破棄
      * ・メニュー画面へのリダイレクト
      */
-    @GetMapping("/cancel")
-    public String cancel(SessionStatus sessionStatus) {
-        sessionStatus.setComplete();
+    @PostMapping("/back")
+    public String back(@ModelAttribute("accountRegistForm") AccountRegistForm form,
+            RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("accountRegistForm", form);
         return "redirect:/admin";
     }
 
@@ -169,7 +170,7 @@ public class AccountRegistController {
         // }
 
         sessionStatus.setComplete();
-        return "admin/employeeAccount/EmployeeAccountComplete";
+        return "admin/employeeAccount/EmployeeAccountInsertComplete";
     }
 
 }
