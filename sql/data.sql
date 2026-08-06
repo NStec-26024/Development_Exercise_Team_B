@@ -76,7 +76,7 @@ WITH
                 FROM inserted_category WHERE name = '文具' UNION ALL
             SELECT product_category_id, 'マーカー(緑)', 123, 'green_maker.jpg', 0
                 FROM inserted_category WHERE name = '文具' UNION ALL
-            SELECT product_category_id, '色鉛筆セット(12色)', 124, 'bcolor_pen12.jpeg', 0
+            SELECT product_category_id, '色鉛筆セット(12色)', 124, 'color_pen12.jpeg', 0
                 FROM inserted_category WHERE name = '文具' UNION ALL
             SELECT product_category_id, '色鉛筆セット(24色)', 125, 'color_pen48.jpeg', 0
                 FROM inserted_category WHERE name = '文具' UNION ALL
