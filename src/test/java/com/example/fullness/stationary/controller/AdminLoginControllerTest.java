@@ -12,7 +12,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.example.fullness.stationary.service.impl.LoginAttemptService;
+import com.example.fullness.stationary.service.LoginAttemptService;
 
 public class AdminLoginControllerTest {
 
@@ -28,7 +28,7 @@ public class AdminLoginControllerTest {
                 when(messageSource.getMessage(anyString(), any(), eq(Locale.JAPAN)))
                                 .thenReturn("MSG");
 
-                AdminLoginController controller = new AdminLoginController(loginAttemptService, messageSource);
+                AdminLoginController controller = new AdminLoginController();
 
                 mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         }

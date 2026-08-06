@@ -8,7 +8,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.fullness.stationary.service.impl.LoginAttemptService;
+import com.example.fullness.stationary.service.LoginAttemptService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
