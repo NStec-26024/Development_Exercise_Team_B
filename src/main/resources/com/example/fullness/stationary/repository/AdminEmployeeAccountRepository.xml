@@ -11,16 +11,16 @@
         <result property="name" column="name" />
         <result property="password" column="password" />
         <association property="employee" javaType="Employee">
-            <id property="id" column="employee_id" />
+            <id property="id" column="id" />
             <result property="departmentId" column="department_id" />
-            <result property="name" column="employee_name" />
+            <result property="name" column="name" />
             <result property="nameKana" column="name_kana" />
         </association>
         </resultMap>
         
         <select id="selectEmployeeNameWithEmployeeAccount" resultMap="employeeAccountResult">
             <![CDATA[
-               SELECT e.id, e.name 
+               SELECT *
                FROM
                employee e
                LEFT OUTER JOIN
@@ -31,24 +31,18 @@
             ]]>
         </select>
 
-        <insert id="insertEmployeeAccount" parameterType="EmployeeAccount">
-        <!-- <selectKey keyProperty="id" resultType="int" order="BEFORE">
-            <![CDATA[
-                select nextval('seq_employee_account_id')
-            ]]>
-        </selectKey> -->
+        <insert id="insertEmployeeAccount" parameterType="EmployeeAccount" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    
         <![CDATA[
             INSERT INTO 
             employee_account (employee_id, name, password)
             VALUES(#{employeeId},#{name},#{password})
-            RETURNING id
         ]]>
     </insert>
 
     <select id="selectNotHasEmployeeAccount" resultMap="employeeAccountResult">
         <![CDATA[
-                SELECT e.name, 
-                a.employee_id
+                SELECT *
                 FROM
                 employee e
                 LEFT OUTER JOIN
@@ -71,7 +65,7 @@
 
     <select id="selectEmployeeNameWithEmployeeAccountId" resultMap="employeeAccountResult">
         <![CDATA[
-                SELECT e.name
+                SELECT *
                 FROM employee e
                 JOIN employee_account a
                 ON e.id=a.employee_id
