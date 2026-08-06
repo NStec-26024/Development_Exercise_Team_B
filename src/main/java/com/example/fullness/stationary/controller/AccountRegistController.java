@@ -27,7 +27,7 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
 @Controller
 @RequestMapping("/admin/account")
-@SessionAttributes("accountRegistForm")
+// @SessionAttributes("accountRegistForm")
 public class AccountRegistController {
 
     @Autowired
@@ -48,12 +48,6 @@ public class AccountRegistController {
     public String showInput(Model model) {
         List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
 
-        // if (!model.containsAttribute("empName")) {
-        // model.addAttribute("accountRegistForm", new AccountRegistForm());
-        // if (!model.containsAttribute("accountRegistForm")) {
-        // model.addAttribute("accountRegistForm", new AccountRegistForm());
-        // }
-
         if (empNameList.isEmpty()) {
             model.addAttribute("infoMessage", "アカウント登録可能な社員が存在しません");
         } else {
@@ -68,25 +62,19 @@ public class AccountRegistController {
     @PostMapping("/postconfirm")
     public String checkInput(
             @Validated @ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm, BindingResult result,
-            Model model, RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
         if (result.hasErrors()) {
 
-            // try {
-            List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
-            redirectAttributes.addFlashAttribute("empName", empNameList);
-
-            redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
             redirectAttributes.addFlashAttribute(
                     BindingResult.MODEL_KEY_PREFIX + "accountRegistForm", result);
             return "redirect:form";
 
         } else {
-            // 追加
 
-            redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
             EmployeeAccount employeeAccount = adminEmployeeAccountService
                     .selectNotHasEmployeeAccount(accountRegistForm.getEmployeeId());
-            redirectAttributes.addFlashAttribute("employeeName", employeeAccount.getName());
+            redirectAttributes.addFlashAttribute("employee", employeeAccount);
 
             return "redirect:/admin/account/confirm";
         }
@@ -99,7 +87,7 @@ public class AccountRegistController {
      */
 
     @GetMapping("/confirm")
-    public String confirm(Model model, @ModelAttribute("accountRegistForm") AccountRegistForm form,
+    public String confirm(@ModelAttribute("accountRegistForm") AccountRegistForm form,
             RedirectAttributes redirectAttributes) {
         /*
          * null:データそのものがない
@@ -133,7 +121,7 @@ public class AccountRegistController {
 
     // 登録処理失敗はたぶん消す(ExeptionHandlerがやってくれる)
     @PostMapping("/postcomplete")
-    public String regist(@SessionAttribute("accountRegistForm") AccountRegistForm form, Model model,
+    public String regist(@SessionAttribute("accountRegistForm") AccountRegistForm form,
             RedirectAttributes redirectAttributes) {
         // 重複チェック
         if (!adminEmployeeAccountService.selectAccountName(form.getName())) {
@@ -151,7 +139,7 @@ public class AccountRegistController {
                 .insertEmployeeAccount(formToEntity.formToEntity(form, encodePassword));
         EmployeeAccount employeeAccount = adminEmployeeAccountService
                 .selectEmployeeNameWithEmployeeAccountId(accountId);
-        redirectAttributes.addFlashAttribute("empName", employeeAccount);
+        redirectAttributes.addFlashAttribute("employee", employeeAccount);
 
         return "redirect:/admin/account/complete";
 

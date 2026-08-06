@@ -21,8 +21,9 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
 
     @Override
     public int insertEmployeeAccount(EmployeeAccount employeeAccount) {
-        int id = adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
-        return id;
+        adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
+        int accountId = employeeAccount.getId();
+        return accountId;
 
     }
 
