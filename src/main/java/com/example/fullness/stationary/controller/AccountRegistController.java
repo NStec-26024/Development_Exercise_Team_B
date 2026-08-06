@@ -57,25 +57,34 @@ public class AccountRegistController {
     }
 
     /**
+     * アカウント登録の入力画面を表示
+     * データベースから登録可能な社員一覧を取得し、セレクトボックス用に画面に引き渡す
      * 
-     * @param model
-     * @return
+     * @param model 画面へデータを引き渡すためのModelオブジェクト
+     * @return 入力画面のテンプレートパス ("admin/account/form")
      */
     @GetMapping("/form")
     public String showInput(Model model) {
-        List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+        List<EmployeeAccount> employeeNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
 
-        if (empNameList.isEmpty()) {
-            model.addAttribute("infoMessage", "アカウント登録可能な社員が存在しません");
+        if (employeeNameList.isEmpty()) {
+            model.addAttribute("errorMessages", "アカウント登録可能な社員が存在しません");
         } else {
-            model.addAttribute("empName", empNameList);
+            model.addAttribute("employeeName", employeeNameList);
         }
-        // }
 
-        return "admin/employeeAccount/EmployeeAccountInsertInput";
+        return "admin/account/form";
     }
 
-    // 「 社員情報の取得に失敗しました」はエラー画面での表示だと思うので多分消す(exeptionHandlerがやってくれる)
+    /**
+     * 入力画面からの送信内容をバリデーションチェックし、問題がなければ確認画面へリダイレクト
+     * エラーがある場合は入力フォームへ値を保持したまま差し戻し
+     * 
+     * @param accountRegistForm  入力画面から送信されたフォームオブジェクト
+     * @param result             バリデーションの検証結果
+     * @param redirectAttributes リダイレクト先へデータを引き継ぐためのフラッシュ属性設定オブジェクト
+     * @return 成功時は確認画面、失敗時は入力画面へのリダイレクトパス
+     */
     @PostMapping("/postconfirm")
     public String checkInput(
             @Validated @ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm, BindingResult result,
@@ -85,108 +94,112 @@ public class AccountRegistController {
 
             redirectAttributes.addFlashAttribute(
                     BindingResult.MODEL_KEY_PREFIX + "accountRegistForm", result);
-            return "redirect:form";
+            return "redirect:/admin/account/form";
 
         } else {
 
-            EmployeeAccount employeeAccount = adminEmployeeAccountService
-                    .selectNotHasEmployeeAccount(accountRegistForm.getEmployeeId());
+            EmployeeAccount employeeAccount = formToEntity.formToEntity(accountRegistForm);
+            employeeAccount = adminEmployeeAccountService
+                    .selectNotHasEmployeeAccount(employeeAccount.getEmployeeId());
             redirectAttributes.addFlashAttribute("employee", employeeAccount);
 
             return "redirect:/admin/account/confirm";
         }
     }
 
-    /*
-     * セッションの中身が空っぽか(formオブジェクトがnullかどうか)
-     * 空っぽならエラーメッセージ準備→入力画面へリダイレクト
-     * 中身あるなら確認画面表示
+    /**
+     * アカウント登録の確認画面を表示
+     * 不正遷移防止のためフォームデータの存在チェックを行う
+     * 
+     * @param accountRegistForm  /postconfirmから送信されたフォームオブジェクト
+     * @param redirectAttributes 不正アクセス時のエラーメッセージ格納オブジェクト
+     * @return 確認画面のテンプレートパス、不正遷移時は入力画面へのリダイレクトパス
      */
-
     @GetMapping("/confirm")
-    public String confirm(@ModelAttribute("accountRegistForm") AccountRegistForm form,
+    public String confirm(@ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm,
             RedirectAttributes redirectAttributes) {
         /*
          * null:データそのものがない
          * isEmpty:文字数０文字の空っぽ(String)
          */
 
-        if (form.getEmployeeId() == null ||
-                form.getName() == null || form.getName().isEmpty() ||
-                form.getPassword() == null || form.getPassword().isEmpty()) {
+        if (accountRegistForm.getEmployeeId() == null ||
+                accountRegistForm.getName() == null || accountRegistForm.getName().isEmpty() ||
+                accountRegistForm.getPassword() == null || accountRegistForm.getPassword().isEmpty()) {
 
-            redirectAttributes.addFlashAttribute("infoMessage", "入力情報が見つかりません。再度入力してください");
+            redirectAttributes.addFlashAttribute("errorMessages", "入力情報が見つかりません。再度入力してください");
             return "redirect:/admin/account/form";
         }
 
-        return "admin/employeeAccount/EmployeeAccountInsertCheck";
+        return "admin/account/confirm";
     }
 
-    /*
-     * ・アカウント名が重複しているか(DBのemployee_accountテーブルにおなじアカウント名があるか問合せ)
-     * serviceクラスにメソッドがあるか
-     * DBに存在(重複)：エラーメッセージ準備→入力画面にリダイレクト
-     * ・パスワードのハッシュ化
-     * ハッシュ化→formオブジェクトのパスワード欄に上書き
-     * ・DBへの書き込み
-     * xmlのinsert文：登録OK→完了画面へ
-     * ・登録出来たら、完了画面にリダイレクト
-     * 完了画面での二重登録(browserの更新ボタンによる)バグを防ぐために
-     * ・登録失敗/DB登録エラー
-     * 例外処理でメッセージ設定、Javaのlogにエラーを記録
+    /**
+     * アカウント名の重複チェックを行い、パスワードをハッシュ化した上でデータベースへ登録
+     * 成功時は完了画面へリダイレクト、重複エラー時は入力画面へリダイレクト
+     * 
+     * @param accountRegistForm  確認画面から送信されたフォームオブジェクト
+     * @param redirectAttributes 完了画面へ引き渡すデータ格納オブジェクト
+     * @return 完了画面へのリダイレクトパス、重複エラー時は入力画面へのリダイレクトパス
      */
-
-    // 登録処理失敗はたぶん消す(ExeptionHandlerがやってくれる)
     @PostMapping("/postcomplete")
-    public String regist(AccountRegistForm form,
+    public String regist(AccountRegistForm accountRegistForm,
             RedirectAttributes redirectAttributes) {
         // 重複チェック
-        if (!adminEmployeeAccountService.selectAccountName(form.getName())) {
-            List<EmployeeAccount> empNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
-            redirectAttributes.addFlashAttribute("empName", empNameList);
-            redirectAttributes.addFlashAttribute("infoMessage", "このアカウント名は既に使用されています");
+        EmployeeAccount employeeAccount = formToEntity.formToEntity(accountRegistForm);
+        if (!adminEmployeeAccountService.selectAccountName(employeeAccount.getName())) {
 
+            redirectAttributes.addFlashAttribute("errorMessages", "このアカウント名は既に使用されています");
+            redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
             return "redirect:/admin/account/form";
         }
 
         // パスワードのハッシュ化
-        String encodePassword = passwordEncoder.encode(form.getPassword());
+        String encodePassword = passwordEncoder.encode(accountRegistForm.getPassword());
         // DBへのインサート処理
         int accountId = adminEmployeeAccountService
-                .insertEmployeeAccount(formToEntity.formToEntity(form, encodePassword));
-        EmployeeAccount employeeAccount = adminEmployeeAccountService
+                .insertEmployeeAccount(formToEntity.formToEntity(accountRegistForm, encodePassword));
+        employeeAccount = adminEmployeeAccountService
                 .selectEmployeeNameWithEmployeeAccountId(accountId);
         redirectAttributes.addFlashAttribute("employee", employeeAccount);
 
+        redirectAttributes.addFlashAttribute("accountName", accountRegistForm.getName());
         return "redirect:/admin/account/complete";
 
     }
 
-    /*
-     * 【キャンセル処理】
-     * ・セッションの破棄
-     * ・メニュー画面へのリダイレクト
+    /**
+     * 確認画面から入力画面へ戻る処理を制御
+     * ユーザーがこれまで入力していた内容とともに入力画面へリダイレクト
+     * 
+     * @param accountRegistForm  入力画面から送信されたフォームオブジェクト
+     * @param redirectAttributes 入力画面へ引き渡すデータ格納オブジェクト
+     * @return 入力画面へのリダイレクトパス
      */
     @PostMapping("/back")
-    public String back(@ModelAttribute("accountRegistForm") AccountRegistForm form,
+    public String back(@ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm,
             RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("accountRegistForm", form);
+        redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
         return "redirect:/admin/account/form";
     }
 
-    /*
-     * セッション削除
-     * 完了画面表示
+    /**
+     * アカウント登録の完了画面を表示
+     * 不正遷移防止のためフォームデータの存在チェックを行う
+     * 
+     * @param accountRegistForm  確認画面から送信されたフォームオブジェクト
+     * @param model              正常アクセスチェック用オブジェクト
+     * @param redirectAttributes 不正遷移のエラーメッセージ格納オブジェクト
+     * @return 完了画面のテンプレートパス、不正アクセス時は管理者トップ画面へのリダイレクトパス
      */
     @GetMapping("/complete")
-    public String complete(SessionStatus sessionStatus, Model model, RedirectAttributes redirectAttributes) {
-        // if (redirectAttributes.getAttribute())) {
+    public String complete(AccountRegistForm accountRegistForm, RedirectAttributes redirectAttributes, Model model) {
+        if (model.getAttribute("employee") == null) {
 
-        // model.addAttribute("infoMessage", "不正なアクセスです");
-        // return "redirect:/admin/account/form";
-        // }
+            redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
+            return "redirect:/admin";
+        }
 
-        sessionStatus.setComplete();
-        return "admin/employeeAccount/EmployeeAccountInsertComplete";
+        return "admin/account/complete";
     }
 }

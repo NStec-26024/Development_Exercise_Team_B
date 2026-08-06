@@ -48,3 +48,8 @@ implementation 'org.springframework.boot:spring-boot-starter'
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.withType(Javadoc) {
+    options.charSet = 'UTF-8'
+    options.encoding = 'UTF-8'
+}

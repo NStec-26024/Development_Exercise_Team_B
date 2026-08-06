@@ -159,7 +159,7 @@
             <div class="form-row">
                 <label for="empNameLabel">社員名</label>
                 <select id="selectEmpName" th:field="*{employeeId}">
-                    <option th:each="employee : ${empName}" th:text="${employee.name}" th:value="${employee.id}">
+                    <option th:each="employee : ${employeeName}" th:text="${employee.name}" th:value="${employee.id}">
                     </option>
                 </select>
             </div>

@@ -9,15 +9,15 @@ import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.repository.AdminEmployeeAccountRepository;
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
+/**
+ * サービス実装クラス
+ */
 @Service
 @Transactional
 public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountService {
 
     @Autowired
     AdminEmployeeAccountRepository adminEmployeeAccountRepository;
-
-    // @Autowired
-    // EmployeeAccount employeeAccount;
 
     @Override
     public int insertEmployeeAccount(EmployeeAccount employeeAccount) {
