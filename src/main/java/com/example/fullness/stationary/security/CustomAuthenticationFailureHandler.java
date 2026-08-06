@@ -2,19 +2,19 @@ package com.example.fullness.stationary.security;
 
 import java.io.IOException;
 import java.util.Locale;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
-import com.example.fullness.stationary.service.LoginAttemptService;
 import org.springframework.context.MessageSource;
-import org.springframework.jdbc.CannotGetJdbcConnectionException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
+
+import com.example.fullness.stationary.service.impl.LoginAttemptService;
 
 /**
  * ログイン認証失敗時の処理をカスタムするハンドラー。
@@ -24,9 +24,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    private final MessageSource messageSource;
-    private final LoginAttemptService loginAttemptService;
+    private MessageSource messageSource;
+    private LoginAttemptService loginAttemptService;
 
+    /**
+     * @param messageSource       メッセージを取得するための MessageSource
+     * @param loginAttemptService ログイン失敗回数とロック状態を管理するサービス
+     */
     public CustomAuthenticationFailureHandler(MessageSource messageSource, LoginAttemptService loginAttemptService) {
         this.messageSource = messageSource;
         this.loginAttemptService = loginAttemptService;
@@ -34,46 +38,45 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
     }
 
     /**
-     * 認証失敗時にロック判定・失敗回数加算・メッセージ設定を行い、
-     * 必要に応じて LockedException を発生させる。
+     * 認証失敗時に呼び出される処理。
+     * アカウント名の保存、失敗回数の加算、エラーメッセージ設定を行い、
+     * ログイン画面へリダイレクトする。
+     *
+     * @param request   認証リクエスト
+     * @param response  レスポンス
+     * @param exception 認証失敗の原因となった例外
+     * @throws IOException      リダイレクト時の入出力例外
+     * @throws ServletException サーブレット例外
      */
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException exception) throws IOException, ServletException {
-
-        HttpSession session = request.getSession(true);
+    public void onAuthenticationFailure(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException exception)
+            throws IOException, ServletException {
+        // ログインフォームの name を取得
         String accountName = request.getParameter("name");
-        AuthenticationException targetException = exception;
+        // 認証失敗ログ
+        log.info("failureHandler が呼ばれました: {}", accountName);
+        // セッションを必ず作成（メッセージ保存のため）
+        HttpSession session = request.getSession(true);
+        // 入力したユーザー名を保存（再表示用）
+        session.setAttribute("loginName", accountName);
 
-        if (accountName != null && !accountName.isBlank() && loginAttemptService.isBlocked(accountName)) {
-            targetException = new LockedException("Account is locked due to multiple failed attempts");
-            log.warn("[AUDIT] ロック中ログイン試行: account={}, sessionId={}", accountName, session.getId());
-        } else {
+        // 失敗回数を加算（ロック判定は LoginAttemptService が行う）
+        if (accountName != null && !accountName.isBlank()) {
             loginAttemptService.loginFailed(accountName);
-
-            if (accountName != null && !accountName.isBlank() && loginAttemptService.isBlocked(accountName)) {
-                targetException = new LockedException("Account is locked due to multiple failed attempts");
-                log.warn("[AUDIT] アカウントロック発生: account={}, sessionId={}", accountName, session.getId());
-            } else {
-                log.warn("[AUDIT] ログイン失敗: account={}, sessionId={}", accountName, session.getId());
-            }
         }
 
-        if (session.getAttribute("loginErrorMessage") == null) {
-            String rawName = request.getParameter("name");
-            session.setAttribute("loginName", rawName);
-            String msgKey = "com.example.fullness.stationary.security.bad_credentials";
-
-            if (targetException instanceof LockedException) {
-                msgKey = "com.example.fullness.stationary.security.locked";
-            } else if (targetException.getCause() instanceof CannotGetJdbcConnectionException) {
-                msgKey = "com.example.fullness.stationary.security.db_error";
-            }
-
-            session.setAttribute("loginErrorMessage",
-                    messageSource.getMessage(msgKey, null, Locale.JAPAN));
-        }
-
-        super.onAuthenticationFailure(request, response, targetException);
+        // 認証失敗メッセージをセッションに保存（画面で表示される）
+        session.setAttribute(
+                "loginErrorMessage",
+                messageSource.getMessage(
+                        "com.example.fullness.stationary.security.bad_credentials",
+                        null,
+                        Locale.JAPAN));
+        // ログイン画面へリダイレクト
+        response.sendRedirect("/admin/login");
     }
+
 }

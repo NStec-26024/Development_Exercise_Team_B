@@ -14,7 +14,7 @@
         <a th:href="@{/admin/product}">商品情報メンテナンス</a>
         <a th:href="@{/admin/category}">商品カテゴリ登録</a>
         <a th:href="@{/admin/account/form}">アカウント登録</a>
-        <a th:href="@{/logout}" class="logout-btn">ログアウト</a>
+        <a th:href="@{/admin/logout}" class="logout-btn">ログアウト</a>
       </span>
 
       <span sec:authorize="!hasRole('ADMIN')">

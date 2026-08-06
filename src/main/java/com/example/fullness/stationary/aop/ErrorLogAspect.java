@@ -22,10 +22,10 @@ public class ErrorLogAspect {
      * @param joinPoint 例外が発生したメソッドの情報（クラス名・メソッド名など）
      * @param ex        発生した例外オブジェクト
      */
-    @AfterThrowing(pointcut = "within(com.example.fullness.stationary..*) && (" +
-            "@within(org.springframework.stereotype.Controller) || " +
-            "@within(org.springframework.web.bind.annotation.RestController) || " +
-            "@within(org.springframework.stereotype.Service))", throwing = "ex")
+    @AfterThrowing(pointcut = "execution(* com.example.fullness.stationary..*(..)) && " +
+            "(@target(org.springframework.stereotype.Controller) || " +
+            "@target(org.springframework.web.bind.annotation.RestController) || " +
+            "@target(org.springframework.stereotype.Service))", throwing = "ex")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
 
         String className = joinPoint.getTarget().getClass().getName();
