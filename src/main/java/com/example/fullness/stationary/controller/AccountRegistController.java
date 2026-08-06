@@ -22,7 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.form.AccountRegistForm;
-import com.example.fullness.stationary.helper.FormToEntity;
+import com.example.fullness.stationary.helper.EmployeeAccountHelper;
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
 /**
@@ -36,7 +36,8 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 @RequestMapping("/admin/account")
 // @SessionAttributes("accountRegistForm")
 public class AccountRegistController {
-
+    // service層でハッシュ化させる(DB登録前)
+    // アカウントの存在確認もservice層
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -44,7 +45,7 @@ public class AccountRegistController {
     AdminEmployeeAccountService adminEmployeeAccountService;
 
     @Autowired
-    FormToEntity formToEntity;
+    EmployeeAccountHelper formToEntity;
 
     /**
      * リクエスト毎にアカウント登録Formオブジェクトを初期化

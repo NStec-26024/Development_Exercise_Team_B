@@ -9,7 +9,7 @@ import com.example.fullness.stationary.form.AccountRegistForm;
  * FormからEntityに変換するHelperクラス
  */
 @Component
-public class FormToEntity {
+public class EmployeeAccountHelper {
 
     /**
      * 入力データが入ったFormとハッシュ化されたパスワードを基に社員アカウントEntityを生成
