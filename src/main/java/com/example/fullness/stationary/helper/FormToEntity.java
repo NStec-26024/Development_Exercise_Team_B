@@ -5,14 +5,33 @@ import org.springframework.stereotype.Component;
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.form.AccountRegistForm;
 
+/**
+ * FormからEntityに変換するHelperクラス
+ */
 @Component
 public class FormToEntity {
 
-    public EmployeeAccount formToEntity(AccountRegistForm form, String encodePassword) {
+    /**
+     * 入力データが入ったFormとハッシュ化されたパスワードを基に、社員アカウントEntityを生成
+     * 
+     * @param accountRegistForm 入力データが入ったForm
+     * @param encodePassword    ハッシュ化されたパスワード
+     * @return 社員アカウントEntity
+     */
+    public EmployeeAccount formToEntity(AccountRegistForm accountRegistForm, String encodePassword) {
         EmployeeAccount employeeAccount = new EmployeeAccount();
-        employeeAccount.setEmployeeId(form.getEmployeeId());
-        employeeAccount.setName(form.getName());
+        employeeAccount.setEmployeeId(accountRegistForm.getEmployeeId());
+        employeeAccount.setName(accountRegistForm.getName());
         employeeAccount.setPassword(encodePassword);
+
+        return employeeAccount;
+    }
+
+    public EmployeeAccount formToEntity(AccountRegistForm accountRegistForm) {
+        EmployeeAccount employeeAccount = new EmployeeAccount();
+        employeeAccount.setEmployeeId(accountRegistForm.getEmployeeId());
+        employeeAccount.setName(accountRegistForm.getName());
+        employeeAccount.setPassword(accountRegistForm.getPassword());
 
         return employeeAccount;
     }
