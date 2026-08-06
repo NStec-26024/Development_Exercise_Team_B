@@ -25,6 +25,13 @@ import com.example.fullness.stationary.form.AccountRegistForm;
 import com.example.fullness.stationary.helper.FormToEntity;
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
+/**
+ * 社員ログインアカウント登録Controller
+ * 
+ * 担当者がシステムを利用するために必要な情報をシステムに登録
+ * 社員アカウントの新規登録処理における画面遷移(入力画面→確認画面→完了画面)
+ * セッションデータ管理・バリデーション・DB登録制御
+ */
 @Controller
 @RequestMapping("/admin/account")
 // @SessionAttributes("accountRegistForm")
@@ -39,11 +46,21 @@ public class AccountRegistController {
     @Autowired
     FormToEntity formToEntity;
 
+    /**
+     * リクエスト毎にアカウント登録Formオブジェクトを初期化
+     * 
+     * @return 初期化されたAccountRegistFormオブジェクト
+     */
     @ModelAttribute
     public AccountRegistForm setUpForm() {
         return new AccountRegistForm();
     }
 
+    /**
+     * 
+     * @param model
+     * @return
+     */
     @GetMapping("/form")
     public String showInput(Model model) {
         List<EmployeeAccount> employeeNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
