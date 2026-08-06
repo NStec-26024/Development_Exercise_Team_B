@@ -150,10 +150,11 @@ public class AccountRegistController {
      * ・セッションの破棄
      * ・メニュー画面へのリダイレクト
      */
-    @GetMapping("/cancel")
-    public String cancel(SessionStatus sessionStatus) {
-        sessionStatus.setComplete();
-        return "redirect:/admin";
+    @PostMapping("/back")
+    public String back(@ModelAttribute("accountRegistForm") AccountRegistForm form,
+            RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("accountRegistForm", form);
+        return "redirect:/admin/account/form";
     }
 
     /*
@@ -169,7 +170,6 @@ public class AccountRegistController {
         // }
 
         sessionStatus.setComplete();
-        return "admin/employeeAccount/EmployeeAccountComplete";
+        return "admin/employeeAccount/EmployeeAccountInsertComplete";
     }
-
 }
