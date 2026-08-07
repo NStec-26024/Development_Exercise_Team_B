@@ -15,14 +15,14 @@ public interface AdminEmployeeAccountService {
      * @param employeeAccount 登録する社員アカウント
      * @return 自動採番されたアカウントID(serial値)
      */
-    public int insertEmployeeAccount(EmployeeAccount employeeAccount);
+    public int addEmployeeAccount(EmployeeAccount employeeAccount);
 
     /**
      * 社員アカウントのない社員の情報一覧を取得
      * 
      * @return 社員情報と紐づいた社員アカウントのリスト
      */
-    public List<EmployeeAccount> selectEmployeeNameWithEmployeeAccount();
+    public List<EmployeeAccount> getEmployeeNameWithEmployeeAccount();
 
     /**
      * 指定された社員IDと紐づくアカウントを取得
@@ -30,7 +30,7 @@ public interface AdminEmployeeAccountService {
      * @param id 社員ID
      * @return 社員アカウント(該当がない場合はnull)
      */
-    public EmployeeAccount selectNotHasEmployeeAccount(int id);
+    public EmployeeAccount getEmployeeAccountWithEmployeeId(int id);
 
     /**
      * 指定されたアカウント名と紐づく社員アカウントを取得
@@ -38,7 +38,7 @@ public interface AdminEmployeeAccountService {
      * @param accountName 取得対象のアカウント名
      * @return 社員アカウント(該当がない場合はnull)
      */
-    public boolean selectAccountName(String accountName);
+    public boolean getAccountName(String accountName);
 
     /**
      * 指定されたアカウントIDに紐づく社員アカウントと社員情報を取得
@@ -46,6 +46,6 @@ public interface AdminEmployeeAccountService {
      * @param id アカウントID
      * @return 社員情報と紐づいた社員アカウント(該当がない場合はnull)
      */
-    public EmployeeAccount selectEmployeeNameWithEmployeeAccountId(int id);
+    public EmployeeAccount getEmployeeNameWithEmployeeAccountId(int id);
 
 }

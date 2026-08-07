@@ -11,16 +11,16 @@
         <result property="name" column="name" />
         <result property="password" column="password" />
         <association property="employee" javaType="Employee">
-            <id property="id" column="id" />
+            <id property="id" column="employee_id" />
             <result property="departmentId" column="department_id" />
-            <result property="name" column="name" />
+            <result property="name" column="employee_name" />
             <result property="nameKana" column="name_kana" />
         </association>
         </resultMap>
         
         <select id="selectEmployeeNameWithEmployeeAccount" resultMap="employeeAccountResult">
             <![CDATA[
-               SELECT *
+               SELECT e.name AS employee_name,e.id AS employee_id
                FROM
                employee e
                LEFT OUTER JOIN
@@ -40,9 +40,9 @@
         ]]>
     </insert>
 
-    <select id="selectNotHasEmployeeAccount" resultMap="employeeAccountResult">
+    <select id="selectEmployeeAccountWithEmployeeId" resultMap="employeeAccountResult">
         <![CDATA[
-                SELECT *
+                SELECT e.name AS employee_name,e.id AS employee_id
                 FROM
                 employee e
                 LEFT OUTER JOIN

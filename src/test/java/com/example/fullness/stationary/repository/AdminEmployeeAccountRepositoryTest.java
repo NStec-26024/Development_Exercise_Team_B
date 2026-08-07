@@ -32,17 +32,17 @@ public class AdminEmployeeAccountRepositoryTest {
     public void selectEmployeeNameWithEmployeeAccountTest() {
         List<EmployeeAccount> employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
         assertEquals(employeeAccount.get(0).getEmployee().getName(), "川田次郎");
-        assertEquals(employeeAccount.get(0).getEmployee().getId(), "2");
+        assertEquals(employeeAccount.get(0).getEmployee().getId(), 2);
         assertEquals(employeeAccount.get(1).getEmployee().getName(), "海田三郎");
-        assertEquals(employeeAccount.get(1).getEmployee().getId(), "3");
+        assertEquals(employeeAccount.get(1).getEmployee().getId(), 3);
 
     }
 
     @Test
-    public void selectNotHasEmployeeAccountTest() {
+    public void selectEmployeeAccountWithEmployeeIdTest() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(1);
         assertEquals(employeeAccount.getEmployee().getName(), "山田太郎");
-        assertEquals(employeeAccount.getEmployee().getId(), "1");
+        assertEquals(employeeAccount.getEmployee().getId(), 1);
 
         employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(2);
         assertEquals(employeeAccount, null);

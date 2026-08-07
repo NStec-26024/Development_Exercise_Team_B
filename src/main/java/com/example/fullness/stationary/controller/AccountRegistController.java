@@ -38,8 +38,6 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 public class AccountRegistController {
     // service層でハッシュ化させる(DB登録前)
     // アカウントの存在確認もservice層
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
     @Autowired
     AdminEmployeeAccountService adminEmployeeAccountService;
@@ -66,7 +64,7 @@ public class AccountRegistController {
      */
     @GetMapping("/form")
     public String showInput(Model model) {
-        List<EmployeeAccount> employeeNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+        List<EmployeeAccount> employeeNameList = adminEmployeeAccountService.getEmployeeNameWithEmployeeAccount();
 
         if (employeeNameList.isEmpty()) {
             model.addAttribute("errorMessages", "アカウント登録可能な社員が存在しません");
@@ -101,7 +99,7 @@ public class AccountRegistController {
 
             EmployeeAccount employeeAccount = formToEntity.formToEntity(accountRegistForm);
             employeeAccount = adminEmployeeAccountService
-                    .selectNotHasEmployeeAccount(employeeAccount.getEmployeeId());
+                    .getEmployeeAccountWithEmployeeId(employeeAccount.getEmployeeId());
             redirectAttributes.addFlashAttribute("employee", employeeAccount);
 
             return "redirect:/admin/account/confirm";
@@ -148,20 +146,18 @@ public class AccountRegistController {
             RedirectAttributes redirectAttributes) {
         // 重複チェック
         EmployeeAccount employeeAccount = formToEntity.formToEntity(accountRegistForm);
-        if (!adminEmployeeAccountService.selectAccountName(employeeAccount.getName())) {
+        if (!adminEmployeeAccountService.getAccountName(employeeAccount.getName())) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "このアカウント名は既に使用されています");
             redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
             return "redirect:/admin/account/form";
         }
 
-        // パスワードのハッシュ化
-        String encodePassword = passwordEncoder.encode(accountRegistForm.getPassword());
         // DBへのインサート処理
         int accountId = adminEmployeeAccountService
-                .insertEmployeeAccount(formToEntity.formToEntity(accountRegistForm, encodePassword));
+                .addEmployeeAccount(formToEntity.formToEntity(accountRegistForm));
         employeeAccount = adminEmployeeAccountService
-                .selectEmployeeNameWithEmployeeAccountId(accountId);
+                .getEmployeeNameWithEmployeeAccountId(accountId);
         redirectAttributes.addFlashAttribute("employee", employeeAccount);
 
         redirectAttributes.addFlashAttribute("accountName", accountRegistForm.getName());

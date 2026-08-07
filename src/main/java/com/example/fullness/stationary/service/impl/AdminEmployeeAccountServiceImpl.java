@@ -2,6 +2,7 @@ package com.example.fullness.stationary.service.impl;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +20,15 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
     @Autowired
     AdminEmployeeAccountRepository adminEmployeeAccountRepository;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Override
-    public int insertEmployeeAccount(EmployeeAccount employeeAccount) {
+    public int addEmployeeAccount(EmployeeAccount employeeAccount) {
+
+        // パスワードのハッシュ化
+        String encodePassword = passwordEncoder.encode(employeeAccount.getPassword());
+        employeeAccount.setPassword(encodePassword);
         adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
         int accountId = employeeAccount.getId();
         return accountId;
@@ -28,18 +36,18 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
     }
 
     @Override
-    public List<EmployeeAccount> selectEmployeeNameWithEmployeeAccount() {
+    public List<EmployeeAccount> getEmployeeNameWithEmployeeAccount() {
         return adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
     }
 
     @Override
-    public EmployeeAccount selectNotHasEmployeeAccount(int id) {
-        return adminEmployeeAccountRepository.selectNotHasEmployeeAccount(id);
+    public EmployeeAccount getEmployeeAccountWithEmployeeId(int id) {
+        return adminEmployeeAccountRepository.selectEmployeeAccountWithEmployeeId(id);
 
     }
 
     @Override
-    public boolean selectAccountName(String accountName) {
+    public boolean getAccountName(String accountName) {
         EmployeeAccount employeeAccount = new EmployeeAccount();
         employeeAccount = adminEmployeeAccountRepository.selectAccountName(accountName);
         if (employeeAccount != null) {
@@ -51,7 +59,7 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
     }
 
     @Override
-    public EmployeeAccount selectEmployeeNameWithEmployeeAccountId(int id) {
+    public EmployeeAccount getEmployeeNameWithEmployeeAccountId(int id) {
         return adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(id);
 
     }
