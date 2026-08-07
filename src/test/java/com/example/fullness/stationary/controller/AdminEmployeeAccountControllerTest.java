@@ -448,21 +448,23 @@ public class AdminEmployeeAccountControllerTest {
          */
         @Test
         public void testRegistOK_case21() throws Exception {
+                EmployeeAccount inpuAccount = new EmployeeAccount();
+                inpuAccount.setName(newInputName);
                 when(employeeAccountHelper.formToEntity(any(AdminEmployeeAccountForm.class)))
-                                .thenReturn(employeeAccount, employeeAccount);
-                when(adminEmployeeAccountService.getAccountName("testUSer")).thenReturn(true);
+                                .thenReturn(inpuAccount, inpuAccount);
+                when(adminEmployeeAccountService.getAccountName(newInputName)).thenReturn(true);
                 when(adminEmployeeAccountService.addEmployeeAccount(any(EmployeeAccount.class)))
                                 .thenReturn(newInputEmployeeId);
                 when(adminEmployeeAccountService.getEmployeeNameWithEmployeeAccountId(anyInt()))
-                                .thenReturn(employeeAccount);
+                                .thenReturn(inpuAccount);
 
                 mockMvc.perform(post("/admin/account/postcomplete")
-                                .param("name", "testUSer")
-                                .param("employeeId", "2")
+                                .param("name", newInputName)
+                                .param("employeeId", String.valueOf(newInputEmployeeId))
                                 .param("password", newInputPassword))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/complete"))
-                                .andExpect(flash().attribute("employee", employeeAccount))
+                                .andExpect(flash().attribute("employee", inpuAccount))
                                 .andExpect(flash().attribute("accountName", newInputName));
                 // // serviceが正しく呼び出されたか
                 // verify(adminEmployeeAccountService).addEmployeeAccount(any(EmployeeAccount.class));
