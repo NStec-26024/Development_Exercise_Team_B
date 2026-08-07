@@ -3,7 +3,7 @@ package com.example.fullness.stationary.helper;
 import org.springframework.stereotype.Component;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
-import com.example.fullness.stationary.form.AccountRegistForm;
+import com.example.fullness.stationary.form.AdminEmployeeAccountForm;
 
 /**
  * FormからEntityに変換するHelperクラス
@@ -14,14 +14,14 @@ public class EmployeeAccountHelper {
     /**
      * 入力データが入ったFormとハッシュ化されたパスワードを基に社員アカウントEntityを生成
      * 
-     * @param accountRegistForm 入力データが入ったForm
-     * @param encodePassword    ハッシュ化されたパスワード
+     * @param adminEmployeeAccountForm 入力データが入ったForm
+     * @param encodePassword           ハッシュ化されたパスワード
      * @return 社員アカウントEntity
      */
-    public EmployeeAccount formToEntity(AccountRegistForm accountRegistForm, String encodePassword) {
+    public EmployeeAccount formToEntity(AdminEmployeeAccountForm adminEmployeeAccountForm, String encodePassword) {
         EmployeeAccount employeeAccount = new EmployeeAccount();
-        employeeAccount.setEmployeeId(accountRegistForm.getEmployeeId());
-        employeeAccount.setName(accountRegistForm.getName());
+        employeeAccount.setEmployeeId(adminEmployeeAccountForm.getEmployeeId());
+        employeeAccount.setName(adminEmployeeAccountForm.getName());
         employeeAccount.setPassword(encodePassword);
 
         return employeeAccount;
@@ -30,14 +30,14 @@ public class EmployeeAccountHelper {
     /**
      * 入力データが入ったFormを基に社員アカウントEntityを生成
      * 
-     * @param accountRegistForm 入力データが入ったForm
+     * @param adminEmployeeAccountForm 入力データが入ったForm
      * @return 社員アカウントEntity
      */
-    public EmployeeAccount formToEntity(AccountRegistForm accountRegistForm) {
+    public EmployeeAccount formToEntity(AdminEmployeeAccountForm adminEmployeeAccountForm) {
         EmployeeAccount employeeAccount = new EmployeeAccount();
-        employeeAccount.setEmployeeId(accountRegistForm.getEmployeeId());
-        employeeAccount.setName(accountRegistForm.getName());
-        employeeAccount.setPassword(accountRegistForm.getPassword());
+        employeeAccount.setEmployeeId(adminEmployeeAccountForm.getEmployeeId());
+        employeeAccount.setName(adminEmployeeAccountForm.getName());
+        employeeAccount.setPassword(adminEmployeeAccountForm.getPassword());
 
         return employeeAccount;
     }

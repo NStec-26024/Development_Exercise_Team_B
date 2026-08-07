@@ -11,7 +11,7 @@ import lombok.Data;
  * 社員アカウント登録画面からの入力値を保持し、バリデーションの設定をしたフォームクラス
  */
 @Data
-public class AccountRegistForm implements Serializable {
+public class AdminEmployeeAccountForm implements Serializable {
 
     /** アカウントID（自動採番） */
     private Integer id;

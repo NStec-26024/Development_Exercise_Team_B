@@ -1,4 +1,4 @@
-package com.example.fullness.stationary.cofig;
+package com.example.fullness.stationary.config;
 
 import javax.sql.DataSource;
 

@@ -21,7 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
-import com.example.fullness.stationary.form.AccountRegistForm;
+import com.example.fullness.stationary.form.AdminEmployeeAccountForm;
 import com.example.fullness.stationary.helper.EmployeeAccountHelper;
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
@@ -34,8 +34,8 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
  */
 @Controller
 @RequestMapping("/admin/account")
-// @SessionAttributes("accountRegistForm")
-public class AccountRegistController {
+// @SessionAttributes("adminEmployeeAccountForm")
+public class AdminEmployeeAccountController {
     // service層でハッシュ化させる(DB登録前)
     // アカウントの存在確認もservice層
     @Autowired
@@ -50,11 +50,11 @@ public class AccountRegistController {
     /**
      * リクエスト毎にアカウント登録Formオブジェクトを初期化
      * 
-     * @return 初期化されたAccountRegistFormオブジェクト
+     * @return 初期化されたadminEmployeeAccountFormオブジェクト
      */
     @ModelAttribute
-    public AccountRegistForm setUpForm() {
-        return new AccountRegistForm();
+    public AdminEmployeeAccountForm setUpForm() {
+        return new AdminEmployeeAccountForm();
     }
 
     /**
@@ -81,25 +81,26 @@ public class AccountRegistController {
      * 入力画面からの送信内容をバリデーションチェックし、問題がなければ確認画面へリダイレクト
      * エラーがある場合は入力フォームへ値を保持したまま差し戻し
      * 
-     * @param accountRegistForm  入力画面から送信されたフォームオブジェクト
-     * @param result             バリデーションの検証結果
-     * @param redirectAttributes リダイレクト先へデータを引き継ぐためのフラッシュ属性設定オブジェクト
+     * @param adminEmployeeAccountForm 入力画面から送信されたフォームオブジェクト
+     * @param result                   バリデーションの検証結果
+     * @param redirectAttributes       リダイレクト先へデータを引き継ぐためのフラッシュ属性設定オブジェクト
      * @return 成功時は確認画面、失敗時は入力画面へのリダイレクトパス
      */
     @PostMapping("/postconfirm")
-    public String checkInput(
-            @Validated @ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm, BindingResult result,
+    public String validateInput(
+            @Validated @ModelAttribute("adminEmployeeAccountForm") AdminEmployeeAccountForm adminEmployeeAccountForm,
+            BindingResult result,
             RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
+        redirectAttributes.addFlashAttribute("adminEmployeeAccountForm", adminEmployeeAccountForm);
         if (result.hasErrors()) {
 
             redirectAttributes.addFlashAttribute(
-                    BindingResult.MODEL_KEY_PREFIX + "accountRegistForm", result);
+                    BindingResult.MODEL_KEY_PREFIX + "adminEmployeeAccountForm", result);
             return "redirect:/admin/account/form";
 
         } else {
 
-            EmployeeAccount employeeAccount = employeeAccountHelper.formToEntity(accountRegistForm);
+            EmployeeAccount employeeAccount = employeeAccountHelper.formToEntity(adminEmployeeAccountForm);
             employeeAccount = adminEmployeeAccountService
                     .selectNotHasEmployeeAccount(employeeAccount.getEmployeeId());
             redirectAttributes.addFlashAttribute("employee", employeeAccount);
@@ -112,21 +113,22 @@ public class AccountRegistController {
      * アカウント登録の確認画面を表示
      * 不正遷移防止のためフォームデータの存在チェックを行う
      * 
-     * @param accountRegistForm  /postconfirmから送信されたフォームオブジェクト
-     * @param redirectAttributes 不正アクセス時のエラーメッセージ格納オブジェクト
+     * @param adminEmployeeAccountForm /postconfirmから送信されたフォームオブジェクト
+     * @param redirectAttributes       不正アクセス時のエラーメッセージ格納オブジェクト
      * @return 確認画面のテンプレートパス、不正遷移時は入力画面へのリダイレクトパス
      */
     @GetMapping("/confirm")
-    public String showConfirm(@ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm,
+    public String showConfirm(
+            @ModelAttribute("adminEmployeeAccountForm") AdminEmployeeAccountForm adminEmployeeAccountForm,
             RedirectAttributes redirectAttributes) {
         /*
          * null:データそのものがない
          * isEmpty:文字数０文字の空っぽ(String)
          */
 
-        if (accountRegistForm.getEmployeeId() == null ||
-                accountRegistForm.getName() == null || accountRegistForm.getName().isEmpty() ||
-                accountRegistForm.getPassword() == null || accountRegistForm.getPassword().isEmpty()) {
+        if (adminEmployeeAccountForm.getEmployeeId() == null ||
+                adminEmployeeAccountForm.getName() == null || adminEmployeeAccountForm.getName().isEmpty() ||
+                adminEmployeeAccountForm.getPassword() == null || adminEmployeeAccountForm.getPassword().isEmpty()) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "入力情報が見つかりません。再度入力してください");
             return "redirect:/admin/account/form";
@@ -139,32 +141,32 @@ public class AccountRegistController {
      * アカウント名の重複チェックを行い、パスワードをハッシュ化した上でデータベースへ登録
      * 成功時は完了画面へリダイレクト、重複エラー時は入力画面へリダイレクト
      * 
-     * @param accountRegistForm  確認画面から送信されたフォームオブジェクト
-     * @param redirectAttributes 完了画面へ引き渡すデータ格納オブジェクト
+     * @param adminEmployeeAccountForm 確認画面から送信されたフォームオブジェクト
+     * @param redirectAttributes       完了画面へ引き渡すデータ格納オブジェクト
      * @return 完了画面へのリダイレクトパス、重複エラー時は入力画面へのリダイレクトパス
      */
     @PostMapping("/postcomplete")
-    public String regist(AccountRegistForm accountRegistForm,
+    public String regist(AdminEmployeeAccountForm adminEmployeeAccountForm,
             RedirectAttributes redirectAttributes) {
         // 重複チェック
-        EmployeeAccount employeeAccount = employeeAccountHelper.formToEntity(accountRegistForm);
+        EmployeeAccount employeeAccount = employeeAccountHelper.formToEntity(adminEmployeeAccountForm);
         if (!adminEmployeeAccountService.selectAccountName(employeeAccount.getName())) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "このアカウント名は既に使用されています");
-            redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
+            redirectAttributes.addFlashAttribute("adminEmployeeAccountForm", adminEmployeeAccountForm);
             return "redirect:/admin/account/form";
         }
 
         // パスワードのハッシュ化
-        String encodePassword = passwordEncoder.encode(accountRegistForm.getPassword());
+        String encodePassword = passwordEncoder.encode(adminEmployeeAccountForm.getPassword());
         // DBへのインサート処理
         int accountId = adminEmployeeAccountService
-                .insertEmployeeAccount(employeeAccountHelper.formToEntity(accountRegistForm, encodePassword));
+                .insertEmployeeAccount(employeeAccountHelper.formToEntity(adminEmployeeAccountForm, encodePassword));
         employeeAccount = adminEmployeeAccountService
                 .selectEmployeeNameWithEmployeeAccountId(accountId);
         redirectAttributes.addFlashAttribute("employee", employeeAccount);
 
-        redirectAttributes.addFlashAttribute("accountName", accountRegistForm.getName());
+        redirectAttributes.addFlashAttribute("accountName", adminEmployeeAccountForm.getName());
         return "redirect:/admin/account/complete";
 
     }
@@ -173,14 +175,14 @@ public class AccountRegistController {
      * 確認画面から入力画面へ戻る処理を制御
      * ユーザーがこれまで入力していた内容とともに入力画面へリダイレクト
      * 
-     * @param accountRegistForm  入力画面から送信されたフォームオブジェクト
-     * @param redirectAttributes 入力画面へ引き渡すデータ格納オブジェクト
+     * @param adminEmployeeAccountForm 入力画面から送信されたフォームオブジェクト
+     * @param redirectAttributes       入力画面へ引き渡すデータ格納オブジェクト
      * @return 入力画面へのリダイレクトパス
      */
     @PostMapping("/back")
-    public String back(@ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm,
+    public String back(@ModelAttribute("adminEmployeeAccountForm") AdminEmployeeAccountForm adminEmployeeAccountForm,
             RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("accountRegistForm", accountRegistForm);
+        redirectAttributes.addFlashAttribute("adminEmployeeAccountForm", adminEmployeeAccountForm);
         return "redirect:/admin/account/form";
     }
 
@@ -188,13 +190,13 @@ public class AccountRegistController {
      * アカウント登録の完了画面を表示
      * 不正遷移防止のためフォームデータの存在チェックを行う
      * 
-     * @param accountRegistForm  確認画面から送信されたフォームオブジェクト
-     * @param model              正常アクセスチェック用オブジェクト
-     * @param redirectAttributes 不正遷移のエラーメッセージ格納オブジェクト
+     * @param adminEmployeeAccountForm 確認画面から送信されたフォームオブジェクト
+     * @param model                    正常アクセスチェック用オブジェクト
+     * @param redirectAttributes       不正遷移のエラーメッセージ格納オブジェクト
      * @return 完了画面のテンプレートパス、不正アクセス時は管理者トップ画面へのリダイレクトパス
      */
     @GetMapping("/complete")
-    public String showCxomplete(AccountRegistForm accountRegistForm, RedirectAttributes redirectAttributes,
+    public String showComplete(AdminEmployeeAccountForm adminEmployeeAccountForm, RedirectAttributes redirectAttributes,
             Model model) {
         if (model.getAttribute("employee") == null) {
 
