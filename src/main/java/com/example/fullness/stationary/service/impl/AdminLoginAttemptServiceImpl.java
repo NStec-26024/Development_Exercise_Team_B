@@ -5,18 +5,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
-import com.example.fullness.stationary.service.LoginAttemptService;
+import com.example.fullness.stationary.service.AdminLoginAttemptService;
 
 /**
  * ログイン失敗回数の管理とアカウントロック判定を行うサービス。
  * 一定回数の失敗でアカウントを一定時間ロックし、成功時には状態をリセットする。
  */
 @Service
-public class LoginAttemptServiceImpl implements LoginAttemptService {
+public class AdminLoginAttemptServiceImpl implements AdminLoginAttemptService {
 
-    private static final int MAX_ATTEMPTS = 5;
-    private static final int LOCK_MINUTES = 10;
+    @Value("${login.max-attempts}")
+    private int MAX_ATTEMPTS;
+
+    @Value("${login.lock-minutes}")
+    private int LOCK_MINUTES;
 
     // 失敗回数
     private final Map<String, Integer> attemptsCache = new ConcurrentHashMap<>();
@@ -24,7 +28,12 @@ public class LoginAttemptServiceImpl implements LoginAttemptService {
     // ロック開始時刻
     private final Map<String, LocalDateTime> lockTimeCache = new ConcurrentHashMap<>();
 
-    /** ログイン失敗時 */
+    /**
+     * ログイン失敗時に失敗回数を加算し、必要に応じてロックを開始する。
+     *
+     * @param username ログインを試行したユーザー名
+     */
+    @Override
     public void loginFailed(String username) {
 
         int attempts = attemptsCache.getOrDefault(username, 0) + 1;
@@ -36,13 +45,23 @@ public class LoginAttemptServiceImpl implements LoginAttemptService {
         }
     }
 
-    /** ログイン成功時（ロック解除） */
+    /**
+     * ログイン成功時に失敗回数とロック状態をリセットする。
+     *
+     * @param username ログインに成功したユーザー名
+     */
     public void loginSucceeded(String username) {
         attemptsCache.remove(username);
         lockTimeCache.remove(username);
     }
 
-    /** ロック判定（メモリ管理 + 自動解除） */
+    /**
+     * アカウントがロック中かどうかを判定する。
+     * ロック時間が過ぎていれば自動的に解除する。
+     *
+     * @param username 判定対象のユーザー名
+     * @return ロック中なら true、ロックされていなければ false
+     */
     public boolean isBlocked(String username) {
 
         // 失敗回数が閾値未満 → ロックされていない

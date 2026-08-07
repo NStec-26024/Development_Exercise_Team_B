@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Fullness Stationary アプリケーションの起動クラス。
  * Spring Boot の自動構成とコンポーネントスキャンを有効化し、
- * アプリケーションを起動するエントリポイントとなる。
+ * アプリケーションを起動する。
  */
 @SpringBootApplication
 public class FullnessStationaryApplication {

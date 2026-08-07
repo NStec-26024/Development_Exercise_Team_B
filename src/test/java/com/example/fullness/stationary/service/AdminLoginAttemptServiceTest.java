@@ -5,15 +5,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.example.fullness.stationary.service.impl.LoginAttemptService;
+import com.example.fullness.stationary.service.impl.AdminLoginAttemptServiceImpl;
 
-public class LoginAttemptServiceTest {
+public class AdminLoginAttemptServiceTest {
     private static final int MAX_ATTEMPTS = 5;
-    private LoginAttemptService service;
+    private AdminLoginAttemptService service;
 
     @BeforeEach
     void setup() {
-        service = new LoginAttemptService();
+        service = new AdminLoginAttemptServiceImpl();
     }
 
     // ============================================================

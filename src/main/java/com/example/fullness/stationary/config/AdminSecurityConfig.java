@@ -1,5 +1,7 @@
 package com.example.fullness.stationary.config;
 
+import java.util.Locale;
+
 import javax.sql.DataSource;
 
 import org.springframework.context.MessageSource;
@@ -8,15 +10,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.example.fullness.stationary.security.CustomAuthenticationFailureHandler;
-import com.example.fullness.stationary.security.SessionLockFilter;
-import com.example.fullness.stationary.service.LoginAttemptService;
+import com.example.fullness.stationary.security.AdminCustomAuthenticationFailureHandler;
+import com.example.fullness.stationary.security.AdminSessionLockFilter;
+import com.example.fullness.stationary.service.AdminLoginAttemptService;
+import com.example.fullness.stationary.service.impl.AdminUserDetailsServiceImpl;
+
+import jakarta.servlet.http.HttpSession;
 
 /**
  * 管理画面（/admin 配下）のセキュリティ設定をまとめたクラス。
@@ -39,23 +43,31 @@ import com.example.fullness.stationary.service.LoginAttemptService;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class AdminSecurityConfig {
 
-        private final LoginAttemptService loginAttemptService;
+        private AdminLoginAttemptService adminLoginAttemptServiceImpl;
 
         /**
          * ログイン失敗回数を管理するサービスを受け取る。
          * ログイン成功時の失敗回数リセットやロック判定に使用する。
+         * 
+         * @param adminLoginAttemptServiceImpl ログイン失敗回数とロック状態を管理するサービス
          */
 
-        public SecurityConfig(LoginAttemptService loginAttemptService) {
-                this.loginAttemptService = loginAttemptService;
+        public AdminSecurityConfig(AdminLoginAttemptService adminLoginAttemptServiceImpl) {
+                this.adminLoginAttemptServiceImpl = adminLoginAttemptServiceImpl;
         }
 
-        @Bean
-        public SessionLockFilter sessionLockFilter(LoginAttemptService loginAttemptService,
+        /**
+         * ロック判定フィルターを生成する。
+         *
+         * @param adminLoginAttemptServiceImpl ログイン失敗回数管理サービス
+         * @param messageSource                メッセージソース
+         * @return ロック判定フィルター
+         */
+        public AdminSessionLockFilter aadminSessionLockFilter(AdminLoginAttemptService adminLoginAttemptServiceImpl,
                         MessageSource messageSource) {
-                return new SessionLockFilter(loginAttemptService, messageSource);
+                return new AdminSessionLockFilter(adminLoginAttemptServiceImpl, messageSource);
         }
 
         /**
@@ -64,38 +76,43 @@ public class SecurityConfig {
          * このメソッドでは次の設定を行う：
          *
          * - URL のアクセス制御
-         * /admin/login などは誰でもアクセス可能
+         * /admin/login は誰でもアクセス可能
          * /admin/** は ADMIN 権限を持つユーザーのみアクセス可能
          *
          * - ロック判定フィルターの追加
-         * ログイン前に SessionLockFilter を実行し、アカウントがロック中なら認証処理を止める
+         * ログイン前に AdminSessionLockFilter を実行し、アカウントがロック中なら認証処理を止める
          *
          * - ログイン処理の設定
          * ログイン画面の URL（/admin/login）
          * ログイン処理の URL（/admin/login-auth）
-         * ログイン成功時：失敗回数リセット、セッションID再生成、管理画面へ遷移
-         * ログイン失敗時：CustomAuthenticationFailureHandler によりメッセージ設定
+         * 成功時：失敗回数リセット、セッションID再生成、管理画面へ遷移
+         * 失敗時：AdminCustomAuthenticationFailureHandler によりメッセージ設定
          *
          * - ログアウト処理の設定
-         * セッション破棄
-         * JSESSIONID Cookie 削除
-         * ログアウト後は /admin へ遷移
+         * セッション破棄、JSESSIONID Cookie 削除、ログアウト後は /admin へ遷移
          *
          * - セッションが無効になったときの処理
-         * セッションが切れた場合、login 画面以外からのアクセスなら timeoutFlag を付けてログイン画面へ戻す
+         * login 画面以外からのアクセスなら timeoutMessage を付けてログイン画面へ戻す
          *
          * - CSRF 無効化
-         * 管理画面の要件に合わせて CSRF を無効化する
-         *
-         * @return 管理画面用の SecurityFilterChain
+         * 
+         * @param http                HttpSecurity 設定オブジェクト
+         * @param failureHandler      認証失敗時のハンドラー
+         * @param messageSource       メッセージソース
+         * @param loginAttemptService ログイン失敗回数管理サービス
+         * @return 管理画面用 SecurityFilterChain
+         * @throws Exception セキュリティ設定時の例外
          */
 
         @Bean
         public SecurityFilterChain securityFilterChain(
                         HttpSecurity http,
-                        CustomAuthenticationFailureHandler failureHandler,
+                        AdminCustomAuthenticationFailureHandler failureHandler,
                         MessageSource messageSource,
-                        SessionLockFilter sessionLockFilter) throws Exception {
+                        AdminLoginAttemptService loginAttemptService) throws Exception {
+
+                AdminSessionLockFilter sessionLockFilter = new AdminSessionLockFilter(loginAttemptService,
+                                messageSource);
 
                 // URL のアクセス制御
                 http.authorizeHttpRequests(auth -> auth
@@ -145,9 +162,14 @@ public class SecurityConfig {
                 http.sessionManagement(session -> session
                                 .invalidSessionStrategy((request, response) -> {
                                         String path = request.getServletPath();
-                                        // login 画面以外からのアクセス時のみ timeoutFlag を付与
+                                        HttpSession newSession = request.getSession(true);
                                         if (!path.startsWith("/admin/login")) {
-                                                request.getSession(true).setAttribute("timeoutFlag", true);
+                                                String timeoutMessage = messageSource.getMessage(
+                                                                "com.example.fullness.stationary.security.session_timeout",
+                                                                null,
+                                                                Locale.JAPAN);
+
+                                                newSession.setAttribute("timeoutMessage", timeoutMessage);
                                         }
                                         response.sendRedirect("/admin/login");
                                 }));
@@ -159,30 +181,27 @@ public class SecurityConfig {
         }
 
         /**
-         * DB（employee_account テーブル）からユーザー情報を読み込む仕組みを提供する。
-         *
-         * ユーザー名・パスワード・権限を SQL で取得し、Spring Security が認証に利用する。
+         * 管理画面用のユーザー認証に利用する UserDetailsService を提供する。
          * 
+         * AdminUserDetailsServiceImpl は employee_account テーブルからユーザー情報を取得し、
+         * Spring Security の認証処理で利用される UserDetails を生成する。
+         * 本メソッドはその実装を SecurityConfig に登録するための Bean 定義である。
+         *
+         * @param service 管理画面のユーザー情報を読み込む UserDetailsService 実装
+         * @return AdminUserDetailsServiceImpl を返す UserDetailsService Bean
          */
         @Bean
-        public UserDetailsService userDetailsService(DataSource dataSource) {
-                JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
-
-                manager.setUsersByUsernameQuery(
-                                "SELECT name, password, TRUE as enabled FROM employee_account WHERE name = ?");
-
-                manager.setAuthoritiesByUsernameQuery(
-                                "SELECT name, 'ROLE_ADMIN' as authority FROM employee_account WHERE name = ?");
-
-                return manager;
+        public UserDetailsService userDetailsService(AdminUserDetailsServiceImpl service) {
+                return service;
         }
 
         /**
          * パスワードを安全に保存するためのハッシュ化方式（BCrypt）を提供する。
+         *
+         * @return BCrypt を利用した PasswordEncoder
          */
         @Bean
         public PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder();
         }
-
 }

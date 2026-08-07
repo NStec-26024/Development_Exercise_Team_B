@@ -12,49 +12,55 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 
-import com.example.fullness.stationary.form.LoginForm;
+import com.example.fullness.stationary.form.AdminLoginForm;
+
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 /**
  * 管理画面で発生した例外を共通処理するハンドラー。
- * DB 接続エラーなどを検知し、適切なメッセージを画面へ渡す。
- * 認証関連の例外は Spring Security に委譲する。
- *
  */
 @Slf4j
 @ControllerAdvice
 public class AdminGlobalExceptionHandler {
 
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
+    /**
+     * メッセージ取得に使用する MessageSource を受け取る。
+     *
+     * @param messageSource メッセージソース
+     */
     public AdminGlobalExceptionHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
     /**
-     * 管理画面の例外を処理し、エラー画面またはログイン画面へ遷移する。
+     * 管理画面で発生した例外を共通処理する。
+     * 認証関連の例外は Spring Security に委譲し、それ以外はメッセージを設定して
+     * エラー画面またはログイン画面へ遷移させる。
      *
-     * @param request HTTP リクエスト
-     * @param ex      発生した例外
-     * @param model   画面へのデータ受け渡し
-     * @return 遷移先ビュー名
-     * @throws Exception 認証関連例外は再スロー
+     * @param request 発生元の HTTP リクエスト
+     * @param ex      捕捉した例外
+     * @param model   画面へ値を渡すためのモデル
+     * @return 遷移先ビュー名（admin/error または admin/login）
+     * @throws Exception 認証関連例外の場合は再スローされる
      */
     @ExceptionHandler(Exception.class)
     public String handleAllExceptions(HttpServletRequest request, Exception ex, Model model) throws Exception {
 
-        // 認証関連の例外は Spring Security に委譲するため再スロー
+        // 認証関連の例外は Spring Security に委譲
         if (ex instanceof AuthenticationException || ex instanceof AccessDeniedException) {
             throw ex;
         }
 
-        // 例外発生箇所と種類をログ出力
         log.info("例外検知: URL={}, type={}", request.getRequestURI(), ex.getClass().getSimpleName());
 
         String errorMessage = ex.getMessage();
         boolean isDisplayErrorPage = false;
 
         try {
-            // DB 接続エラーの場合は専用メッセージを表示する
+            // DB 接続エラー
             if (ex instanceof org.springframework.jdbc.CannotGetJdbcConnectionException ||
                     ex.getCause() instanceof org.springframework.jdbc.CannotGetJdbcConnectionException) {
 
@@ -62,14 +68,12 @@ public class AdminGlobalExceptionHandler {
                 errorMessage = messageSource.getMessage(
                         "com.example.fullness.stationary.security.db_error", null, Locale.JAPAN);
 
-                // メッセージが空の場合は汎用システムエラー文言を設定
             } else if (errorMessage == null || errorMessage.isBlank()) {
 
                 errorMessage = messageSource.getMessage(
                         "com.example.fullness.stationary.security.system_error", null, Locale.JAPAN);
             }
 
-            // メッセージキーが存在しない場合のフォールバック
         } catch (NoSuchMessageException e) {
             errorMessage = "システムエラーが発生しました。";
         }
@@ -77,25 +81,36 @@ public class AdminGlobalExceptionHandler {
         // 画面にエラーメッセージを渡す
         model.addAttribute("errorMessage", errorMessage);
 
-        // DB エラーの場合は専用エラー画面へ遷移
+        // DB エラーは専用画面へ
         if (isDisplayErrorPage) {
             return "admin/error";
         }
 
-        // ログイン画面へ戻すため、前回入力したユーザー名を復元する
+        // ログイン画面へ戻すための初期化処理
         HttpSession session = request.getSession(false);
-        LoginForm loginForm = new LoginForm();
+        AdminLoginForm adminLoginForm = new AdminLoginForm();
 
         if (session != null) {
-            // セッションに保存されていたログイン名をフォームにセット
+
+            // loginErrorMessage（認証失敗時のメッセージ）
+            String loginError = (String) session.getAttribute("loginErrorMessage");
+            if (loginError != null) {
+                model.addAttribute("securityErrorMessage", loginError);
+                session.removeAttribute("loginErrorMessage");
+            }
+
+            // loginName（前回入力したユーザー名の復元）
             String savedName = (String) session.getAttribute("loginName");
             if (savedName != null) {
-                loginForm.setName(savedName);
+                adminLoginForm.setName(savedName);
+                session.removeAttribute("loginName");
             }
         }
 
-        // ログイン画面にフォームを渡す
-        model.addAttribute("loginForm", loginForm);
+        model.addAttribute("adminLoginForm", adminLoginForm);
+        model.addAttribute(
+                BindingResult.MODEL_KEY_PREFIX + "adminLoginForm",
+                new BeanPropertyBindingResult(adminLoginForm, "adminLoginForm"));
 
         return "admin/login";
     }

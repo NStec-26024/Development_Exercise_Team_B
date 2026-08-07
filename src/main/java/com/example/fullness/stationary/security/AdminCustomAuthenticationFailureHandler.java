@@ -14,7 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
-import com.example.fullness.stationary.service.impl.LoginAttemptService;
+import com.example.fullness.stationary.service.AdminLoginAttemptService;
 
 /**
  * ログイン認証失敗時の処理をカスタムするハンドラー。
@@ -22,18 +22,19 @@ import com.example.fullness.stationary.service.impl.LoginAttemptService;
  */
 @Slf4j
 @Component
-public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+public class AdminCustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
     private MessageSource messageSource;
-    private LoginAttemptService loginAttemptService;
+    private AdminLoginAttemptService adminLoginAttemptServiceImpl;
 
     /**
-     * @param messageSource       メッセージを取得するための MessageSource
-     * @param loginAttemptService ログイン失敗回数とロック状態を管理するサービス
+     * @param messageSource                メッセージソース
+     * @param adminLoginAttemptServiceImpl ログイン失敗回数とロック状態を管理するサービス
      */
-    public CustomAuthenticationFailureHandler(MessageSource messageSource, LoginAttemptService loginAttemptService) {
+    public AdminCustomAuthenticationFailureHandler(MessageSource messageSource,
+            AdminLoginAttemptService adminLoginAttemptServiceImpl) {
         this.messageSource = messageSource;
-        this.loginAttemptService = loginAttemptService;
+        this.adminLoginAttemptServiceImpl = adminLoginAttemptServiceImpl;
         setDefaultFailureUrl("/admin/login");
     }
 
@@ -54,18 +55,22 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
             HttpServletResponse response,
             AuthenticationException exception)
             throws IOException, ServletException {
+
         // ログインフォームの name を取得
         String accountName = request.getParameter("name");
+
         // 認証失敗ログ
         log.info("failureHandler が呼ばれました: {}", accountName);
+
         // セッションを必ず作成（メッセージ保存のため）
         HttpSession session = request.getSession(true);
-        // 入力したユーザー名を保存（再表示用）
+
+        // ★ 入力したユーザー名を保存（再表示用）
         session.setAttribute("loginName", accountName);
 
         // 失敗回数を加算（ロック判定は LoginAttemptService が行う）
         if (accountName != null && !accountName.isBlank()) {
-            loginAttemptService.loginFailed(accountName);
+            adminLoginAttemptServiceImpl.loginFailed(accountName);
         }
 
         // 認証失敗メッセージをセッションに保存（画面で表示される）
@@ -75,6 +80,7 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
                         "com.example.fullness.stationary.security.bad_credentials",
                         null,
                         Locale.JAPAN));
+
         // ログイン画面へリダイレクト
         response.sendRedirect("/admin/login");
     }

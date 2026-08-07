@@ -8,7 +8,7 @@ import lombok.Data;
  * 必須チェックは Jakarta Validation により行われる。
  */
 @Data
-public class LoginForm {
+public class AdminLoginForm {
 
     /** アカウント名（必須） */
     @NotBlank(message = "アカウント名を入力してください")
