@@ -45,7 +45,7 @@ public class AccountRegistController {
     AdminEmployeeAccountService adminEmployeeAccountService;
 
     @Autowired
-    EmployeeAccountHelper formToEntity;
+    EmployeeAccountHelper employeeAccountHelper;
 
     /**
      * リクエスト毎にアカウント登録Formオブジェクトを初期化
@@ -99,7 +99,7 @@ public class AccountRegistController {
 
         } else {
 
-            EmployeeAccount employeeAccount = formToEntity.formToEntity(accountRegistForm);
+            EmployeeAccount employeeAccount = employeeAccountHelper.formToEntity(accountRegistForm);
             employeeAccount = adminEmployeeAccountService
                     .selectNotHasEmployeeAccount(employeeAccount.getEmployeeId());
             redirectAttributes.addFlashAttribute("employee", employeeAccount);
@@ -117,7 +117,7 @@ public class AccountRegistController {
      * @return 確認画面のテンプレートパス、不正遷移時は入力画面へのリダイレクトパス
      */
     @GetMapping("/confirm")
-    public String confirm(@ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm,
+    public String showConfirm(@ModelAttribute("accountRegistForm") AccountRegistForm accountRegistForm,
             RedirectAttributes redirectAttributes) {
         /*
          * null:データそのものがない
@@ -147,7 +147,7 @@ public class AccountRegistController {
     public String regist(AccountRegistForm accountRegistForm,
             RedirectAttributes redirectAttributes) {
         // 重複チェック
-        EmployeeAccount employeeAccount = formToEntity.formToEntity(accountRegistForm);
+        EmployeeAccount employeeAccount = employeeAccountHelper.formToEntity(accountRegistForm);
         if (!adminEmployeeAccountService.selectAccountName(employeeAccount.getName())) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "このアカウント名は既に使用されています");
@@ -159,7 +159,7 @@ public class AccountRegistController {
         String encodePassword = passwordEncoder.encode(accountRegistForm.getPassword());
         // DBへのインサート処理
         int accountId = adminEmployeeAccountService
-                .insertEmployeeAccount(formToEntity.formToEntity(accountRegistForm, encodePassword));
+                .insertEmployeeAccount(employeeAccountHelper.formToEntity(accountRegistForm, encodePassword));
         employeeAccount = adminEmployeeAccountService
                 .selectEmployeeNameWithEmployeeAccountId(accountId);
         redirectAttributes.addFlashAttribute("employee", employeeAccount);
@@ -194,7 +194,8 @@ public class AccountRegistController {
      * @return 完了画面のテンプレートパス、不正アクセス時は管理者トップ画面へのリダイレクトパス
      */
     @GetMapping("/complete")
-    public String complete(AccountRegistForm accountRegistForm, RedirectAttributes redirectAttributes, Model model) {
+    public String showCxomplete(AccountRegistForm accountRegistForm, RedirectAttributes redirectAttributes,
+            Model model) {
         if (model.getAttribute("employee") == null) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
