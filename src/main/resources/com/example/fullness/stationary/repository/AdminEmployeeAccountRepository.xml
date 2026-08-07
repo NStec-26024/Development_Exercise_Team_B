@@ -65,7 +65,7 @@
 
     <select id="selectEmployeeNameWithEmployeeAccountId" resultMap="employeeAccountResult">
         <![CDATA[
-                SELECT e.name AS AS employee_name,a.name
+                SELECT e.name AS employee_name,a.name
                 FROM employee e
                 JOIN employee_account a
                 ON e.id=a.employee_id

@@ -48,8 +48,8 @@ public class AdminEmployeeAccountRepositoryTest {
         assertEquals(employeeAccount.getEmployee().getId(), 2);
 
         employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(3);
-        assertEquals(employeeAccount.get(1).getEmployee().getName(), "海田三郎");
-        assertEquals(employeeAccount.get(1).getEmployee().getId(), 3);
+        assertEquals(employeeAccount.getEmployee().getName(), "海田三郎");
+        assertEquals(employeeAccount.getEmployee().getId(), 3);
 
     }
 
