@@ -42,7 +42,7 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
 
     @Override
     public EmployeeAccount getEmployeeAccountWithEmployeeId(int id) {
-        return adminEmployeeAccountRepository.selectEmployeeAccountWithEmployeeId(id);
+        return adminEmployeeAccountRepository.selectNotHasEmployeeAccount(id);
 
     }
 

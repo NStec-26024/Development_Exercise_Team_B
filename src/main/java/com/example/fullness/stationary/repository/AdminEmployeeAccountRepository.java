@@ -33,7 +33,7 @@ public interface AdminEmployeeAccountRepository {
      * @param id 社員ID
      * @return 社員アカウント(該当がない場合はnull)
      */
-    public EmployeeAccount selectEmployeeAccountWithEmployeeId(int id);
+    public EmployeeAccount selectNotHasEmployeeAccount(int id);
 
     /**
      * 指定されたアカウント名と紐づく社員アカウントを取得
