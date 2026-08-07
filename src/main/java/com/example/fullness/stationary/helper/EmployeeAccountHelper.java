@@ -12,22 +12,6 @@ import com.example.fullness.stationary.form.AdminEmployeeAccountForm;
 public class EmployeeAccountHelper {
 
     /**
-     * 入力データが入ったFormとハッシュ化されたパスワードを基に社員アカウントEntityを生成
-     * 
-     * @param adminEmployeeAccountForm 入力データが入ったForm
-     * @param encodePassword           ハッシュ化されたパスワード
-     * @return 社員アカウントEntity
-     */
-    public EmployeeAccount formToEntity(AdminEmployeeAccountForm adminEmployeeAccountForm, String encodePassword) {
-        EmployeeAccount employeeAccount = new EmployeeAccount();
-        employeeAccount.setEmployeeId(adminEmployeeAccountForm.getEmployeeId());
-        employeeAccount.setName(adminEmployeeAccountForm.getName());
-        employeeAccount.setPassword(encodePassword);
-
-        return employeeAccount;
-    }
-
-    /**
      * 入力データが入ったFormを基に社員アカウントEntityを生成
      * 
      * @param adminEmployeeAccountForm 入力データが入ったForm

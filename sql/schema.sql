@@ -1,3 +1,27 @@
+drop table    if exists employee_account;
+drop table    if exists employee;
+drop table    if exists department;
+drop table    if exists product_stock;
+drop table    if exists order_detail;
+drop table    if exists product;
+drop table    if exists product_category;
+drop table    if exists orders;
+drop table    if exists payment_method;
+drop table    if exists order_status;
+drop table    if exists customer;
+
+drop sequence if exists employee_account_id_seq;
+drop sequence if exists employee_id_seq;
+drop sequence if exists department_id_seq;
+drop sequence if exists product_stock_id_seq;
+drop sequence if exists order_detail_id_seq;
+drop sequence if exists product_id_seq;
+drop sequence if exists product_category_id_seq;
+drop sequence if exists orders_id_seq;
+drop sequence if exists payment_method_id_seq;
+drop sequence if exists order_status_id_seq;
+drop sequence if exists customer_id_seq;
+
 create table department(
   id serial,
   name VARCHAR(100),

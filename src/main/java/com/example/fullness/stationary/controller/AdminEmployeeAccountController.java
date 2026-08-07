@@ -38,8 +38,6 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 public class AdminEmployeeAccountController {
     // service層でハッシュ化させる(DB登録前)
     // アカウントの存在確認もservice層
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
     @Autowired
     AdminEmployeeAccountService adminEmployeeAccountService;
@@ -66,7 +64,7 @@ public class AdminEmployeeAccountController {
      */
     @GetMapping("/form")
     public String showInput(Model model) {
-        List<EmployeeAccount> employeeNameList = adminEmployeeAccountService.selectEmployeeNameWithEmployeeAccount();
+        List<EmployeeAccount> employeeNameList = adminEmployeeAccountService.getEmployeeNameWithEmployeeAccount();
 
         if (employeeNameList.isEmpty()) {
             model.addAttribute("errorMessages", "アカウント登録可能な社員が存在しません");
@@ -102,7 +100,7 @@ public class AdminEmployeeAccountController {
 
             EmployeeAccount employeeAccount = employeeAccountHelper.formToEntity(adminEmployeeAccountForm);
             employeeAccount = adminEmployeeAccountService
-                    .selectNotHasEmployeeAccount(employeeAccount.getEmployeeId());
+                    .getEmployeeAccountWithEmployeeId(employeeAccount.getEmployeeId());
             redirectAttributes.addFlashAttribute("employee", employeeAccount);
 
             return "redirect:/admin/account/confirm";
@@ -150,20 +148,18 @@ public class AdminEmployeeAccountController {
             RedirectAttributes redirectAttributes) {
         // 重複チェック
         EmployeeAccount employeeAccount = employeeAccountHelper.formToEntity(adminEmployeeAccountForm);
-        if (!adminEmployeeAccountService.selectAccountName(employeeAccount.getName())) {
+        if (!adminEmployeeAccountService.getAccountName(employeeAccount.getName())) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "このアカウント名は既に使用されています");
             redirectAttributes.addFlashAttribute("adminEmployeeAccountForm", adminEmployeeAccountForm);
             return "redirect:/admin/account/form";
         }
 
-        // パスワードのハッシュ化
-        String encodePassword = passwordEncoder.encode(adminEmployeeAccountForm.getPassword());
         // DBへのインサート処理
         int accountId = adminEmployeeAccountService
-                .insertEmployeeAccount(employeeAccountHelper.formToEntity(adminEmployeeAccountForm, encodePassword));
+                .addEmployeeAccount(employeeAccountHelper.formToEntity(adminEmployeeAccountForm));
         employeeAccount = adminEmployeeAccountService
-                .selectEmployeeNameWithEmployeeAccountId(accountId);
+                .getEmployeeNameWithEmployeeAccountId(accountId);
         redirectAttributes.addFlashAttribute("employee", employeeAccount);
 
         redirectAttributes.addFlashAttribute("accountName", adminEmployeeAccountForm.getName());
