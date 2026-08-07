@@ -181,21 +181,6 @@ public class AdminSecurityConfig {
         }
 
         /**
-         * 管理画面用のユーザー認証に利用する UserDetailsService を提供する。
-         * 
-         * AdminUserDetailsServiceImpl は employee_account テーブルからユーザー情報を取得し、
-         * Spring Security の認証処理で利用される UserDetails を生成する。
-         * 本メソッドはその実装を SecurityConfig に登録するための Bean 定義である。
-         *
-         * @param service 管理画面のユーザー情報を読み込む UserDetailsService 実装
-         * @return AdminUserDetailsServiceImpl を返す UserDetailsService Bean
-         */
-        @Bean
-        public UserDetailsService userDetailsService(AdminUserDetailsServiceImpl service) {
-                return service;
-        }
-
-        /**
          * パスワードを安全に保存するためのハッシュ化方式（BCrypt）を提供する。
          *
          * @return BCrypt を利用した PasswordEncoder

@@ -51,8 +51,8 @@ public class AdminLoginControllerTest {
         void showLoginPageTest_case04_Ok() throws Exception {
                 mockMvc.perform(get("/admin/login")
                                 .sessionAttr("loginName", "yamadatarou1001"))
-                                .andExpect(model().attributeExists("loginForm"))
-                                .andExpect(model().attribute("loginForm",
+                                .andExpect(model().attributeExists("adminLoginForm"))
+                                .andExpect(model().attribute("adminLoginForm",
                                                 org.hamcrest.Matchers.hasProperty("name",
                                                                 org.hamcrest.Matchers.is("yamadatarou1001"))))
                                 .andExpect(view().name("admin/login"));
@@ -64,6 +64,6 @@ public class AdminLoginControllerTest {
                 mockMvc.perform(get("/admin/login"))
                                 .andExpect(status().isOk())
                                 .andExpect(view().name("admin/login"))
-                                .andExpect(model().attributeExists("loginForm"));
+                                .andExpect(model().attributeExists("adminLoginForm"));
         }
 }

@@ -10,14 +10,12 @@ import com.example.fullness.stationary.form.AdminLoginForm;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * 管理画面のログイン画面表示を担当するコントローラー。
  * セッションに保存されたメッセージや前回入力したユーザー名を読み取り、
  * ログイン画面へ反映する。
  */
-@Slf4j
 @Controller
 @RequestMapping("/admin")
 public class AdminLoginController {

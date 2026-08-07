@@ -52,27 +52,9 @@ public class AdminUserDetailsServiceImpl implements UserDetailsService {
         if (employeeAccount == null) {
             throw new UsernameNotFoundException("User not found: " + username);
         }
-
         return User.withUsername(employeeAccount.getName())
-                .password(normalizeStoredPassword(employeeAccount.getPassword()))
+                .password(employeeAccount.getPassword())
                 .roles("ADMIN")
                 .build();
-    }
-
-    private String normalizeStoredPassword(String storedPassword) {
-        if (storedPassword == null || storedPassword.isBlank()) {
-            return storedPassword;
-        }
-
-        if (storedPassword.startsWith("{")) {
-            return storedPassword;
-        }
-
-        if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$")
-                || storedPassword.startsWith("$2y$")) {
-            return "{bcrypt}" + storedPassword;
-        }
-
-        return "{noop}" + storedPassword;
     }
 }

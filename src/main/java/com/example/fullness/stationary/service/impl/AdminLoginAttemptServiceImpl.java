@@ -35,6 +35,9 @@ public class AdminLoginAttemptServiceImpl implements AdminLoginAttemptService {
      */
     @Override
     public void loginFailed(String username) {
+        if (username == null || username.isBlank()) {
+            return;
+        }
 
         int attempts = attemptsCache.getOrDefault(username, 0) + 1;
         attemptsCache.put(username, attempts);

@@ -65,7 +65,7 @@ public class AdminCustomAuthenticationFailureHandler extends SimpleUrlAuthentica
         // セッションを必ず作成（メッセージ保存のため）
         HttpSession session = request.getSession(true);
 
-        // ★ 入力したユーザー名を保存（再表示用）
+        // 入力したユーザー名を保存
         session.setAttribute("loginName", accountName);
 
         // 失敗回数を加算（ロック判定は LoginAttemptService が行う）

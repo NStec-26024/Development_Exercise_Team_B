@@ -4,16 +4,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.example.fullness.stationary.service.impl.AdminLoginAttemptServiceImpl;
 
 public class AdminLoginAttemptServiceTest {
+
+    private AdminLoginAttemptServiceImpl service;
+
+    // テスト側で定義（必須）
     private static final int MAX_ATTEMPTS = 5;
-    private AdminLoginAttemptService service;
+    private static final int LOCK_MINUTES = 10;
 
     @BeforeEach
     void setup() {
         service = new AdminLoginAttemptServiceImpl();
+        ReflectionTestUtils.setField(service, "MAX_ATTEMPTS", MAX_ATTEMPTS);
+        ReflectionTestUtils.setField(service, "LOCK_MINUTES", LOCK_MINUTES);
+        service.loginSucceeded("yamadatarou1001");
     }
 
     // ============================================================
@@ -24,7 +32,7 @@ public class AdminLoginAttemptServiceTest {
     void loginSucceededTest_case01_Ok() {
         String account = "yamadatarou1001";
 
-        // ロック状態にする
+        // ロック状態にする（3回失敗）
         for (int i = 0; i < MAX_ATTEMPTS; i++) {
             service.loginFailed(account);
         }
@@ -47,20 +55,21 @@ public class AdminLoginAttemptServiceTest {
         // 1〜(MAX_ATTEMPTS - 1)回失敗 → ロックされない
         for (int i = 0; i < MAX_ATTEMPTS - 1; i++) {
             service.loginFailed(account);
-            assertFalse(service.isBlocked(account));
         }
+        assertFalse(service.isBlocked(account));
     }
 
     @Test
     void loginFailedTest_case02_Ok() {
         String account = "yamadatarou1001";
 
-        // MAX_ATTEMPTS 回目でロック
-        for (int i = 0; i < MAX_ATTEMPTS - 1; i++) {
+        // MAX_ATTEMPTS-1回失敗 → ロックされない
+        for (int i = 1; i <= MAX_ATTEMPTS - 1; i++) {
             service.loginFailed(account);
+            assertFalse(service.isBlocked(account));
         }
-        assertFalse(service.isBlocked(account));
 
+        // MAX_ATTEMPTS回目でロック
         service.loginFailed(account);
         assertTrue(service.isBlocked(account));
     }
@@ -97,9 +106,9 @@ public class AdminLoginAttemptServiceTest {
         }
         assertTrue(service.isBlocked(account));
 
+        // 成功 → ロック解除
         service.loginSucceeded(account);
 
         assertFalse(service.isBlocked(account));
     }
-
 }
