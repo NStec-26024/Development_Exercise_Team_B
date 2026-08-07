@@ -201,6 +201,6 @@ public class AdminEmployeeAccountController {
             return "redirect:/admin";
         }
 
-        return "admin/account/complete";
+        return "/admin/account/complete";
     }
 }
