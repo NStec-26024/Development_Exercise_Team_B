@@ -10,7 +10,7 @@ import com.example.fullness.stationary.entity.EmployeeAccount;
  * 社員アカウント情報に関するデータベースアクセスを制御するマッパーインターフェース
  */
 @Mapper
-public interface AdminEmployeeAccountRepository {
+public interface EmployeeAccountRepository {
 
     /**
      * 新しい社員アカウントをデータベースに登録

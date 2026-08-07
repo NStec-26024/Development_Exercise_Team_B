@@ -12,10 +12,10 @@ import com.example.fullness.stationary.entity.EmployeeAccount;
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class AdminEmployeeAccountRepositoryTest {
+public class EmployeeAccountRepositoryTest {
 
     @Autowired
-    AdminEmployeeAccountRepository adminEmployeeAccountRepository;
+    EmployeeAccountRepository adminEmployeeAccountRepository;
 
     @Test
     public void InsertEmployeeAccountTest() {

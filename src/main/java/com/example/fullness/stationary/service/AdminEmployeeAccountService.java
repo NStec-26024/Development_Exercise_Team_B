@@ -48,4 +48,6 @@ public interface AdminEmployeeAccountService {
      */
     public EmployeeAccount getEmployeeNameWithEmployeeAccountId(int id);
 
+    public boolean getNotHasEmployeeAccount(int id);
+
 }
