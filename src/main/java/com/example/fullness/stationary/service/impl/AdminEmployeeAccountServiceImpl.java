@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
-import com.example.fullness.stationary.repository.AdminEmployeeAccountRepository;
+import com.example.fullness.stationary.repository.EmployeeAccountRepository;
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
 /**
@@ -18,7 +18,7 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountService {
 
     @Autowired
-    AdminEmployeeAccountRepository adminEmployeeAccountRepository;
+    EmployeeAccountRepository employeeAccountRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -29,7 +29,7 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
         // パスワードのハッシュ化
         String encodePassword = passwordEncoder.encode(employeeAccount.getPassword());
         employeeAccount.setPassword(encodePassword);
-        adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
+        employeeAccountRepository.insertEmployeeAccount(employeeAccount);
         int accountId = employeeAccount.getId();
         return accountId;
 
@@ -37,19 +37,19 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
 
     @Override
     public List<EmployeeAccount> getEmployeeNameWithEmployeeAccount() {
-        return adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
+        return employeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
     }
 
     @Override
     public EmployeeAccount getEmployeeAccountWithEmployeeId(int id) {
-        return adminEmployeeAccountRepository.selectNotHasEmployeeAccount(id);
+        return employeeAccountRepository.selectNotHasEmployeeAccount(id);
 
     }
 
     @Override
     public boolean getAccountName(String accountName) {
         EmployeeAccount employeeAccount = new EmployeeAccount();
-        employeeAccount = adminEmployeeAccountRepository.selectAccountName(accountName);
+        employeeAccount = employeeAccountRepository.selectAccountName(accountName);
         if (employeeAccount != null) {
             return false;
         } else {
@@ -60,8 +60,19 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
 
     @Override
     public EmployeeAccount getEmployeeNameWithEmployeeAccountId(int id) {
-        return adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(id);
+        return employeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(id);
 
+    }
+
+    @Override
+    public boolean getNotHasEmployeeAccount(int id) {
+        EmployeeAccount employeeAccount = new EmployeeAccount();
+        employeeAccount = employeeAccountRepository.selectNotHasEmployeeAccount(id);
+        if (employeeAccount == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

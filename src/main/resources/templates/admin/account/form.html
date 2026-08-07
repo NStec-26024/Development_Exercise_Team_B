@@ -28,7 +28,7 @@
                 <li th:each="msg : ${errorMessages}" th:text="${msg}"></li>
             </ul>
 
-            <form th:action="@{/admin/account/postconfirm}" method="post" th:object="${accountRegistForm}">
+            <form th:action="@{/admin/account/postconfirm}" method="post" th:object="${adminEmployeeAccountForm}">
                 <div class="mb-3 row">
                     <label class="col-sm-4 col-form-label">社員名</label>
                     <div class="col-sm-8">

@@ -33,10 +33,10 @@ public interface AdminEmployeeAccountService {
     public EmployeeAccount getEmployeeAccountWithEmployeeId(int id);
 
     /**
-     * 指定されたアカウント名と紐づく社員アカウントを取得
+     * 指定されたアカウント名の重複チェックを行う
      * 
-     * @param accountName 取得対象のアカウント名
-     * @return 社員アカウント(該当がない場合はnull)
+     * @param accountName 重複チェック対象のアカウント名
+     * @return アカウント名が未登録な場合は {@code true}、重複する場合は {@code false}
      */
     public boolean getAccountName(String accountName);
 
@@ -47,5 +47,13 @@ public interface AdminEmployeeAccountService {
      * @return 社員情報と紐づいた社員アカウント(該当がない場合はnull)
      */
     public EmployeeAccount getEmployeeNameWithEmployeeAccountId(int id);
+
+    /**
+     * 指定された社員IDに紐づく社員アカウントが存在するかどうかを判定
+     * 
+     * @param id 判定対象の社員ID
+     * @return アカウントが存在しない場合は {@code true}、存在する場合は {@code false}
+     */
+    public boolean getNotHasEmployeeAccount(int id);
 
 }

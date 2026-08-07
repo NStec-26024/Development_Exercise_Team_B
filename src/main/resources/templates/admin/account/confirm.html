@@ -15,7 +15,7 @@
         <div class="admin-panel p-4 mx-auto" style="max-width: 560px;">
             <h1 class="text-center mb-4">アカウント登録(確認)</h1>
 
-            <table class="table table-borderless" th:object="${accountRegistForm}">
+            <table class="table table-borderless" th:object="${adminEmployeeAccountForm}">
                 <tbody>
                     <tr>
                         <th class="w-25">社員名</th>
@@ -32,7 +32,7 @@
                 </tbody>
             </table>
 
-            <form th:action="@{/admin/account/postcomplete}" method="post" th:object="${accountRegistForm}">
+            <form th:action="@{/admin/account/postcomplete}" method="post" th:object="${adminEmployeeAccountForm}">
 
                 <input type="hidden" th:field="*{employeeId}">
                 <input type="hidden" th:field="*{name}">

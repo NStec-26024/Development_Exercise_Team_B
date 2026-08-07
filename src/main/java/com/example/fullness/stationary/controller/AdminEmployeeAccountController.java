@@ -148,7 +148,8 @@ public class AdminEmployeeAccountController {
             RedirectAttributes redirectAttributes) {
         // 重複チェック
         EmployeeAccount employeeAccount = employeeAccountHelper.formToEntity(adminEmployeeAccountForm);
-        if (!adminEmployeeAccountService.getAccountName(employeeAccount.getName())) {
+        if (!adminEmployeeAccountService.getAccountName(employeeAccount.getName())
+                || !adminEmployeeAccountService.getNotHasEmployeeAccount(employeeAccount.getEmployeeId())) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "このアカウント名は既に使用されています");
             redirectAttributes.addFlashAttribute("adminEmployeeAccountForm", adminEmployeeAccountForm);
