@@ -8,17 +8,20 @@ import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.jdbc.Sql;
+
 import com.example.fullness.stationary.entity.EmployeeAccount;
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Sql(scripts = { "/sql/schema.sql", "/sql/data.sql" }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class EmployeeAccountRepositoryTest {
 
     @Autowired
     EmployeeAccountRepository adminEmployeeAccountRepository;
 
     @Test
-    public void InsertEmployeeAccountTest() {
+    public void InsertEmployeeAccountTest_case1() {
         EmployeeAccount employeeAccount = new EmployeeAccount();
         employeeAccount.setEmployeeId(2);
         employeeAccount.setName("asdfgh");
@@ -29,7 +32,7 @@ public class EmployeeAccountRepositoryTest {
     }
 
     @Test
-    public void selectEmployeeNameWithEmployeeAccountTest() {
+    public void selectEmployeeNameWithEmployeeAccountTest_case2() {
         List<EmployeeAccount> employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
         assertEquals(employeeAccount.get(0).getEmployee().getName(), "川田次郎");
         assertEquals(employeeAccount.get(0).getEmployee().getId(), 2);
@@ -39,7 +42,7 @@ public class EmployeeAccountRepositoryTest {
     }
 
     @Test
-    public void selectNotHasEmployeeAccountTest() {
+    public void selectNotHasEmployeeAccountTest_case3() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(1);
         assertEquals(employeeAccount, null);
 
@@ -54,7 +57,7 @@ public class EmployeeAccountRepositoryTest {
     }
 
     @Test
-    public void selectAccountNameTest() {
+    public void selectAccountNameTest_case4() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectAccountName("yamadatarou1001");
         assertEquals(employeeAccount.getId(), 1);
         assertEquals(employeeAccount.getName(), "yamadatarou1001");
@@ -64,7 +67,7 @@ public class EmployeeAccountRepositoryTest {
     }
 
     @Test
-    public void selectEmployeeNameWithEmployeeAccountIdTest() {
+    public void selectEmployeeNameWithEmployeeAccountIdTest_case5() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(1);
         assertEquals(employeeAccount.getName(), "yamadatarou1001");
         assertEquals(employeeAccount.getEmployee().getName(), "山田太郎");
