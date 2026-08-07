@@ -32,7 +32,7 @@ public class EmployeeAccountRepositoryTest {
     }
 
     @Test
-    public void selectEmployeeNameWithEmployeeAccountTest_case2() {
+    public void selectEmployeeNameWithEmployeeAccountTest_OK_case2() {
         List<EmployeeAccount> employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
         assertEquals(employeeAccount.get(0).getEmployee().getName(), "川田次郎");
         assertEquals(employeeAccount.get(0).getEmployee().getId(), 2);
@@ -42,22 +42,38 @@ public class EmployeeAccountRepositoryTest {
     }
 
     @Test
-    public void selectNotHasEmployeeAccountTest_case3() {
-        EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(1);
+    @Sql(scripts = { "/sql/schema.sql" })
+    public void selectEmployeeNameWithEmployeeAccountTest_null_case3() {
+        List<EmployeeAccount> employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
         assertEquals(employeeAccount, null);
 
-        employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(2);
+    }
+
+    @Test
+    public void selectNotHasEmployeeAccountTest_OK_case4() {
+        EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(2);
         assertEquals(employeeAccount.getEmployee().getName(), "川田次郎");
         assertEquals(employeeAccount.getEmployee().getId(), 2);
 
-        employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(3);
+    }
+
+    @Test
+    public void selectNotHasEmployeeAccountTest_Ok_case5() {
+        EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(3);
         assertEquals(employeeAccount.getEmployee().getName(), "海田三郎");
         assertEquals(employeeAccount.getEmployee().getId(), 3);
 
     }
 
     @Test
-    public void selectAccountNameTest_case4() {
+    public void selectNotHasEmployeeAccountTest_null_case6() {
+        EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(1);
+        assertEquals(employeeAccount, null);
+
+    }
+
+    @Test
+    public void selectAccountNameTest_OK_case7() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectAccountName("yamadatarou1001");
         assertEquals(employeeAccount.getId(), 1);
         assertEquals(employeeAccount.getName(), "yamadatarou1001");
@@ -67,10 +83,24 @@ public class EmployeeAccountRepositoryTest {
     }
 
     @Test
-    public void selectEmployeeNameWithEmployeeAccountIdTest_case5() {
+    public void selectAccountNameTest_null_case8() {
+        EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectAccountName("a");
+        assertEquals(employeeAccount, null);
+
+    }
+
+    @Test
+    public void selectEmployeeNameWithEmployeeAccountIdTest_OK_case9() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(1);
         assertEquals(employeeAccount.getName(), "yamadatarou1001");
         assertEquals(employeeAccount.getEmployee().getName(), "山田太郎");
+
+    }
+
+    @Test
+    public void selectEmployeeNameWithEmployeeAccountIdTest_null_case10() {
+        EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(2);
+        assertEquals(employeeAccount, null);
 
     }
 
