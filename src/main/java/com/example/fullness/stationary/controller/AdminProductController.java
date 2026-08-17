@@ -3,7 +3,6 @@ package com.example.fullness.stationary.controller;
 import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.service.AdminProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -93,7 +92,7 @@ public class AdminProductController {
      */
     @GetMapping("/product/edit/{id}")
     public String editProduct(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @RequestParam(name = "category", required = false, defaultValue = "0") Integer categoryId,
             @RequestParam(name = "page", defaultValue = "1") int page) {
 
@@ -112,7 +111,7 @@ public class AdminProductController {
      */
     @GetMapping("/product/delete/{id}")
     public String deleteProduct(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @RequestParam(name = "category", required = false, defaultValue = "0") Integer categoryId,
             @RequestParam(name = "page", defaultValue = "1") int page) {
 
