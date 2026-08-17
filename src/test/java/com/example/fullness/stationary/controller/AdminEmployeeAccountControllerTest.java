@@ -22,8 +22,8 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -57,9 +57,14 @@ public class AdminEmployeeAccountControllerTest {
         PasswordEncoder passwordEncoder;
 
         EmployeeAccount employeeAccount;
-        int newInputEmployeeId = 2;
-        String newInputName = "kawatajirou1002";
-        String newInputPassword = "password";
+        EmployeeAccount inputAccount;
+        Employee inputEmployee;
+        AdminEmployeeAccountForm inputForm;
+
+        int newInputEmployeeId = 2; // 社員ID
+        String newInputEmployeeName = "川田次郎"; // 社員名
+        String newInputAccountName = "kawatajirou1002"; // アカウント名
+        String newInputPassword = "password"; // パスワード
 
         @BeforeEach
         public void setUp() {
@@ -68,15 +73,30 @@ public class AdminEmployeeAccountControllerTest {
                 employeeAccount.setEmployeeId(1);
                 employeeAccount.setName("yamadatarou1001");
 
+                // テストで入力する社員情報
+                inputEmployee = new Employee();
+                inputEmployee.setId(newInputEmployeeId);
+                inputEmployee.setName(newInputEmployeeName);
+
+                // テストで入力する社員アカウント情報
+                inputAccount = new EmployeeAccount();
+                inputAccount.setEmployeeId(newInputEmployeeId);
+                inputAccount.setName(newInputAccountName);
+                inputAccount.setPassword(newInputPassword);
+                inputAccount.setEmployee(inputEmployee);
+
+                inputForm = new AdminEmployeeAccountForm();
+
         }
 
         /*
-         * employee_Accountテーブルに社員存在しているとき
+         * serviceからの戻り値である社員情報が１件以上あるとき
          */
         @Test
         public void testShowInputOK_case1() throws Exception {
+
                 when(adminEmployeeAccountService.getEmployeeNameWithEmployeeAccount())
-                                .thenReturn(List.of(employeeAccount));
+                                .thenReturn(List.of(inputAccount));
                 mockMvc.perform(get("/admin/account/form")) // GETリクエストを送信
                                 // 画面のURLにアクセスした際のHTTPステータスコードが200か
                                 .andExpect(status().isOk())
@@ -84,10 +104,12 @@ public class AdminEmployeeAccountControllerTest {
                                 .andExpect(model().attributeExists("employeeName"))
                                 // 画面のURLにアクセスした際のView名が正しいか
                                 .andExpect(view().name("admin/account/form"));
+
+                verify(adminEmployeeAccountService).getEmployeeNameWithEmployeeAccount();
         }
 
         /*
-         * employee_Accountテーブルに社員0のとき
+         * serviceからの戻り値である社員情報がないとき
          */
         @Test
         public void testShowInputNG_case2() throws Exception {
@@ -97,37 +119,55 @@ public class AdminEmployeeAccountControllerTest {
                                 .andExpect(status().isOk())
                                 .andExpect(model().attributeExists("errorMessages"))
                                 .andExpect(view().name("admin/account/form"));
+
+                verify(adminEmployeeAccountService).getEmployeeNameWithEmployeeAccount();
         }
 
         /*
          * バリデーションOKのとき
-         * 
          */
         @Test
-        public void testValidateInputOK_case3() throws Exception {
-                EmployeeAccount inpuAccount = new EmployeeAccount();
-                inpuAccount.setEmployeeId(newInputEmployeeId);
-                inpuAccount.setName(newInputName);
-                inpuAccount.setPassword(newInputPassword);
+        public void testValidateInputOK_case1() throws Exception {
 
-                // どんな中身のFormでもinputAccountを返す
-                when(employeeAccountHelper.formToEntity(any(AdminEmployeeAccountForm.class)))
-                                .thenReturn(inpuAccount);
-                when(adminEmployeeAccountService.getEmployeeAccountWithEmployeeId(anyInt()))
-                                .thenReturn(inpuAccount);
+                AdminEmployeeAccountForm inputForm = new AdminEmployeeAccountForm();
+                inputForm.setEmployeeId(newInputEmployeeId);
+                inputForm.setName(newInputAccountName);
+                inputForm.setPassword(newInputPassword);
+
+                // @UniqueAccountNameでアカウント名の重複無しであることにする
+                when(adminEmployeeAccountService.getAccountName(newInputAccountName))
+                                .thenReturn(true);
+                // FormをEmployeeAccountに変換したことにする
+                when(employeeAccountHelper.formToEntity(inputForm))
+                                .thenReturn(inputAccount);
+                // 社員IDからEmployeeAccountを取得したことにする
+                when(adminEmployeeAccountService.getEmployeeAccountWithEmployeeId(newInputEmployeeId))
+                                .thenReturn(inputAccount);
+
+                // 入力画面からPOST(入力画面から送られてきたデータ)
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", String.valueOf(newInputEmployeeId))
-                                .param("name", newInputName)
-                                .param("password", newInputPassword))
+                                .param("employeeId", String.valueOf(inputAccount.getEmployeeId()))
+                                .param("name", inputAccount.getName())
+                                .param("password", inputAccount.getPassword()))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/confirm"))
                                 .andReturn();
+                // Flash Attributeを取得
                 FlashMap flashMap = mvcResult.getFlashMap();
-                EmployeeAccount result = (EmployeeAccount) flashMap.get("employee");
-                assertNotNull(result);
-                assertEquals(newInputName, result.getName());
-                assertEquals(newInputEmployeeId, result.getEmployeeId());
-                assertEquals(newInputPassword, result.getPassword());
+                EmployeeAccount resultEmployeeAccount = (EmployeeAccount) flashMap.get("employee");
+                // Flash AttributeにEmployeeAccountが入っているか
+                assertNotNull(resultEmployeeAccount);
+                // employeeの中身が合っているか
+                assertEquals(inputAccount.getEmployeeId(), resultEmployeeAccount.getEmployeeId());
+                assertEquals(inputAccount.getName(), resultEmployeeAccount.getName());
+                assertEquals(inputAccount.getPassword(), resultEmployeeAccount.getPassword());
+                // Controllerからserviceにちゃんと値が渡されているか
+                verify(adminEmployeeAccountService).getAccountName(newInputAccountName);
+                verify(adminEmployeeAccountService).getEmployeeAccountWithEmployeeId(newInputEmployeeId);
+
+                // ControllerからHelperにFormが渡されているか
+                verify(employeeAccountHelper).formToEntity(inputForm);
+
         }
 
         /*
@@ -137,11 +177,12 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：正しく入力
          */
         @Test
-        public void testValidateInputNG_case4() throws Exception {
-                MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "")
-                                .param("name", newInputName)
-                                .param("password", newInputPassword))
+        public void testValidateInputNG_case2() throws Exception {
+
+                MvcResult mvcResult = mockMvc
+                                .perform(post("/admin/account/postconfirm")
+                                                .param("name", newInputAccountName)
+                                                .param("password", newInputPassword))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
                                 .andReturn();
@@ -157,10 +198,9 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：正しく入力
          */
         @Test
-        public void testValidateInputNG_case5() throws Exception {
+        public void testValidateInputNG_case3() throws Exception {
+
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "")
-                                .param("name", "")
                                 .param("password", newInputPassword))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
@@ -177,9 +217,9 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：正しく入力
          */
         @Test
-        public void testValidateInputNG_case6() throws Exception {
+        public void testValidateInputNG_case4() throws Exception {
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "2")
+                                .param("employeeId", String.valueOf(newInputEmployeeId))
                                 .param("name", "acco")
                                 .param("password", newInputPassword))
                                 .andExpect(status().is3xxRedirection())
@@ -197,9 +237,10 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：正しく入力
          */
         @Test
-        public void testValidateInputNG_case7() throws Exception {
+        public void testValidateInputNG_case5() throws Exception {
+
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "2")
+                                .param("employeeId", String.valueOf(newInputEmployeeId))
                                 .param("name", "accountaccountaccount")
                                 .param("password", newInputPassword))
                                 .andExpect(status().is3xxRedirection())
@@ -217,7 +258,9 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：正しく入力
          */
         @Test
-        public void testValidateInputNG_case8() throws Exception {
+        public void testValidateInputNG_case6() throws Exception {
+                when(adminEmployeeAccountService.getAccountName(employeeAccount.getName()))
+                                .thenReturn(false);
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
                                 .param("employeeId", String.valueOf(newInputEmployeeId))
                                 .param("name", employeeAccount.getName())
@@ -228,6 +271,8 @@ public class AdminEmployeeAccountControllerTest {
                 FlashMap flashMap = mvcResult.getFlashMap();
                 String errMSG = BindingResult.MODEL_KEY_PREFIX + "adminEmployeeAccountForm";
                 assertNotNull(flashMap.get(errMSG));
+
+                verify(adminEmployeeAccountService).getAccountName(employeeAccount.getName());
         }
 
         /*
@@ -237,9 +282,9 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：正しく入力
          */
         @Test
-        public void testValidateInputNG_case9() throws Exception {
+        public void testValidateInputNG_case7() throws Exception {
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "2")
+                                .param("employeeId", String.valueOf(newInputEmployeeId))
                                 .param("name", "アカウント")
                                 .param("password", newInputPassword))
                                 .andExpect(status().is3xxRedirection())
@@ -257,11 +302,10 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：未入力
          */
         @Test
-        public void testValidateInputNG_case10() throws Exception {
+        public void testValidateInputNG_case8() throws Exception {
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "2")
-                                .param("name", newInputName)
-                                .param("password", ""))
+                                .param("employeeId", String.valueOf(newInputEmployeeId))
+                                .param("name", newInputAccountName))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
                                 .andReturn();
@@ -277,10 +321,10 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：5文字未満
          */
         @Test
-        public void testValidateInputNG_case11() throws Exception {
+        public void testValidateInputNG_case9() throws Exception {
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "2")
-                                .param("name", newInputName)
+                                .param("employeeId", String.valueOf(newInputEmployeeId))
+                                .param("name", newInputAccountName)
                                 .param("password", "pass"))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
@@ -297,10 +341,10 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：21文字以上
          */
         @Test
-        public void testValidateInputNG_case12() throws Exception {
+        public void testValidateInputNG_case10() throws Exception {
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "2")
-                                .param("name", newInputName)
+                                .param("employeeId", String.valueOf(newInputEmployeeId))
+                                .param("name", newInputAccountName)
                                 .param("password", "passwordpasswordpassword"))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
@@ -317,10 +361,10 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：全角カナ
          */
         @Test
-        public void testValidateInputNG_case13() throws Exception {
+        public void testValidateInputNG_case11() throws Exception {
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "2")
-                                .param("name", newInputName)
+                                .param("employeeId", String.valueOf(newInputEmployeeId))
+                                .param("name", newInputAccountName)
                                 .param("password", "パスワード"))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
@@ -337,9 +381,10 @@ public class AdminEmployeeAccountControllerTest {
          * パスワード：全角カナ
          */
         @Test
-        public void testValidateInputNG_case14() throws Exception {
+        public void testValidateInputNG_case12() throws Exception {
+
                 MvcResult mvcResult = mockMvc.perform(post("/admin/account/postconfirm")
-                                .param("employeeId", "2")
+                                .param("employeeId", String.valueOf(newInputEmployeeId))
                                 .param("name", "アカウント")
                                 .param("password", "パスワード"))
                                 .andExpect(status().is3xxRedirection())
@@ -354,16 +399,24 @@ public class AdminEmployeeAccountControllerTest {
          * 確認画面表示の正常系テスト
          */
         @Test
-        public void testShowConfirmOK_case15() throws Exception {
-                AdminEmployeeAccountForm adminEmployeeAccountForm = new AdminEmployeeAccountForm();
-                adminEmployeeAccountForm.setEmployeeId(newInputEmployeeId);
-                adminEmployeeAccountForm.setName(newInputName);
-                adminEmployeeAccountForm.setPassword(newInputPassword);
+        public void testShowConfirmOK_case1() throws Exception {
+                AdminEmployeeAccountForm inputForm = new AdminEmployeeAccountForm();
+                inputForm.setEmployeeId(newInputEmployeeId);
+                inputForm.setName(newInputAccountName);
+                inputForm.setPassword(newInputPassword);
+
+                Employee inputEmployee = new Employee();
+                inputEmployee.setName(newInputEmployeeName);
+
+                EmployeeAccount inputEmployeeAccount = new EmployeeAccount();
+                inputEmployeeAccount.setEmployee(inputEmployee);
 
                 mockMvc.perform(get("/admin/account/confirm")
-                                .flashAttr("adminEmployeeAccountForm", adminEmployeeAccountForm))
+                                .flashAttr("adminEmployeeAccountForm", inputForm)
+                                .flashAttr("employee", inputEmployeeAccount))
                                 .andExpect(status().isOk())
-                                .andExpect(view().name("/admin/account/confirm"));
+                                .andExpect(view().name("admin/account/confirm"));
+
         }
 
         /*
@@ -371,11 +424,13 @@ public class AdminEmployeeAccountControllerTest {
          * employeeId:null
          */
         @Test
-        public void testShowConfirmNG_case16() throws Exception {
+        public void testShowConfirmNG_case2() throws Exception {
+                AdminEmployeeAccountForm inputForm = new AdminEmployeeAccountForm();
+                inputForm.setName(newInputAccountName);
+                inputForm.setPassword(newInputPassword);
                 mockMvc.perform(get("/admin/account/confirm")
-                                .param("name", newInputName)
-                                .param("password", newInputPassword))
-                                .andExpect(status().isOk())
+                                .flashAttr("adminEmployeeAccountForm", inputForm))
+                                .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
                                 .andExpect(flash().attribute("errorMessages", "入力情報が見つかりません。再度入力してください"));
         }
@@ -385,11 +440,13 @@ public class AdminEmployeeAccountControllerTest {
          * name:null
          */
         @Test
-        public void testShowConfirmNG_case17() throws Exception {
+        public void testShowConfirmNG_case3() throws Exception {
+                AdminEmployeeAccountForm inputForm = new AdminEmployeeAccountForm();
+                inputForm.setEmployeeId(newInputEmployeeId);
+                inputForm.setPassword(newInputPassword);
                 mockMvc.perform(get("/admin/account/confirm")
-                                .param("employeeId", "2")
-                                .param("password", newInputPassword))
-                                .andExpect(status().isOk())
+                                .flashAttr("adminEmployeeAccountForm", inputForm))
+                                .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
                                 .andExpect(flash().attribute("errorMessages", "入力情報が見つかりません。再度入力してください"));
 
@@ -400,12 +457,14 @@ public class AdminEmployeeAccountControllerTest {
          * name:0文字
          */
         @Test
-        public void testShowConfirmNG_case18() throws Exception {
+        public void testShowConfirmNG_case4() throws Exception {
+                AdminEmployeeAccountForm inputForm = new AdminEmployeeAccountForm();
+                inputForm.setEmployeeId(newInputEmployeeId);
+                inputForm.setName("");
+                inputForm.setPassword(newInputPassword);
                 mockMvc.perform(get("/admin/account/confirm")
-                                .param("employeeId", "2")
-                                .param("name", "")
-                                .param("password", newInputPassword))
-                                .andExpect(status().isOk())
+                                .flashAttr("adminEmployeeAccountForm", inputForm))
+                                .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
                                 .andExpect(flash().attribute("errorMessages", "入力情報が見つかりません。再度入力してください"));
 
@@ -416,11 +475,14 @@ public class AdminEmployeeAccountControllerTest {
          * password:null
          */
         @Test
-        public void testShowConfirmNG_case19() throws Exception {
+        public void testShowConfirmNG_case5() throws Exception {
+                AdminEmployeeAccountForm inputForm = new AdminEmployeeAccountForm();
+                inputForm.setEmployeeId(newInputEmployeeId);
+                inputForm.setName(newInputAccountName);
+                inputForm.setPassword(null);
                 mockMvc.perform(get("/admin/account/confirm")
-                                .param("employeeId", "2")
-                                .param("name", newInputName))
-                                .andExpect(status().isOk())
+                                .flashAttr("adminEmployeeAccountForm", inputForm))
+                                .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
                                 .andExpect(flash().attribute("errorMessages", "入力情報が見つかりません。再度入力してください"));
 
@@ -431,12 +493,15 @@ public class AdminEmployeeAccountControllerTest {
          * password:0文字
          */
         @Test
-        public void testShowConfirmNG_case20() throws Exception {
+        public void testShowConfirmNG_case6() throws Exception {
+                AdminEmployeeAccountForm inputForm = new AdminEmployeeAccountForm();
+                inputForm.setEmployeeId(newInputEmployeeId);
+                inputForm.setName(newInputAccountName);
+                inputForm.setPassword("");
+
                 mockMvc.perform(get("/admin/account/confirm")
-                                .param("employeeId", "2")
-                                .param("name", newInputName)
-                                .param("password", ""))
-                                .andExpect(status().isOk())
+                                .flashAttr("adminEmployeeAccountForm", inputForm))
+                                .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
                                 .andExpect(flash().attribute("errorMessages", "入力情報が見つかりません。再度入力してください"));
 
@@ -447,28 +512,38 @@ public class AdminEmployeeAccountControllerTest {
          * アカウント重複なし→DB登録
          */
         @Test
-        public void testRegistOK_case21() throws Exception {
-                EmployeeAccount inpuAccount = new EmployeeAccount();
-                inpuAccount.setName(newInputName);
-                when(employeeAccountHelper.formToEntity(any(AdminEmployeeAccountForm.class)))
-                                .thenReturn(inpuAccount, inpuAccount);
-                when(adminEmployeeAccountService.getAccountName(newInputName)).thenReturn(true);
-                when(adminEmployeeAccountService.addEmployeeAccount(any(EmployeeAccount.class)))
-                                .thenReturn(newInputEmployeeId);
-                when(adminEmployeeAccountService.getEmployeeNameWithEmployeeAccountId(anyInt()))
-                                .thenReturn(inpuAccount);
+        public void testRegistOK_case1() throws Exception {
+                inputForm.setEmployeeId(newInputEmployeeId);
+                inputForm.setName(newInputAccountName);
+                inputForm.setPassword(newInputPassword);
+
+                when(employeeAccountHelper.formToEntity(inputForm))
+                                .thenReturn(inputAccount, inputAccount);
+                when(adminEmployeeAccountService.getAccountName(inputAccount.getName()))
+                                .thenReturn(true);
+                when(adminEmployeeAccountService.getNotHasEmployeeAccount(inputAccount.getEmployeeId()))
+                                .thenReturn(true);
+                when(adminEmployeeAccountService.addEmployeeAccount(inputAccount))
+                                .thenReturn(inputAccount.getEmployeeId());
+                when(adminEmployeeAccountService.getEmployeeNameWithEmployeeAccountId(inputAccount.getEmployeeId()))
+                                .thenReturn(inputAccount);
 
                 mockMvc.perform(post("/admin/account/postcomplete")
-                                .param("name", newInputName)
-                                .param("employeeId", String.valueOf(newInputEmployeeId))
-                                .param("password", newInputPassword))
+                                .param("name", inputAccount.getName())
+                                .param("employeeId", String.valueOf(inputAccount.getEmployeeId()))
+                                .param("password", inputAccount.getPassword()))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/complete"))
-                                .andExpect(flash().attribute("employee", inpuAccount))
-                                .andExpect(flash().attribute("accountName", newInputName));
-                // // serviceが正しく呼び出されたか
-                // verify(adminEmployeeAccountService).addEmployeeAccount(any(EmployeeAccount.class));
-                // verify(adminEmployeeAccountService).getEmployeeNameWithEmployeeAccountId(anyInt());
+                                .andExpect(flash().attribute("employee", inputAccount))
+                                .andExpect(flash().attribute("accountName", inputAccount.getName()));
+                // serviceが正しく呼び出されたか
+                verify(adminEmployeeAccountService).getAccountName(inputAccount.getName());
+                verify(adminEmployeeAccountService).getNotHasEmployeeAccount(inputAccount.getEmployeeId());
+                verify(adminEmployeeAccountService).addEmployeeAccount(inputAccount);
+                verify(adminEmployeeAccountService).getEmployeeNameWithEmployeeAccountId(inputAccount.getEmployeeId());
+
+                // Helperが正しく呼び出されたか(2回とも)
+                verify(employeeAccountHelper, times(2)).formToEntity(inputForm);
 
         }
 
@@ -477,32 +552,38 @@ public class AdminEmployeeAccountControllerTest {
          * アカウント重複あり
          */
         @Test
-        public void testRegistNG_case22() throws Exception {
-                when(employeeAccountHelper.formToEntity(any(AdminEmployeeAccountForm.class)))
+        public void testRegistNG_case2() throws Exception {
+                when(employeeAccountHelper.formToEntity(inputForm))
                                 .thenReturn(employeeAccount);
-                when(adminEmployeeAccountService.getAccountName(employeeAccount.getName())).thenReturn(false);
+                when(adminEmployeeAccountService.getAccountName(employeeAccount.getName()))
+                                .thenReturn(false);
 
                 mockMvc.perform(post("/admin/account/postcomplete")
                                 .param("name", employeeAccount.getName())
-                                .param("employeeId", "2")
-                                .param("password", newInputPassword))
+                                .param("employeeId", String.valueOf(inputAccount.getEmployeeId()))
+                                .param("password", inputAccount.getPassword()))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
                                 .andExpect(flash().attribute("errorMessages", "このアカウント名は既に使用されています"))
                                 .andExpect(flash().attributeExists("adminEmployeeAccountForm"));
 
-                verify(adminEmployeeAccountService, never()).addEmployeeAccount(any(EmployeeAccount.class));
+                verify(employeeAccountHelper).formToEntity(inputForm);
+                verify(adminEmployeeAccountService).getAccountName(employeeAccount.getName());
+
+                verify(adminEmployeeAccountService, never()).addEmployeeAccount(inputAccount);
+                verify(adminEmployeeAccountService, never())
+                                .getEmployeeAccountWithEmployeeId(inputAccount.getEmployeeId());
         }
 
         /*
          * 戻るボタン正常テスト
          */
         @Test
-        public void testBackOK_case23() throws Exception {
+        public void testBackOK_case1() throws Exception {
                 mockMvc.perform(post("/admin/account/back")
-                                .param("employeeId", "2")
-                                .param("name", newInputName)
-                                .param("password", newInputPassword))
+                                .param("employeeId", String.valueOf(inputAccount.getEmployeeId()))
+                                .param("name", inputAccount.getName())
+                                .param("password", inputAccount.getPassword()))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin/account/form"))
                                 .andExpect(flash().attributeExists("adminEmployeeAccountForm"));
@@ -512,17 +593,16 @@ public class AdminEmployeeAccountControllerTest {
          * 完了画面表示の正常テスト
          */
         @Test
-        public void testShowCompleteOK_case24() throws Exception {
-                EmployeeAccount employeeAccount = new EmployeeAccount();
+        public void testShowCompleteOK_case1() throws Exception {
 
                 mockMvc.perform(get("/admin/account/complete")
-                                .flashAttr("employee", employeeAccount))
+                                .flashAttr("employee", inputAccount))
                                 .andExpect(status().isOk())
                                 .andExpect(view().name("/admin/account/complete"));
         }
 
         @Test
-        public void testShowCompleteNG_case25() throws Exception {
+        public void testShowCompleteNG_case2() throws Exception {
                 mockMvc.perform(get("/admin/account/complete"))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/admin"))
