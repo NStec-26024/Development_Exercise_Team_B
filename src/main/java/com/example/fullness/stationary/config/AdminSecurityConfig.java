@@ -2,23 +2,18 @@ package com.example.fullness.stationary.config;
 
 import java.util.Locale;
 
-import javax.sql.DataSource;
-
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.fullness.stationary.security.AdminCustomAuthenticationFailureHandler;
-import com.example.fullness.stationary.security.AdminSessionLockFilter;
 import com.example.fullness.stationary.service.AdminLoginAttemptService;
-import com.example.fullness.stationary.service.impl.AdminUserDetailsServiceImpl;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -33,42 +28,16 @@ import jakarta.servlet.http.HttpSession;
  * - ログイン画面とログイン処理の設定
  * - ログアウト時の動作
  * - セッション切れ時の遷移（timeoutFlag の付与）
- * - ログイン失敗回数によるアカウントロック判定（SessionLockFilter）
+ * - ログイン失敗回数によるアカウントロック判定（AdminUserDetailsServiceImpl が
+ * accountLocked() を設定し、DaoAuthenticationProvider の標準拡張点
+ * isAccountNonLocked() を通じて判定する）
  * - ログイン失敗時のメッセージ設定（CustomAuthenticationFailureHandler）
- * - DB からユーザー情報を読み込む仕組み（JdbcUserDetailsManager）
- *
- * 管理画面は社内管理者専用のため、
- * ロック判定やセッションタイムアウトなど、より厳しいセキュリティを適用している。
+ * - DB からユーザー情報を読み込む仕組み（AdminUserDetailsServiceImpl）
  */
 
 @Configuration
 @EnableWebSecurity
 public class AdminSecurityConfig {
-
-        private AdminLoginAttemptService adminLoginAttemptServiceImpl;
-
-        /**
-         * ログイン失敗回数を管理するサービスを受け取る。
-         * ログイン成功時の失敗回数リセットやロック判定に使用する。
-         * 
-         * @param adminLoginAttemptServiceImpl ログイン失敗回数とロック状態を管理するサービス
-         */
-
-        public AdminSecurityConfig(AdminLoginAttemptService adminLoginAttemptServiceImpl) {
-                this.adminLoginAttemptServiceImpl = adminLoginAttemptServiceImpl;
-        }
-
-        /**
-         * ロック判定フィルターを生成する。
-         *
-         * @param adminLoginAttemptServiceImpl ログイン失敗回数管理サービス
-         * @param messageSource                メッセージソース
-         * @return ロック判定フィルター
-         */
-        public AdminSessionLockFilter aadminSessionLockFilter(AdminLoginAttemptService adminLoginAttemptServiceImpl,
-                        MessageSource messageSource) {
-                return new AdminSessionLockFilter(adminLoginAttemptServiceImpl, messageSource);
-        }
 
         /**
          * 管理画面のセキュリティルールをまとめて構築するメソッド。
@@ -79,12 +48,10 @@ public class AdminSecurityConfig {
          * /admin/login は誰でもアクセス可能
          * /admin/** は ADMIN 権限を持つユーザーのみアクセス可能
          *
-         * - ロック判定フィルターの追加
-         * ログイン前に AdminSessionLockFilter を実行し、アカウントがロック中なら認証処理を止める
-         *
          * - ログイン処理の設定
-         * ログイン画面の URL（/admin/login）
-         * ログイン処理の URL（/admin/login-auth）
+         * ログイン画面・ログイン処理ともに同一 URL（/admin/login）
+         * ロック判定は AdminUserDetailsServiceImpl が設定する accountLocked() を
+         * DaoAuthenticationProvider が事前チェックすることで行う（独立フィルターは持たない）
          * 成功時：失敗回数リセット、セッションID再生成、管理画面へ遷移
          * 失敗時：AdminCustomAuthenticationFailureHandler によりメッセージ設定
          *
@@ -104,6 +71,7 @@ public class AdminSecurityConfig {
          * @throws Exception セキュリティ設定時の例外
          */
 
+        @Order(1)
         @Bean
         public SecurityFilterChain securityFilterChain(
                         HttpSecurity http,
@@ -111,31 +79,24 @@ public class AdminSecurityConfig {
                         MessageSource messageSource,
                         AdminLoginAttemptService loginAttemptService) throws Exception {
 
-                AdminSessionLockFilter sessionLockFilter = new AdminSessionLockFilter(loginAttemptService,
-                                messageSource);
+                // このフィルターチェーンが担当する範囲を /admin 配下に限定する。
+                // これにより、顧客向け画面（/ , /login , /account/** 等）は
+                // FrontSecurityConfig 側のフィルターチェーンで扱われる。
+                http.securityMatcher("/admin/**");
 
                 // URL のアクセス制御
                 http.authorizeHttpRequests(auth -> auth
                                 .requestMatchers(
-                                                "/admin",
                                                 "/admin/login",
-                                                "/admin/error",
-                                                "/css/**",
-                                                "/js/**",
-                                                "/",
-                                                "/images/**")
+                                                "/admin/error")
                                 .permitAll()
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .anyRequest().authenticated());
-
-                // ロック判定フィルターを認証前に追加
-                http.addFilterBefore(sessionLockFilter, UsernamePasswordAuthenticationFilter.class);
+                                .anyRequest().hasRole("ADMIN"));
 
                 // ログイン設定
                 http.formLogin(form -> form
                                 .loginPage("/admin/login") // ログイン画面（GET）
-                                .loginProcessingUrl("/admin/login-auth") // 認証処理（POST）
-                                .usernameParameter("name") // フォームの name と一致
+                                .loginProcessingUrl("/admin/login") // 認証処理（POST、画面と同一URL）
+                                .usernameParameter("username") // フォームの username と一致
                                 .passwordParameter("password") // フォームの password と一致
                                 .successHandler((request, response, authentication) -> {
                                         // ログイン成功 → ロック解除

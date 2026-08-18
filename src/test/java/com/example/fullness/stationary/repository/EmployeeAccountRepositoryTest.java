@@ -15,30 +15,36 @@ class EmployeeAccountRepositoryDbTest {
     private EmployeeAccountRepository repository;
 
     // ============================================================
-    // 正常系：DB から bcrypt パスワードを正しく取得できるか
+    // 正常系：指定したユーザー名で DB から正しい情報を取得できること
     // ============================================================
     @Test
     void findByNameTest_case01_Ok() {
 
+        // 実行
         EmployeeAccount result = repository.findByName("yamadatarou1001");
 
+        // 検証：null ではない
         assertThat(result).isNotNull();
+
+        // 検証：id / employeeId が正しい
         assertThat(result.getId()).isEqualTo(1);
         assertThat(result.getEmployeeId()).isEqualTo(1001);
 
-        // bcrypt が DB から正しく取得できているか
+        // 検証：bcrypt パスワードが正しく取得できている
         assertThat(result.getPassword())
                 .isEqualTo("$2a$10$nOMKs31N.scADyHLn1KfyOagrb52vXDEokqGp4MueMbqAam1iaS1e");
     }
 
     // ============================================================
-    // 異常系：存在しないユーザー名の場合 null が返るか
+    // 異常系：存在しないユーザー名の場合 null が返ること
     // ============================================================
     @Test
     void findByNameTest_case02_Ok() {
 
+        // 実行
         EmployeeAccount result = repository.findByName("unknown");
 
+        // 検証：null が返る
         assertThat(result).isNull();
     }
 }

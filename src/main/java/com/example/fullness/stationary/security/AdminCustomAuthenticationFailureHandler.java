@@ -7,9 +7,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.MessageSource;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -18,30 +18,39 @@ import com.example.fullness.stationary.service.AdminLoginAttemptService;
 
 /**
  * ログイン認証失敗時の処理をカスタムするハンドラー。
- * ログイン失敗回数の記録、ロック判定、エラーメッセージの設定を行う。
+ * 入力されたアカウント名をセッションに保存し、ロック中かどうかを次の2通りで判定する。
+ *
+ * 1. {@link LockedException}が発生した場合（既存アカウントのロック状態を
+ * {@code DaoAuthenticationProvider}が事前チェックした結果）
+ * 2. それ以外の例外でも{@link AdminLoginAttemptService#isBlocked}がtrueの場合
+ * （存在しないアカウント名でロックに達している場合）
+ *
+ * ロック中と判定した場合はロックメッセージを設定し失敗回数を加算しない。
+ * それ以外の認証失敗はアカウント名の有無を区別せずbad_credentialsメッセージを設定し、
+ * 失敗回数を加算する。
  */
-@Slf4j
 @Component
 public class AdminCustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    private MessageSource messageSource;
-    private AdminLoginAttemptService adminLoginAttemptServiceImpl;
+    private final AdminLoginAttemptService adminLoginAttemptServiceImpl;
+    private final MessageSource messageSource;
 
     /**
-     * @param messageSource                メッセージソース
      * @param adminLoginAttemptServiceImpl ログイン失敗回数とロック状態を管理するサービス
+     * @param messageSource                メッセージ取得に使用する MessageSource
      */
-    public AdminCustomAuthenticationFailureHandler(MessageSource messageSource,
-            AdminLoginAttemptService adminLoginAttemptServiceImpl) {
-        this.messageSource = messageSource;
+    public AdminCustomAuthenticationFailureHandler(AdminLoginAttemptService adminLoginAttemptServiceImpl,
+            MessageSource messageSource) {
         this.adminLoginAttemptServiceImpl = adminLoginAttemptServiceImpl;
+        this.messageSource = messageSource;
         setDefaultFailureUrl("/admin/login");
     }
 
     /**
      * 認証失敗時に呼び出される処理。
-     * アカウント名の保存、失敗回数の加算、エラーメッセージ設定を行い、
-     * ログイン画面へリダイレクトする。
+     * アカウント名の保存を行い、ロック中でなければ失敗回数を加算した上で
+     * bad_credentials メッセージを設定する。ロック中の場合はロックメッセージを設定し、
+     * 失敗回数は加算しない。
      *
      * @param request   認証リクエスト
      * @param response  レスポンス
@@ -56,30 +65,39 @@ public class AdminCustomAuthenticationFailureHandler extends SimpleUrlAuthentica
             AuthenticationException exception)
             throws IOException, ServletException {
 
-        // ログインフォームの name を取得
-        String accountName = request.getParameter("name");
+        // ログインフォームの username を取得（AdminSecurityConfig#usernameParameter と一致させる）
+        String accountName = request.getParameter("username");
 
-        // 認証失敗ログ
-        log.info("failureHandler が呼ばれました: {}", accountName);
-
-        // セッションを必ず作成（メッセージ保存のため）
+        // セッションを必ず作成（アカウント名保存のため）
         HttpSession session = request.getSession(true);
 
-        // 入力したユーザー名を保存
-        session.setAttribute("loginName", accountName);
+        // 入力したユーザー名を保存（パスワードは保存しない）
+        session.setAttribute("loginUsername", accountName);
 
-        // 失敗回数を加算（ロック判定は LoginAttemptService が行う）
-        if (accountName != null && !accountName.isBlank()) {
-            adminLoginAttemptServiceImpl.loginFailed(accountName);
+        boolean locked = exception instanceof LockedException
+                || (accountName != null && !accountName.isBlank()
+                        && adminLoginAttemptServiceImpl.isBlocked(accountName));
+
+        if (locked) {
+            // ロック中の試行はパスワード照合まで到達していないため、失敗回数は加算しない
+            session.setAttribute("loginErrorMessage",
+                    messageSource.getMessage(
+                            "com.example.fullness.stationary.security.locked",
+                            null,
+                            Locale.JAPAN));
+        } else {
+            // アカウント未登録・パスワード不一致を区別せず同一メッセージを表示する
+            session.setAttribute("loginErrorMessage",
+                    messageSource.getMessage(
+                            "com.example.fullness.stationary.security.bad_credentials",
+                            null,
+                            Locale.JAPAN));
+
+            if (accountName != null && !accountName.isBlank()) {
+                // 失敗回数を加算（ロック判定は LoginAttemptService が行う）
+                adminLoginAttemptServiceImpl.loginFailed(accountName);
+            }
         }
-
-        // 認証失敗メッセージをセッションに保存（画面で表示される）
-        session.setAttribute(
-                "loginErrorMessage",
-                messageSource.getMessage(
-                        "com.example.fullness.stationary.security.bad_credentials",
-                        null,
-                        Locale.JAPAN));
 
         // ログイン画面へリダイレクト
         response.sendRedirect("/admin/login");

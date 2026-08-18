@@ -1,6 +1,5 @@
 package com.example.fullness.stationary.controller;
 
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,22 +19,10 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/admin")
 public class AdminLoginController {
 
-    private final MessageSource messageSource;
-
-    /**
-     * 管理画面のログイン画面表示を担当するコントローラー。
-     * メッセージソースを受け取り、画面表示時のメッセージ取得に利用する。
-     *
-     * @param messageSource メッセージ取得に使用する MessageSource
-     */
-    public AdminLoginController(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
-
     /**
      * ログイン画面を表示する。
-     * セッションに保存された timeoutMessage、loginErrorMessage、loginName を読み取り、
-     * 必要に応じて画面へ反映する。読み取ったメッセージは重複表示を防ぐため削除する。
+     * セッションに保存された timeoutMessage、loginErrorMessage、loginUsername を読み取って
+     * 画面へ反映し、読み取った値はセッションから削除する。
      *
      * @param model   画面へ値を渡す Model
      * @param request HTTP リクエスト（セッション情報の取得に使用）
@@ -47,28 +34,37 @@ public class AdminLoginController {
         HttpSession session = request.getSession(false);
         AdminLoginForm adminLoginForm = new AdminLoginForm();
 
-        if (session != null) {
+        model.addAttribute("timeoutMessage", popSessionAttribute(session, "timeoutMessage"));
+        model.addAttribute("securityErrorMessage", popSessionAttribute(session, "loginErrorMessage"));
 
-            Object timeoutMessage = session.getAttribute("timeoutMessage");
-            if (timeoutMessage != null) {
-                model.addAttribute("timeoutMessage", timeoutMessage);
-                session.removeAttribute("timeoutMessage");
-            }
-
-            Object errorMsg = session.getAttribute("loginErrorMessage");
-            if (errorMsg != null) {
-                model.addAttribute("securityErrorMessage", errorMsg);
-                session.removeAttribute("loginErrorMessage");
-            }
-
-            Object savedName = session.getAttribute("loginName");
-            if (savedName != null) {
-                adminLoginForm.setName(String.valueOf(savedName));
-                session.removeAttribute("loginName");
-            }
+        String savedUsername = popSessionAttribute(session, "loginUsername");
+        if (savedUsername != null) {
+            adminLoginForm.setName(savedUsername);
         }
 
         model.addAttribute("adminLoginForm", adminLoginForm);
         return "admin/login";
+    }
+
+    /**
+     * セッションから値を取り出し、取り出した値は即座にセッションから削除する。
+     *
+     * @param session 対象セッション（null の場合は未取得として扱う）
+     * @param key     取得する属性名
+     * @return 保存されていた値。存在しない場合は null
+     */
+    // ログイン画面のメッセージ（タイムアウト・認証エラー等）を再読み込み時に重複表示させないための一度限り読み取り。
+    private String popSessionAttribute(HttpSession session, String key) {
+        if (session == null) {
+            return null;
+        }
+
+        Object value = session.getAttribute(key);
+        if (value == null) {
+            return null;
+        }
+
+        session.removeAttribute(key);
+        return String.valueOf(value);
     }
 }

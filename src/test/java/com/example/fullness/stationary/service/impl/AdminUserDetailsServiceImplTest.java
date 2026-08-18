@@ -1,4 +1,4 @@
-package com.example.fullness.stationary.service;
+package com.example.fullness.stationary.service.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -7,20 +7,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.repository.EmployeeAccountRepository;
-import com.example.fullness.stationary.service.impl.AdminUserDetailsServiceImpl;
+import com.example.fullness.stationary.service.AdminLoginAttemptService;
 
 class AdminUserDetailsServiceImplTest {
 
     private EmployeeAccountRepository mockRepository;
+    private AdminLoginAttemptService mockLoginAttemptService;
     private AdminUserDetailsServiceImpl service;
 
     @BeforeEach
     void setup() {
         mockRepository = mock(EmployeeAccountRepository.class);
-        service = new AdminUserDetailsServiceImpl(mockRepository);
+        mockLoginAttemptService = mock(AdminLoginAttemptService.class);
+
+        service = new AdminUserDetailsServiceImpl();
+
+        ReflectionTestUtils.setField(service, "employeeAccountRepository", mockRepository);
+        ReflectionTestUtils.setField(service, "adminLoginAttemptServiceImpl", mockLoginAttemptService);
     }
 
     // ============================================================
@@ -29,18 +36,18 @@ class AdminUserDetailsServiceImplTest {
     @Test
     void loadUserByUsernameTest_case01_Ok() {
 
-        // 入力
         EmployeeAccount account = new EmployeeAccount();
         account.setName("yamadatarou1001");
-        account.setPassword("$2a$10$5W3fG3.GKrBOTbzlwY.kWeJRv8.RMJTnhUpu5M.5XUEODK3.jrsNO");
+        account.setPassword("$2a$10$nOMKs31N.scADyHLn1KfyOagrb52vXDEokqGp4MueMbqAam1iaS1e");
 
         when(mockRepository.findByName("yamadatarou1001"))
                 .thenReturn(account);
 
-        // 処理
+        when(mockLoginAttemptService.isBlocked("yamadatarou1001"))
+                .thenReturn(false);
+
         UserDetails userDetails = service.loadUserByUsername("yamadatarou1001");
 
-        // 出力
         assertEquals("yamadatarou1001", userDetails.getUsername());
         assertEquals(account.getPassword(), userDetails.getPassword());
         assertTrue(
@@ -54,11 +61,9 @@ class AdminUserDetailsServiceImplTest {
     @Test
     void loadUserByUsernameTest_case02_Ok() {
 
-        // 入力
         when(mockRepository.findByName("unknown"))
                 .thenReturn(null);
 
-        // 出力（例外）
         assertThrows(UsernameNotFoundException.class, () -> {
             service.loadUserByUsername("unknown");
         });

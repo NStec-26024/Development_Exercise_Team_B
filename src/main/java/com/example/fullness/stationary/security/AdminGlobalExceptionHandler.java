@@ -6,11 +6,14 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.example.fullness.stationary.form.AdminLoginForm;
 
@@ -33,6 +36,27 @@ public class AdminGlobalExceptionHandler {
      */
     public AdminGlobalExceptionHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
+    }
+
+    /**
+     * 静的リソース（画像・favicon等）が見つからない場合の専用処理。404を返し、
+     * リクエストURLが{@code /images/**}配下の場合のみWARNログを出力する。
+     *
+     * @param request 発生元の HTTP リクエスト
+     * @param ex      捕捉した例外
+     */
+    // @ControllerAdviceは複数ハンドラーがあれば最も型が近いものを優先するため、
+    // このメソッドを{@link #handleAllExceptions}より具体的な型で分けておくことで、
+    // 静的リソース404が管理者ログイン画面への遷移に巻き取られてしまうのを防いでいる。
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void handleResourceNotFound(HttpServletRequest request, NoResourceFoundException ex) {
+        String uri = request.getRequestURI();
+        if (uri.startsWith("/images/")) {
+            // DBに登録された商品画像URLに対応する実ファイルが存在しないデータ不整合の
+            // 兆候であるため、運用上見逃さないようログに残す（favicon.ico等の通常の404は対象外）
+            log.warn("商品画像ファイルが見つかりません（DBのimage_urlに対応する実ファイルが無い可能性）: URL={}", uri);
+        }
     }
 
     /**
@@ -99,11 +123,11 @@ public class AdminGlobalExceptionHandler {
                 session.removeAttribute("loginErrorMessage");
             }
 
-            // loginName（前回入力したユーザー名の復元）
-            String savedName = (String) session.getAttribute("loginName");
-            if (savedName != null) {
-                adminLoginForm.setName(savedName);
-                session.removeAttribute("loginName");
+            // loginUsername（前回入力したユーザー名の復元）
+            String savedUsername = (String) session.getAttribute("loginUsername");
+            if (savedUsername != null) {
+                adminLoginForm.setName(savedUsername);
+                session.removeAttribute("loginUsername");
             }
         }
 
