@@ -2,6 +2,9 @@ package com.example.fullness.stationary.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -30,6 +33,11 @@ public class AdminLoginController {
      */
     @GetMapping("/login")
     public String showLoginPage(Model model, HttpServletRequest request) {
+        // 認証済みユーザーが直接 /admin/login にアクセスした場合は管理トップへリダイレクト
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/admin";
+        }
 
         HttpSession session = request.getSession(false);
         AdminLoginForm adminLoginForm = new AdminLoginForm();

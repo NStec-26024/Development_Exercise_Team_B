@@ -13,6 +13,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
 import com.example.fullness.stationary.service.AdminLoginAttemptService;
 
@@ -70,6 +71,21 @@ public class AdminCustomAuthenticationFailureHandler extends SimpleUrlAuthentica
 
         // セッションを必ず作成（アカウント名保存のため）
         HttpSession session = request.getSession(true);
+
+        // 認証処理中に DB 接続エラーが発生した場合はエラー画面へ遷移させる
+        Throwable root = exception;
+        while (root.getCause() != null) {
+            root = root.getCause();
+        }
+        if (root instanceof CannotGetJdbcConnectionException) {
+            String dbError = messageSource.getMessage(
+                    "com.example.fullness.stationary.security.db_error",
+                    null,
+                    Locale.JAPAN);
+            session.setAttribute("errorMessage", dbError);
+            response.sendRedirect("/admin/error");
+            return;
+        }
 
         // 入力したユーザー名を保存（パスワードは保存しない）
         session.setAttribute("loginUsername", accountName);
