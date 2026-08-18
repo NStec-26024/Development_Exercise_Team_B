@@ -96,7 +96,7 @@ public class AdminSecurityConfig {
                 http.formLogin(form -> form
                                 .loginPage("/admin/login") // ログイン画面（GET）
                                 .loginProcessingUrl("/admin/login") // 認証処理（POST、画面と同一URL）
-                                .usernameParameter("username") // フォームの username と一致
+                                .usernameParameter("name") // フォームの name と一致
                                 .passwordParameter("password") // フォームの password と一致
                                 .successHandler((request, response, authentication) -> {
                                         // ログイン成功 → ロック解除

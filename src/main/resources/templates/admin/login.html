@@ -16,7 +16,7 @@
     <main class="main-content">
         <h2>ログイン画面</h2>
 
-        <form th:action="@{/admin/login-auth}" th:object="${adminLoginForm}" method="post">
+        <form th:action="@{/admin/login}" th:object="${adminLoginForm}" method="post">
             <div th:if="${timeoutMessage != null or securityErrorMessage != null or errorMessage != null or #fields.hasErrors()}"
                 class="error-message" style="margin-bottom: 20px; font-weight: bold; font-size: 16px;">
                 <div th:if="${errorMessage != null}">

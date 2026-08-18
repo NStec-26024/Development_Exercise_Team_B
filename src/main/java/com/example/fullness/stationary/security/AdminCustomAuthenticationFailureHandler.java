@@ -65,8 +65,8 @@ public class AdminCustomAuthenticationFailureHandler extends SimpleUrlAuthentica
             AuthenticationException exception)
             throws IOException, ServletException {
 
-        // ログインフォームの username を取得（AdminSecurityConfig#usernameParameter と一致させる）
-        String accountName = request.getParameter("username");
+        // ログインフォームの name を取得（AdminSecurityConfig#usernameParameter と一致させる）
+        String accountName = request.getParameter("name");
 
         // セッションを必ず作成（アカウント名保存のため）
         HttpSession session = request.getSession(true);
