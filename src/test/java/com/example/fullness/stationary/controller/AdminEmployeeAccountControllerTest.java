@@ -553,7 +553,8 @@ public class AdminEmployeeAccountControllerTest {
          */
         @Test
         public void testRegistNG_case2() throws Exception {
-                when(employeeAccountHelper.formToEntity(inputForm))
+
+                when(employeeAccountHelper.formToEntity(any(AdminEmployeeAccountForm.class)))
                                 .thenReturn(employeeAccount);
                 when(adminEmployeeAccountService.getAccountName(employeeAccount.getName()))
                                 .thenReturn(false);
@@ -567,7 +568,7 @@ public class AdminEmployeeAccountControllerTest {
                                 .andExpect(flash().attribute("errorMessages", "このアカウント名は既に使用されています"))
                                 .andExpect(flash().attributeExists("adminEmployeeAccountForm"));
 
-                verify(employeeAccountHelper).formToEntity(inputForm);
+                verify(employeeAccountHelper).formToEntity(any(AdminEmployeeAccountForm.class));
                 verify(adminEmployeeAccountService).getAccountName(employeeAccount.getName());
 
                 verify(adminEmployeeAccountService, never()).addEmployeeAccount(inputAccount);
