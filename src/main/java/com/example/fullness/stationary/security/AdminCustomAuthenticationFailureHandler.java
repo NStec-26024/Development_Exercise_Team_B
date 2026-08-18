@@ -10,7 +10,9 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -47,6 +49,25 @@ public class AdminCustomAuthenticationFailureHandler extends SimpleUrlAuthentica
         setDefaultFailureUrl("/admin/login");
     }
 
+    private boolean isDbError(Throwable t) {
+        Throwable cur = t;
+        while (cur != null) {
+            if (cur instanceof CannotGetJdbcConnectionException
+                    || cur instanceof DataAccessResourceFailureException) {
+                return true;
+            }
+
+            String cn = cur.getClass().getName();
+            if (cn.contains("JDBCConnectionException") || cn.contains("CommunicationsException")
+                    || cn.contains("SQLException") || cn.contains("SQLTimeoutException")) {
+                return true;
+            }
+
+            cur = cur.getCause();
+        }
+        return false;
+    }
+
     /**
      * 認証失敗時に呼び出される処理。
      * アカウント名の保存を行い、ロック中でなければ失敗回数を加算した上で
@@ -73,16 +94,33 @@ public class AdminCustomAuthenticationFailureHandler extends SimpleUrlAuthentica
         HttpSession session = request.getSession(true);
 
         // 認証処理中に DB 接続エラーが発生した場合はエラー画面へ遷移させる
-        Throwable root = exception;
-        while (root.getCause() != null) {
-            root = root.getCause();
+        // リクエスト属性や例外チェーン全体を調べる（handler のみで対処）
+        boolean dbErrorDetected = false;
+
+        // サーブレットエラー属性に例外があればチェック
+        Object servletEx = request.getAttribute("javax.servlet.error.exception");
+        if (servletEx instanceof Throwable) {
+            if (isDbError((Throwable) servletEx)) {
+                dbErrorDetected = true;
+            }
         }
-        if (root instanceof CannotGetJdbcConnectionException) {
-            String dbError = messageSource.getMessage(
+
+        // 直接渡された exception チェーンをチェック
+        if (!dbErrorDetected && exception != null) {
+            if (isDbError(exception)) {
+                dbErrorDetected = true;
+            } else if (exception instanceof AuthenticationServiceException && exception.getCause() != null
+                    && isDbError(exception.getCause())) {
+                dbErrorDetected = true;
+            }
+        }
+
+        if (dbErrorDetected) {
+            String dbErrorMsg = messageSource.getMessage(
                     "com.example.fullness.stationary.security.db_error",
                     null,
                     Locale.JAPAN);
-            session.setAttribute("errorMessage", dbError);
+            session.setAttribute("errorMessage", dbErrorMsg);
             response.sendRedirect("/admin/error");
             return;
         }

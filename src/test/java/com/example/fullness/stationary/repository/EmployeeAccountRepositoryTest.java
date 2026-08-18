@@ -5,11 +5,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
 
 @SpringBootTest
-class EmployeeAccountRepositoryDbTest {
+@Transactional
+@Sql(scripts = {
+        "classpath:sql/clear.sql",
+        "classpath:sql/data.sql"
+}, config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED))
+class EmployeeAccountRepositoryTest {
 
     @Autowired
     private EmployeeAccountRepository repository;
@@ -28,7 +36,7 @@ class EmployeeAccountRepositoryDbTest {
 
         // 検証：id / employeeId が正しい
         assertThat(result.getId()).isEqualTo(1);
-        assertThat(result.getEmployeeId()).isEqualTo(1001);
+        assertThat(result.getEmployeeId()).isEqualTo(1);
 
         // 検証：bcrypt パスワードが正しく取得できている
         assertThat(result.getPassword())
