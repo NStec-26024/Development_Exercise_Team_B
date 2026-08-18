@@ -77,7 +77,7 @@ public class AdminSecurityConfig {
                         HttpSecurity http,
                         AdminCustomAuthenticationFailureHandler failureHandler,
                         MessageSource messageSource,
-                        AdminLoginAttemptService loginAttemptService) throws Exception {
+                        AdminLoginAttemptService loginAttemptServiceImpl) throws Exception {
 
                 // このフィルターチェーンが担当する範囲を /admin 配下に限定する。
                 // これにより、顧客向け画面（/ , /login , /account/** 等）は
@@ -87,6 +87,7 @@ public class AdminSecurityConfig {
                 // URL のアクセス制御
                 http.authorizeHttpRequests(auth -> auth
                                 .requestMatchers(
+                                                "/admin",
                                                 "/admin/login",
                                                 "/admin/error")
                                 .permitAll()
@@ -100,7 +101,7 @@ public class AdminSecurityConfig {
                                 .passwordParameter("password") // フォームの password と一致
                                 .successHandler((request, response, authentication) -> {
                                         // ログイン成功 → ロック解除
-                                        loginAttemptService.loginSucceeded(authentication.getName());
+                                        loginAttemptServiceImpl.loginSucceeded(authentication.getName());
                                         // セッション固定攻撃対策
                                         request.changeSessionId();
                                         // 管理画面トップへ遷移
