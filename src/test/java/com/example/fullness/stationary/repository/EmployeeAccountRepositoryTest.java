@@ -1,6 +1,7 @@
 package com.example.fullness.stationary.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -24,20 +25,20 @@ public class EmployeeAccountRepositoryTest {
     public void InsertEmployeeAccountTest_case1() {
         EmployeeAccount employeeAccount = new EmployeeAccount();
         employeeAccount.setEmployeeId(2);
-        employeeAccount.setName("asdfgh");
-        employeeAccount.setPassword("sadfghgf");
+        employeeAccount.setName("kawatajirou1002");
+        employeeAccount.setPassword("password");
         adminEmployeeAccountRepository.insertEmployeeAccount(employeeAccount);
-        int expected = employeeAccount.getId();
-        assertEquals(expected, 2);
+        int actual = employeeAccount.getId();
+        assertEquals(2, actual);
     }
 
     @Test
     public void selectEmployeeNameWithEmployeeAccountTest_OK_case2() {
         List<EmployeeAccount> employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
-        assertEquals(employeeAccount.get(0).getEmployee().getName(), "川田次郎");
-        assertEquals(employeeAccount.get(0).getEmployee().getId(), 2);
-        assertEquals(employeeAccount.get(1).getEmployee().getName(), "海田三郎");
-        assertEquals(employeeAccount.get(1).getEmployee().getId(), 3);
+        assertEquals("川田次郎", employeeAccount.get(0).getEmployee().getName());
+        assertEquals(2, employeeAccount.get(0).getEmployee().getId());
+        assertEquals("海田三郎", employeeAccount.get(1).getEmployee().getName());
+        assertEquals(3, employeeAccount.get(1).getEmployee().getId());
 
     }
 
@@ -45,62 +46,62 @@ public class EmployeeAccountRepositoryTest {
     @Sql(scripts = { "/sql/schema.sql" })
     public void selectEmployeeNameWithEmployeeAccountTest_null_case3() {
         List<EmployeeAccount> employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
-        assertEquals(employeeAccount, null);
+        assertTrue(employeeAccount.isEmpty());
 
     }
 
     @Test
     public void selectNotHasEmployeeAccountTest_OK_case4() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(2);
-        assertEquals(employeeAccount.getEmployee().getName(), "川田次郎");
-        assertEquals(employeeAccount.getEmployee().getId(), 2);
+        assertEquals("川田次郎", employeeAccount.getEmployee().getName());
+        assertEquals(2, employeeAccount.getEmployee().getId());
 
     }
 
     @Test
     public void selectNotHasEmployeeAccountTest_Ok_case5() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(3);
-        assertEquals(employeeAccount.getEmployee().getName(), "海田三郎");
-        assertEquals(employeeAccount.getEmployee().getId(), 3);
+        assertEquals("海田三郎", employeeAccount.getEmployee().getName());
+        assertEquals(3, employeeAccount.getEmployee().getId());
 
     }
 
     @Test
     public void selectNotHasEmployeeAccountTest_null_case6() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectNotHasEmployeeAccount(1);
-        assertEquals(employeeAccount, null);
+        assertEquals(null, employeeAccount);
 
     }
 
     @Test
     public void selectAccountNameTest_OK_case7() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectAccountName("yamadatarou1001");
-        assertEquals(employeeAccount.getId(), 1);
-        assertEquals(employeeAccount.getName(), "yamadatarou1001");
-        assertEquals(employeeAccount.getPassword(), "yamadapassword1001");
-        assertEquals(employeeAccount.getEmployeeId(), 1);
+        assertEquals(1, employeeAccount.getId());
+        assertEquals("yamadatarou1001", employeeAccount.getName());
+        assertEquals("yamadapassword1001", employeeAccount.getPassword());
+        assertEquals(1, employeeAccount.getEmployeeId());
 
     }
 
     @Test
     public void selectAccountNameTest_null_case8() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectAccountName("a");
-        assertEquals(employeeAccount, null);
+        assertEquals(null, employeeAccount);
 
     }
 
     @Test
     public void selectEmployeeNameWithEmployeeAccountIdTest_OK_case9() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(1);
-        assertEquals(employeeAccount.getName(), "yamadatarou1001");
-        assertEquals(employeeAccount.getEmployee().getName(), "山田太郎");
+        assertEquals("yamadatarou1001", employeeAccount.getName());
+        assertEquals("山田太郎", employeeAccount.getEmployee().getName());
 
     }
 
     @Test
     public void selectEmployeeNameWithEmployeeAccountIdTest_null_case10() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(2);
-        assertEquals(employeeAccount, null);
+        assertEquals(null, employeeAccount);
 
     }
 

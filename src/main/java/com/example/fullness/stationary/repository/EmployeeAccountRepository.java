@@ -28,7 +28,7 @@ public interface EmployeeAccountRepository {
     public List<EmployeeAccount> selectEmployeeNameWithEmployeeAccount();
 
     /**
-     * 指定された社員IDと紐づくアカウントを取得
+     * 指定された社員IDと紐づく社員アカウントのない社員を取得
      * 
      * @param id 社員ID
      * @return 社員アカウント(該当がない場合はnull)
