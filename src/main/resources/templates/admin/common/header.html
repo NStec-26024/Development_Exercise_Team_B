@@ -9,12 +9,15 @@
   <header th:fragment="header" class="site-header">
     <h1>フルネス文具 管理画面</h1>
     <nav>
-      <!-- ADMIN ロールを持っている場合のみ、管理メニュー一式を表示します -->
       <span sec:authorize="hasRole('ADMIN')" class="header-logged-in">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <a th:href="@{/admin/product}">商品情報メンテナンス</a>
         <a th:href="@{/admin/category}">商品カテゴリ登録</a>
         <a th:href="@{/admin/account/form}">アカウント登録</a>
-        <a th:href="@{/admin/logout}" class="logout-btn">ログアウト</a>
+        <form th:action="@{/admin/logout}" method="post" style="display:inline;">
+          <button type="submit" class="logout-btn">ログアウト</button>
+        </form>
+        </input>
       </span>
 
       <span sec:authorize="!hasRole('ADMIN')">
