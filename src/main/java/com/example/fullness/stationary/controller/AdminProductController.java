@@ -83,25 +83,6 @@ public class AdminProductController {
     }
 
     /**
-     * 編集ページへのリダイレクトを行うエンドポイント。
-     *
-     * @param id         編集対象の商品ID
-     * @param categoryId 検索時のカテゴリID（リダイレクト先に付与）
-     * @param page       検索時のページ番号（リダイレクト先に付与）
-     * @return 編集画面へのリダイレクト URL
-     */
-    @GetMapping("/product/edit/{id}")
-    public String editProduct(
-            @PathVariable("id") Integer id,
-            @RequestParam(name = "category", required = false, defaultValue = "0") Integer categoryId,
-            @RequestParam(name = "page", defaultValue = "1") int page) {
-
-        return "redirect:/admin/product/update/" + id
-                + "?category=" + categoryId
-                + "&page=" + page;
-    }
-
-    /**
      * 削除確認ページへのリダイレクトを行うエンドポイント。
      *
      * @param id         削除対象の商品ID

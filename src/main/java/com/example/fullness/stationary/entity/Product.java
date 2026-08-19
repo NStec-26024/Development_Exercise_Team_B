@@ -1,7 +1,6 @@
 package com.example.fullness.stationary.entity;
 
 import java.io.Serializable;
-import java.util.List;
 
 import lombok.Data;
 
@@ -11,6 +10,7 @@ import lombok.Data;
  */
 @Data
 public class Product implements Serializable {
+
     private Integer id;
     private String name;
     private Integer price;
@@ -19,4 +19,7 @@ public class Product implements Serializable {
     private String imageUrl;
 
     private String categoryName;
+
+    private ProductCategory category;
+    private ProductStock productStock;
 }
