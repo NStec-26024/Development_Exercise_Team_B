@@ -26,7 +26,7 @@
 
     <!-- 全商品件数（削除済み除く） -->
     <select id="countAll" resultType="int">
-        SELECT COUNT(*) FROM product WHERE delete_flag = 0
+        SELECT COUNT(*) FROM product WHERE delete_flg = 0
     </select>
 
     <!-- カテゴリ別商品件数（削除済み除く） -->
@@ -34,7 +34,7 @@
         SELECT COUNT(*)
         FROM product
         WHERE product_category_id = #{categoryId}
-          AND delete_flag = 0
+          AND delete_flg = 0
     </select>
 
     <!-- 全商品ページング取得（カテゴリ名・在庫含む） -->
@@ -52,7 +52,7 @@
         FROM product p
         LEFT JOIN product_category pc ON p.product_category_id = pc.id
         LEFT JOIN product_stock ps ON p.id = ps.product_id
-        WHERE p.delete_flag = 0
+        WHERE p.delete_flg = 0
         ORDER BY p.id
         LIMIT #{limit} OFFSET #{offset}
     </select>
@@ -73,7 +73,7 @@
         LEFT JOIN product_category pc ON p.product_category_id = pc.id
         LEFT JOIN product_stock ps ON p.id = ps.product_id
         WHERE p.product_category_id = #{categoryId}
-          AND p.delete_flag = 0
+          AND p.delete_flg = 0
         ORDER BY p.id
         LIMIT #{limit} OFFSET #{offset}
     </select>
@@ -94,6 +94,6 @@
         LEFT JOIN product_category pc ON p.product_category_id = pc.id
         LEFT JOIN product_stock ps ON p.id = ps.product_id
         WHERE p.id = #{id}
-          AND p.delete_flag = 0
+          AND p.delete_flg = 0
     </select>
 </mapper>

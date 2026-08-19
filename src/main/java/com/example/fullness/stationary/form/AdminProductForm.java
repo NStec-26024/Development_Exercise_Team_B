@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 // それぞれ区別したメッセージで表示するため。
 @Data
 public class AdminProductForm {
+    private Integer id;
 
     /** 商品名（必須、2〜20文字） */
     @NotBlank(message = "商品名を入力してください")
@@ -34,6 +35,7 @@ public class AdminProductForm {
     /** カテゴリID（必須） */
     @NotNull(message = "カテゴリを選択してください")
     private Integer categoryId;
+    private String imagePath;
 
     /**
      * アップロードされた商品画像。

@@ -44,7 +44,7 @@ public class AdminProductEditFormController {
     @Autowired
     private SessionService sessionService;
 
-    @InitBinder("productForm")
+    @InitBinder("form")
     public void initBinder(WebDataBinder binder) {
         binder.addValidators(adminProductEditValidator);
     }
@@ -64,6 +64,7 @@ public class AdminProductEditFormController {
         }
 
         AdminProductForm form = new AdminProductForm();
+        form.setId(id);
 
         AdminProductSessionData data = sessionService.get(session);
         if (data != null && id.equals(data.targetId)) {
@@ -71,15 +72,17 @@ public class AdminProductEditFormController {
             form.setPrice(String.valueOf(data.price));
             form.setStock(String.valueOf(data.stock));
             form.setCategoryId(data.categoryId);
+            form.setImagePath(data.existingImageUrl);
         } else {
             form.setName(product.getName());
             form.setPrice(String.valueOf(product.getPrice()));
             int stock = product.getProductStock() != null ? product.getProductStock().getQuantity() : 0;
             form.setStock(String.valueOf(stock));
             form.setCategoryId(product.getCategoryId());
+            form.setImagePath(product.getImageUrl());
         }
 
-        model.addAttribute("productForm", form);
+        model.addAttribute("form", form);
         model.addAttribute("categories", productQueryService.getAllCategories());
         model.addAttribute("productId", id);
         model.addAttribute("currentImageUrl", product.getImageUrl());
@@ -90,7 +93,7 @@ public class AdminProductEditFormController {
     @PostMapping("/{id}")
     public String submitEditForm(
             @PathVariable Integer id,
-            @Valid @ModelAttribute("productForm") AdminProductForm form,
+            @Valid @ModelAttribute("form") AdminProductForm form,
             BindingResult bindingResult,
             HttpSession session,
             Model model,
