@@ -33,5 +33,6 @@ public class ErrorLogAspect {
 
         log.error("【システムエラー】発生場所: {}.{}() | エラー内容: {}",
                 className, methodName, ex.getMessage(), ex);
+
     }
 }

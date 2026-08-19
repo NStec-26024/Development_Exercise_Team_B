@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org" xmlns:sec="http://thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
 
 <body>
 
-    <!-- 上部ヘッダー -->
+    <!-- 上部ヘッダー（site-header に統合） -->
     <div th:replace="~{admin/common/header :: header}"></div>
 
     <!-- メイン -->
@@ -17,8 +17,11 @@
         <h2>ログイン画面</h2>
 
         <form th:action="@{/admin/login}" th:object="${adminLoginForm}" method="post">
+
+            <!-- エラーメッセージ -->
             <div th:if="${timeoutMessage != null or securityErrorMessage != null or errorMessage != null or #fields.hasErrors()}"
                 class="error-message" style="margin-bottom: 20px; font-weight: bold; font-size: 16px;">
+
                 <div th:if="${errorMessage != null}">
                     <p th:text="${errorMessage}"></p>
                 </div>
@@ -26,37 +29,37 @@
                 <div th:if="${timeoutMessage != null}">
                     <p th:text="${timeoutMessage}"></p>
                 </div>
+
                 <div th:if="${securityErrorMessage != null}">
                     <p th:text="${securityErrorMessage}"></p>
                 </div>
+
                 <div th:if="${#fields.hasErrors()}">
                     <p th:each="err : ${#fields.errors('name')}" th:text="${err}"></p>
                     <p th:each="err : ${#fields.errors('password')}" th:text="${err}"></p>
                 </div>
             </div>
 
-            <!-- ユーザー名の入力欄 -->
+            <!-- ユーザー名 -->
             <div>
                 <label for="username">ユーザー名：</label>
                 <input type="text" id="username" th:field="*{name}" th:errorclass="is-error" />
             </div>
 
-            <!-- パスワードの入力欄 -->
+            <!-- パスワード -->
             <div>
                 <label for="password">パスワード：</label>
                 <input type="password" id="password" th:field="*{password}" th:errorclass="is-error" />
             </div>
 
-
             <!-- 送信ボタン -->
             <div>
-                <button type="submit">ログイン</button>
+                <button type="submit" class="logout-btn">ログイン</button>
             </div>
 
         </form>
     </main>
 
-    <!-- 下部フッター -->
     <div th:replace="~{admin/common/footer :: footer}"></div>
 
 </body>

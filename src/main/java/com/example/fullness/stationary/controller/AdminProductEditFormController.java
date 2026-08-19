@@ -16,14 +16,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.dto.AdminProductSessionData;
 import com.example.fullness.stationary.entity.Product;
-import com.example.fullness.stationary.exception.AdminBusinessException;
 import com.example.fullness.stationary.form.AdminProductForm;
 import com.example.fullness.stationary.service.AdminProductQueryService;
 import com.example.fullness.stationary.service.SessionService;
-import com.example.fullness.stationary.validator.AdminProductEditValidator;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -36,18 +33,10 @@ public class AdminProductEditFormController {
     private AdminProductQueryService productQueryService;
 
     @Autowired
-    private AdminProductEditValidator adminProductEditValidator;
-
-    @Autowired
     private MessageSource messageSource;
 
     @Autowired
     private SessionService sessionService;
-
-    @InitBinder("form")
-    public void initBinder(WebDataBinder binder) {
-        binder.addValidators(adminProductEditValidator);
-    }
 
     @GetMapping("/{id}")
     public String showEditForm(
@@ -93,40 +82,52 @@ public class AdminProductEditFormController {
     @PostMapping("/{id}")
     public String submitEditForm(
             @PathVariable Integer id,
-            @Valid @ModelAttribute("form") AdminProductForm form,
-            BindingResult bindingResult,
+            @ModelAttribute("form") AdminProductForm form,
             HttpSession session,
             Model model,
             RedirectAttributes redirectAttributes) {
 
         Product current = productQueryService.getProductById(id);
+
         if (current == null) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     messageSource.getMessage("com.example.fullness.stationary.product.not_found", null, Locale.JAPAN));
             return "redirect:/admin/product";
         }
+        System.out.println("DEBUG existingImageUrl = " + current.getImageUrl());
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("categories", productQueryService.getAllCategories());
-            model.addAttribute("productId", id);
-            model.addAttribute("currentImageUrl", current.getImageUrl());
-            return "admin/product/edit_form";
+        int price = 0;
+        int stock = 0;
+
+        try {
+            if (form.getPrice() != null && !form.getPrice().isBlank()) {
+                price = Integer.parseInt(form.getPrice());
+            }
+        } catch (Exception ignored) {
+        }
+
+        try {
+            if (form.getStock() != null && !form.getStock().isBlank()) {
+                stock = Integer.parseInt(form.getStock());
+            }
+        } catch (Exception ignored) {
         }
 
         AdminProductSessionData data = new AdminProductSessionData();
         data.targetId = id;
-        data.name = form.getName();
-        data.price = Integer.parseInt(form.getPrice());
-        data.stock = Integer.parseInt(form.getStock());
-        data.categoryId = form.getCategoryId();
+        data.name = form.getName(); // 空でも OK
+        data.price = price; // 空なら 0
+        data.stock = stock; // 空なら 0
+        data.categoryId = form.getCategoryId(); // null でも OK（後続で使うなら注意）
 
+        // 画像処理（空なら何もしない）
         if (form.getImage() != null && !form.getImage().isEmpty()) {
             try {
                 data.imageBytes = form.getImage().getBytes();
+                data.imageFileName = form.getImage().getOriginalFilename();
             } catch (IOException e) {
-                throw new AdminBusinessException("画像の読み込みに失敗しました");
+                // 画像読み込み失敗しても遷移は続行
             }
-            data.imageFileName = form.getImage().getOriginalFilename();
         }
 
         data.existingImageUrl = current.getImageUrl();
@@ -135,4 +136,51 @@ public class AdminProductEditFormController {
 
         return "redirect:/admin/product/edit/confirm";
     }
+
+    // @PostMapping("/{id}")
+    // public String submitEditForm(
+    // @PathVariable Integer id,
+    // @Valid @ModelAttribute("form") AdminProductForm form,
+    // BindingResult bindingResult,
+    // HttpSession session,
+    // Model model,
+    // RedirectAttributes redirectAttributes) {
+
+    // Product current = productQueryService.getProductById(id);
+    // if (current == null) {
+    // redirectAttributes.addFlashAttribute("errorMessage",
+    // messageSource.getMessage("com.example.fullness.stationary.product.not_found",
+    // null, Locale.JAPAN));
+    // return "redirect:/admin/product";
+    // }
+
+    // if (bindingResult.hasErrors()) {
+    // model.addAttribute("categories", productQueryService.getAllCategories());
+    // model.addAttribute("productId", id);
+    // model.addAttribute("currentImageUrl", current.getImageUrl());
+    // return "admin/product/edit_form";
+    // }
+
+    // AdminProductSessionData data = new AdminProductSessionData();
+    // data.targetId = id;
+    // data.name = form.getName();
+    // data.price = Integer.parseInt(form.getPrice());
+    // data.stock = Integer.parseInt(form.getStock());
+    // data.categoryId = form.getCategoryId();
+
+    // if (form.getImage() != null && !form.getImage().isEmpty()) {
+    // try {
+    // data.imageBytes = form.getImage().getBytes();
+    // } catch (IOException e) {
+    // throw new AdminBusinessException("画像の読み込みに失敗しました");
+    // }
+    // data.imageFileName = form.getImage().getOriginalFilename();
+    // }
+
+    // data.existingImageUrl = current.getImageUrl();
+
+    // sessionService.save(session, data);
+
+    // return "redirect:/admin/product/edit/confirm";
+    // }
 }
