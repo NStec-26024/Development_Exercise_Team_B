@@ -60,7 +60,7 @@ public class AdminEmployeeAccountServiceTest {
 
         when(passwordEncoder.encode(employeeAccount.getPassword())).thenReturn("paswordencode");
 
-        when(employeeAccountRepository.insertEmployeeAccount(any(EmployeeAccount.class)))
+        when(employeeAccountRepository.insertEmployeeAccount(employeeAccount))
                 .thenAnswer(invocation -> {
                     EmployeeAccount arg = invocation.getArgument(0);
                     arg.setId(123);
@@ -72,6 +72,7 @@ public class AdminEmployeeAccountServiceTest {
         assertEquals(123, resultId);
         verify(passwordEncoder, times(1)).encode("password");
         assertEquals("paswordencode", employeeAccount.getPassword());
+        verify(employeeAccountRepository, times(1)).insertEmployeeAccount(employeeAccount);
     }
 
     @Test
@@ -95,6 +96,7 @@ public class AdminEmployeeAccountServiceTest {
                 .getEmployeeNameWithEmployeeAccount();
 
         assertEquals(employeeAccountList, actualEmployeeAccountList);
+        verify(employeeAccountRepository, times(1)).selectEmployeeNameWithEmployeeAccount();
 
     }
 
@@ -118,6 +120,7 @@ public class AdminEmployeeAccountServiceTest {
                 .getEmployeeAccountWithEmployeeId(employeeAccount.getEmployeeId());
 
         assertEquals(employeeAccount, actualEmployeeAccount);
+        verify(employeeAccountRepository, times(1)).selectNotHasEmployeeAccount(employeeAccount.getEmployeeId());
 
     }
 
@@ -140,6 +143,7 @@ public class AdminEmployeeAccountServiceTest {
         boolean actual = adminEmployeeAccountService.getAccountName(employeeAccount.getName());
 
         assertEquals(false, actual);
+        verify(employeeAccountRepository, times(1)).selectAccountName(employeeAccount.getName());
 
     }
 
@@ -152,6 +156,7 @@ public class AdminEmployeeAccountServiceTest {
         boolean actual = adminEmployeeAccountService.getAccountName(employeeAccount.getName());
 
         assertEquals(true, actual);
+        verify(employeeAccountRepository, times(1)).selectAccountName(employeeAccount.getName());
 
     }
 
@@ -175,6 +180,8 @@ public class AdminEmployeeAccountServiceTest {
                 .getEmployeeNameWithEmployeeAccountId(employeeAccount.getId());
 
         assertEquals(employeeAccount, actualEmployeeAccount);
+        verify(employeeAccountRepository, times(1)).selectEmployeeNameWithEmployeeAccountId(employeeAccount.getId());
+
     }
 
     @Test
@@ -196,6 +203,8 @@ public class AdminEmployeeAccountServiceTest {
                 .getNotHasEmployeeAccount(employeeAccount.getEmployeeId());
 
         assertEquals(true, actual);
+        verify(employeeAccountRepository, times(1)).selectNotHasEmployeeAccount(employeeAccount.getEmployeeId());
+
     }
 
     @Test
@@ -207,6 +216,8 @@ public class AdminEmployeeAccountServiceTest {
                 .getNotHasEmployeeAccount(2);
 
         assertEquals(false, actual);
+        verify(employeeAccountRepository, times(1)).selectNotHasEmployeeAccount(2);
+
     }
 
     @Test
