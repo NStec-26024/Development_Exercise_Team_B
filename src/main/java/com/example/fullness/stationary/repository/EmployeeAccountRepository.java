@@ -51,4 +51,12 @@ public interface EmployeeAccountRepository {
      */
     public EmployeeAccount selectEmployeeNameWithEmployeeAccountId(int id);
 
+    /**
+     * 指定したユーザー名のパスワードを返す。
+     *
+     * @param name ユーザー名
+     * @return パスワード（存在しない場合は null）
+     */
+    EmployeeAccount findByName(String name);
+
 }
