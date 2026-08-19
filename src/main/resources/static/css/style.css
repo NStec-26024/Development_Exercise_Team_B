@@ -1,0 +1,178 @@
+/* ==========================================
+画面全体のベース設定（Flexboxレイアウト）
+========================================== */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+    background-color: #ffffff;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================
+ヘッダー（上部共通部品）のデザイン
+========================================== */
+.site-header {
+    border-bottom: 3px solid #009944;
+    padding: 15px 0;
+    text-align: center;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.site-header h1 {
+    color: #009944;
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    width: 100%;
+}
+
+.site-header nav {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+}
+
+.site-header nav a {
+    color: #009944;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.site-header nav a.logout-btn {
+    border: 1px solid #009944;
+    padding: 5px 15px;
+    border-radius: 4px;
+}
+
+.header-logged-in {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.site-header nav a.login-link-btn {
+    border: 1px solid #009944;
+    padding: 5px 15px;
+    border-radius: 4px;
+    display: inline-block;
+
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* ==========================================
+メインコンテンツ（中央エリア）
+========================================== */
+.main-content {
+    flex: 1;
+    text-align: center;
+    padding: 40px 0;
+}
+
+.menu-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.menu-image {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+}
+
+/* ==========================================
+フッター（下部共通部品）のデザイン
+========================================== */
+.site-footer {
+    border-top: 3px solid #009944;
+    /* 緑の太線 */
+    padding: 20px 0;
+    text-align: center;
+    color: #009944;
+    font-weight: bold;
+}
+
+/* ==========================================
+バリデーションエラー用のスタイル
+========================================== */
+.error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+.is-error {
+    border: 1px solid #dc3545 !important;
+    background-color: #fff8f8;
+}
+
+/* =========================================================================
+   管理画面専用 システムエラー用スタイル
+   ========================================================================= */
+
+.system-error-container {
+    max-width: 800px;
+    margin: 80px auto;
+    padding: 0 20px;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+}
+
+.system-error-title {
+    font-size: 32px;
+    color: #333333;
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+}
+
+.system-error-box {
+    background-color: #f8d7da;
+    /* 薄いピンク背景 */
+    color: #721c24;
+    /* 濃い赤色の文字 */
+    padding: 30px 40px;
+    border-radius: 4px;
+    margin-bottom: 30px;
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.system-error-box p {
+    margin: 0;
+}
+
+/* リンクエリアの配置 */
+.system-error-link-area {
+    text-align: left;
+    padding-left: 5px;
+}
+
+/* 「» メニュー画面に戻る」の緑色リンク */
+.system-error-back-link {
+    color: #28a745;
+    /* ヘッダーの文字色に合わせた緑色 */
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.system-error-back-link:hover {
+    text-decoration: underline;
+    /* マウスホバー時に下線を表示 */
+}

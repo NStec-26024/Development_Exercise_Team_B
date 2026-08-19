@@ -1,3 +1,4 @@
+
 WITH 
     /* departmentテーブルにデータを挿入 */
     inserted_department AS(
@@ -21,7 +22,7 @@ WITH
                 UNION ALL
             SELECT department_id, '海田三郎', 'ウミタサブロウ'
                 FROM inserted_department
-                WHERE name = 'シスム開発部'
+                WHERE name = 'システム開発部'
         )
         
         RETURNING id AS employee_id, name
