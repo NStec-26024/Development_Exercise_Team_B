@@ -1,11 +1,79 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+    "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.fullness.stationary.repository.EmployeeAccountRepository">
+    <mapper namespace="com.example.fullness.stationary.repository.EmployeeAccountRepository">
 
-    <!-- name で 1件取得（EmployeeAccount を返す） -->
+        <resultMap id="employeeAccountResult" type="EmployeeAccount">
+        <id property="id" column="id" />
+        <result property="employeeId" column="employee_id" />
+        <result property="name" column="name" />
+        <result property="password" column="password" />
+        <association property="employee" javaType="Employee">
+            <id property="id" column="employee_id" />
+            <result property="departmentId" column="department_id" />
+            <result property="name" column="employee_name" />
+            <result property="nameKana" column="name_kana" />
+        </association>
+        </resultMap>
+        
+        <select id="selectEmployeeNameWithEmployeeAccount" resultMap="employeeAccountResult">
+            <![CDATA[
+               SELECT e.name AS employee_name,e.id AS employee_id
+               FROM
+               employee e
+               LEFT OUTER JOIN
+               employee_account a
+               ON e.id = a.employee_id
+               WHERE
+               a.id IS NULL
+            ]]>
+        </select>
+
+        <insert id="insertEmployeeAccount" parameterType="EmployeeAccount" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    
+        <![CDATA[
+            INSERT INTO 
+            employee_account (employee_id, name, password)
+            VALUES(#{employeeId},#{name},#{password})
+        ]]>
+    </insert>
+
+    <select id="selectNotHasEmployeeAccount" resultMap="employeeAccountResult">
+        <![CDATA[
+                SELECT e.name AS employee_name,e.id AS employee_id
+                FROM
+                employee e
+                LEFT OUTER JOIN
+                employee_account a
+                ON e.id = a.employee_id
+                WHERE
+                a.id IS NULL
+                AND
+                e.id = #{employeeId}
+            ]]>
+    </select>
+
+    <select id="selectAccountName" resultType="EmployeeAccount">
+        <![CDATA[
+                SELECT *
+                FROM employee_account
+                WHERE name=#{name}
+            ]]>
+    </select>
+
+    <select id="selectEmployeeNameWithEmployeeAccountId" resultMap="employeeAccountResult">
+        <![CDATA[
+                SELECT e.name AS employee_name,a.name
+                FROM employee e
+                JOIN employee_account a
+                ON e.id=a.employee_id
+                WHERE a.id=#{id}
+            ]]>
+    </select>
+
+      <!-- name で 1件取得（EmployeeAccount を返す） -->
     <select id="findByName" resultType="com.example.fullness.stationary.entity.EmployeeAccount">
     SELECT 
         id,
@@ -16,4 +84,5 @@
     WHERE name = #{name}
     </select>
 
-</mapper>
+
+    </mapper>

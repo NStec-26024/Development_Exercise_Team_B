@@ -21,7 +21,7 @@ WITH
                 UNION ALL
             SELECT department_id, '海田三郎', 'ウミタサブロウ'
                 FROM inserted_department
-                WHERE name = 'シスム開発部'
+                WHERE name = 'システム開発部'
         )
         
         RETURNING id AS employee_id, name
@@ -30,7 +30,7 @@ WITH
     /* employee_accountテーブルにデータを挿入 */
     inserted_employee_account AS (
         INSERT INTO employee_account (employee_id, name, password)(
-            SELECT employee_id, 'yamadatarou1001', '$2a$10$nOMKs31N.scADyHLn1KfyOagrb52vXDEokqGp4MueMbqAam1iaS1e'
+            SELECT employee_id, 'yamadatarou1001', 'yamadapassword1001'
                 FROM inserted_employee
                 WHERE name = '山田太郎'
         )
