@@ -55,7 +55,7 @@ create table product_category(
 create table product(
     id serial,
     product_category_id integer,
-    name VARCHAR(20),
+    name VARCHAR(30),
     price integer,
     image_url VARCHAR(200),
     delete_flg integer,

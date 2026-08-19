@@ -105,7 +105,7 @@ public class AdminEmployeeAccountControllerTest {
                                 // 画面のURLにアクセスした際のView名が正しいか
                                 .andExpect(view().name("admin/account/form"));
 
-                verify(adminEmployeeAccountService).getEmployeeNameWithEmployeeAccount();
+                verify(adminEmployeeAccountService).getEmployeeNameWithEmployeeAccount();// いる？
         }
 
         /*
@@ -120,7 +120,7 @@ public class AdminEmployeeAccountControllerTest {
                                 .andExpect(model().attributeExists("errorMessages"))
                                 .andExpect(view().name("admin/account/form"));
 
-                verify(adminEmployeeAccountService).getEmployeeNameWithEmployeeAccount();
+                verify(adminEmployeeAccountService).getEmployeeNameWithEmployeeAccount(); // いる？
         }
 
         /*
@@ -150,7 +150,9 @@ public class AdminEmployeeAccountControllerTest {
                                 .param("name", inputAccount.getName())
                                 .param("password", inputAccount.getPassword()))
                                 .andExpect(status().is3xxRedirection())
+                                .andExpect(model().hasNoErrors())
                                 .andExpect(redirectedUrl("/admin/account/confirm"))
+                                .andExpect(flash().attributeExists("employee"))
                                 .andReturn();
                 // Flash Attributeを取得
                 FlashMap flashMap = mvcResult.getFlashMap();
