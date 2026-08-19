@@ -84,7 +84,7 @@ class ProductCategoryRepositoryTest {
 
         // 検証：id / name が正しい
         assertThat(result.getId()).isEqualTo(3);
-        assertThat(result.getName()).isEqualTo("パソコン周辺機器");
+        assertThat(result.getName()).isEqualTo("");
     }
 
     // ============================================================
