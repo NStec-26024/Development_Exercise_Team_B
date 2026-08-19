@@ -96,7 +96,7 @@ public class AdminSecurityConfig {
                 // ログイン設定
                 http.formLogin(form -> form
                                 .loginPage("/admin/login") // ログイン画面（GET）
-                                .loginProcessingUrl("/admin/login") // 認証処理（POST、画面と同一URL）
+                                .loginProcessingUrl("/admin/authenticate") // 認証処理
                                 .usernameParameter("name") // フォームの name と一致
                                 .passwordParameter("password") // フォームの password と一致
                                 .successHandler((request, response, authentication) -> {
@@ -135,10 +135,6 @@ public class AdminSecurityConfig {
                                         }
                                         response.sendRedirect("/admin/login");
                                 }));
-
-                // CSRF 無効化
-                http.csrf(csrf -> csrf.disable());
-
                 return http.build();
         }
 

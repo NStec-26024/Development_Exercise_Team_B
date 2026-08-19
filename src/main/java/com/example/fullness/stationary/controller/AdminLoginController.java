@@ -2,16 +2,28 @@ package com.example.fullness.stationary.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.form.AdminLoginForm;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 /**
  * 管理画面のログイン画面表示を担当するコントローラー。
@@ -52,6 +64,26 @@ public class AdminLoginController {
 
         model.addAttribute("adminLoginForm", adminLoginForm);
         return "admin/login";
+    }
+
+    @PostMapping("/login")
+    public String login(@Valid @ModelAttribute("form") AdminLoginForm form,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        if (bindingResult.hasErrors()) {
+            List<String> errorMessages = new ArrayList<>();
+            bindingResult.getAllErrors().forEach(e -> errorMessages.add(e.getDefaultMessage()));
+            redirectAttributes.addFlashAttribute("errorMessage", String.join(" ", errorMessages));
+            redirectAttributes.addFlashAttribute("form", form);
+            return "redirect:/admin/login";
+        }
+
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/authenticate");
+        dispatcher.forward(request, response);
+        return null;
     }
 
     /**
