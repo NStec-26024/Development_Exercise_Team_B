@@ -73,7 +73,16 @@
             ]]>
     </select>
 
-
+      <!-- name で 1件取得（EmployeeAccount を返す） -->
+    <select id="findByName" resultType="com.example.fullness.stationary.entity.EmployeeAccount">
+    SELECT 
+        id,
+        employee_id AS employeeId,
+        name,
+        password
+    FROM employee_account
+    WHERE name = #{name}
+    </select>
 
 
     </mapper>
