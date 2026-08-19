@@ -1,0 +1,376 @@
+/* ========================================
+   共通スタイル
+======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    min-height: 100vh;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.main-content {
+    padding: 30px;
+    text-align: center;
+}
+
+h1 {
+    color: #2d5e2d;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #2d5e2d;
+}
+
+.search-form {
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+
+/* ========================================
+   メッセージ
+======================================== */
+.message {
+    padding: 12px 20px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.error-message {
+    background-color: #fee;
+    border: 1px solid #c00;
+    color: #c00;
+}
+
+.info-message {
+    background-color: #e7f3ff;
+    border: 1px solid #2196F3;
+    color: #1976D2;
+}
+
+/* ========================================
+   検索フォーム
+======================================== */
+.search-form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    min-width: 120px;
+}
+
+.form-select {
+    flex: 1;
+    max-width: 300px;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.form-select:hover {
+    border-color: #2d5e2d;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: #2d5e2d;
+    box-shadow: 0 0 0 3px rgba(45, 94, 45, 0.1);
+}
+
+/* 選択されたオプション */
+.form-select option:checked {
+    background-color: #2d5e2d;
+    color: white;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* ========================================
+   ボタン
+======================================== */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: #2d5e2d;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #1f4620;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   検索情報
+======================================== */
+.search-info {
+    background-color: #e8f5e9;
+    padding: 12px 20px;
+    border-radius: 4px;
+    margin: 15px 0;
+    border-left: 4px solid #2d5e2d;
+}
+
+.search-info p {
+    margin: 0;
+    color: #333;
+}
+
+.search-info strong {
+    color: #2d5e2d;
+    font-weight: 700;
+}
+
+/* ========================================
+   商品テーブル
+======================================== */
+.product-table-wrapper {
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    border: 1px solid #000;
+}
+
+.product-table thead {
+    background-color: #2d5e2d;
+    color: white;
+}
+
+.product-table th {
+    padding: 12px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #000;
+}
+
+.product-table td {
+    padding: 12px;
+    border: 1px solid #000;
+    text-align: center;
+}
+
+.product-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* 商品画像 */
+.product-image-cell {
+    width: 80px;
+    text-align: center;
+}
+
+.product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* 商品名 */
+.product-name-cell {
+    min-width: 200px;
+    font-weight: 600;
+}
+
+/* カテゴリ */
+.product-category-cell {
+    min-width: 100px;
+    color: #666;
+}
+
+/* 価格 */
+.product-price-cell {
+    text-align: right;
+    font-weight: 600;
+    color: #2d5e2d;
+    min-width: 100px;
+}
+
+/* 在庫 */
+.product-stock-cell {
+    text-align: center;
+    min-width: 60px;
+}
+
+/* アクション */
+.action-cell {
+    text-align: center;
+    width: 80px;
+}
+
+.btn-action {
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.btn-edit {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   データがない場合
+======================================== */
+.no-data {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 16px;
+    background-color: #fafafa;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+/* ========================================
+   ページネーション
+======================================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.page-link,
+.page-btn {
+    padding: 8px 12px;
+    border: 1px solid #2d5e2d;
+    background-color: white;
+    color: #2d5e2d;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.3s;
+    min-width: 40px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.page-link:hover:not(.disabled):not(.current),
+.page-btn:hover:not(.disabled):not(.current) {
+    background-color: #2d5e2d;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.page-btn.current {
+    background-color: #2d5e2d;
+    color: white;
+    font-weight: bold;
+    cursor: default;
+}
+
+.page-btn.disabled {
+    background-color: #f0f0f0;
+    color: #999;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
