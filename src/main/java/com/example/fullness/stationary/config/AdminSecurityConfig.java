@@ -135,11 +135,6 @@ public class AdminSecurityConfig {
                                         }
                                         response.sendRedirect("/admin/login");
                                 }));
-
-                // CSRF 有効化
-                http.csrf(csrf -> {
-                });
-
                 return http.build();
         }
 

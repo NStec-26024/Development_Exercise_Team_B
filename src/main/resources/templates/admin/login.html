@@ -17,7 +17,6 @@
         <h2>ログイン画面</h2>
 
         <form th:action="@{/admin/login}" th:object="${adminLoginForm}" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div th:if="${timeoutMessage != null or securityErrorMessage != null or errorMessage != null or #fields.hasErrors()}"
                 class="error-message" style="margin-bottom: 20px; font-weight: bold; font-size: 16px;">
                 <div th:if="${errorMessage != null}">
