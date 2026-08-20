@@ -2,6 +2,7 @@ package com.example.fullness.stationary.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
@@ -112,6 +113,7 @@ public class AdminProductCategoryServiceImplTest {
 
         assertEquals(productCategory, actual);
         verify(productCategoryRepository, times(1)).selectById(4);
+        assertInstanceOf(ProductCategory.class, productCategory);
 
     }
 
