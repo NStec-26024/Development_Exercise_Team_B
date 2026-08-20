@@ -254,7 +254,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         System.out.println("totalCount: " + totalCount);
 
         // Modelに設定
-        model.addAttribute("productList", products);
+        model.addAttribute("products", products);
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("totalCount", totalCount);

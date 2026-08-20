@@ -41,7 +41,7 @@
                 </thead>
                 <tbody>
                     <tr th:each="p : ${products}">
-                        <td><img th:src="@{${p.imagePath}}" th:alt="${p.name}" class="table-thumb"></td>
+                        <td><img th:src="@{|/images/${p.imageUrl}|}" th:alt="${p.name}" class="table-thumb"></td>
                         <td th:text="${p.name}"></td>
                         <td th:text="${p.price} + '円'"></td>
                         <td><a th:href="@{/admin/product/edit/{id}(id=${p.id})}" class="btn btn-fs btn-sm">修正</a></td>
