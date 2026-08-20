@@ -6,8 +6,8 @@
 
 
  <resultMap id="productCategoryResultMap" type="com.example.fullness.stationary.entity.ProductCategory">
- <id property="id" column="id"/>
- <result property="name" column="name"/>
+    <id property="id" column="id"/>
+    <result property="name" column="name"/>
  </resultMap>
 
     <select id="findAll" resultMap="productCategoryResultMap">
