@@ -11,7 +11,7 @@
     <nav>
       <span sec:authorize="hasRole('ADMIN')" class="header-logged-in">
         <a th:href="@{/admin/product}">商品情報メンテナンス</a>
-        <a th:href="@{/admin/category}">商品カテゴリ登録</a>
+        <a th:href="@{/admin/category/add}">商品カテゴリ登録</a>
         <a th:href="@{/admin/account/form}">アカウント登録</a>
         <form th:action="@{/admin/logout}" method="post" style="display:inline;">
           <button type="submit" class="logout-btn">ログアウト</button>

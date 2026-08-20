@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+    "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="com.example.fullness.stationary.repository.ProductCategoryRepository">
+
+    <insert id="insertProductCategory" parameterType="ProductCategory" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    
+        <![CDATA[
+            INSERT INTO 
+            product_category (name)
+            VALUES(#{name})
+        ]]>
+    </insert>
+
+    <select id="selectCategoryNameWithCategoryId" resultType="ProductCategory">
+        <![CDATA[
+                SELECT name
+                FROM product_category
+                WHERE id=#{id}
+            ]]>
+    </select>
+
+    <select id="selectCategoryName" resultType="ProductCategory">
+        <![CDATA[
+                SELECT *
+                FROM product_category
+                WHERE name=#{name}
+            ]]>
+    </select>
+    </mapper>
