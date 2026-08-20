@@ -100,4 +100,18 @@
           AND p.delete_flg = 0
     </select>
 
+    <!-- 商品情報更新（商品名・単価・カテゴリ・画像URL） -->
+    <update id="update" parameterType="com.example.fullness.stationary.entity.Product">
+        <![CDATA[
+            UPDATE product
+            SET
+                name = #{name},
+                price = #{price},
+                product_category_id = #{categoryId},
+                image_url = #{imageUrl}
+            WHERE id = #{id}
+              AND delete_flg = 0
+        ]]>
+    </update>
+
 </mapper>
