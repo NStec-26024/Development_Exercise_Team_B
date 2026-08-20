@@ -16,21 +16,21 @@ public class AdminProductCategoryServiceImpl implements AdminProductCategoryServ
     ProductCategoryRepository productCategoryRepository;
 
     @Override
-    public int addProductCategory(ProductCategory productCategory) {
-        productCategoryRepository.insertProductCategory(productCategory);
+    public int add(ProductCategory productCategory) {
+        productCategoryRepository.insert(productCategory);
         int productId = productCategory.getId();
         return productId;
     }
 
     @Override
-    public String getCategoryNameWithCategoryId(int id) {
-        ProductCategory productCategory = productCategoryRepository.selectCategoryNameWithCategoryId(id);
-        return productCategory.getName();
+    public ProductCategory getById(int id) {
+        return productCategoryRepository.selectById(id);
+
     }
 
     @Override
-    public boolean getCategoryName(String categoryName) {
-        ProductCategory productCategory = productCategoryRepository.selectCategoryName(categoryName);
+    public boolean existName(String categoryName) {
+        ProductCategory productCategory = productCategoryRepository.selectByName(categoryName);
         if (productCategory != null) {
             return false;
         } else {

@@ -17,7 +17,7 @@ public class UniqueProductCategoryNameValidator implements ConstraintValidator<U
             return true;
         }
 
-        if (!adminProductCategoryService.getCategoryName(name)) {
+        if (!adminProductCategoryService.existName(name)) {
 
             return false;
         }

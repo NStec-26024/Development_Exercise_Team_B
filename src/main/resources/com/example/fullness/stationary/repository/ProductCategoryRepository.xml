@@ -5,7 +5,7 @@
 
     <mapper namespace="com.example.fullness.stationary.repository.ProductCategoryRepository">
 
-    <insert id="insertProductCategory" parameterType="ProductCategory" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    <insert id="insert" parameterType="ProductCategory" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
     
         <![CDATA[
             INSERT INTO 
@@ -14,7 +14,7 @@
         ]]>
     </insert>
 
-    <select id="selectCategoryNameWithCategoryId" resultType="ProductCategory">
+    <select id="selectById" resultType="ProductCategory">
         <![CDATA[
                 SELECT name
                 FROM product_category
@@ -22,7 +22,7 @@
             ]]>
     </select>
 
-    <select id="selectCategoryName" resultType="ProductCategory">
+    <select id="selectByName" resultType="ProductCategory">
         <![CDATA[
                 SELECT *
                 FROM product_category

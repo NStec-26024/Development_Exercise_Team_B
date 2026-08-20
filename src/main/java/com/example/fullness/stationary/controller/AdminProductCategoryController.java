@@ -122,7 +122,7 @@ public class AdminProductCategoryController {
             RedirectAttributes redirectAttributes) {
         // 重複チェック
         ProductCategory productCategory = productCategoryHelper.formToEntity(adminProductCategoryForm);
-        if (!adminProductCategoryService.getCategoryName(productCategory.getName())) {
+        if (!adminProductCategoryService.existName(productCategory.getName())) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "入力されたカテゴリ名は既に登録されています");
             redirectAttributes.addFlashAttribute("adminProductCategoryForm", adminProductCategoryForm);
@@ -131,10 +131,10 @@ public class AdminProductCategoryController {
 
         // DBへのインサート処理
         int categoryId = adminProductCategoryService
-                .addProductCategory(productCategory);
-        String name = adminProductCategoryService
-                .getCategoryNameWithCategoryId(categoryId);
-        redirectAttributes.addFlashAttribute("categoryName", name);
+                .add(productCategory);
+        productCategory = adminProductCategoryService
+                .getById(categoryId);
+        redirectAttributes.addFlashAttribute("categoryName", productCategory);
 
         return "redirect:/admin/category/add/complete";
 

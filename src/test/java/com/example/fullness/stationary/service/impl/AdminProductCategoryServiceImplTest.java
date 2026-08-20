@@ -38,89 +38,89 @@ public class AdminProductCategoryServiceImplTest {
     }
 
     @Test
-    public void addProductCategoryTest_OK_case1() {
+    public void addTest_OK_case1() {
 
-        when(productCategoryRepository.insertProductCategory(productCategory))
+        when(productCategoryRepository.insert(productCategory))
                 .thenAnswer(invocation -> {
                     ProductCategory arg = invocation.getArgument(0);
                     arg.setId(5);
                     return 1;
                 });
 
-        int actual = adminProductCategoryService.addProductCategory(productCategory);
+        int actual = adminProductCategoryService.add(productCategory);
 
         assertEquals(5, actual);
-        verify(productCategoryRepository, times(1)).insertProductCategory(productCategory);
+        verify(productCategoryRepository, times(1)).insert(productCategory);
     }
 
     @Test
-    public void addProductCategoryTest_NG_case2() {
-        when(productCategoryRepository.insertProductCategory(productCategory))
+    public void addTest_NG_case2() {
+        when(productCategoryRepository.insert(productCategory))
                 .thenThrow(new DataRetrievalFailureException("e"));
         assertThrows(DataRetrievalFailureException.class, () -> {
-            adminProductCategoryService.addProductCategory(productCategory);
+            adminProductCategoryService.add(productCategory);
         });
 
     }
 
     @Test
-    public void getCategoryNameTest_OK_case03() {
+    public void existNameTest_OK_case03() {
 
-        when(productCategoryRepository.selectCategoryName("衣料品"))
+        when(productCategoryRepository.selectByName("衣料品"))
                 .thenReturn(productCategory);
 
-        boolean actual = adminProductCategoryService.getCategoryName("衣料品");
+        boolean actual = adminProductCategoryService.existName("衣料品");
 
         assertFalse(actual);
-        verify(productCategoryRepository, times(1)).selectCategoryName("衣料品");
+        verify(productCategoryRepository, times(1)).selectByName("衣料品");
 
     }
 
     @Test
-    public void getCategoryNameTest_OK_case04() {
+    public void existNameTest_OK_case04() {
 
-        when(productCategoryRepository.selectCategoryName("衣料品"))
+        when(productCategoryRepository.selectByName("衣料品"))
                 .thenReturn(null);
 
-        boolean actual = adminProductCategoryService.getCategoryName("衣料品");
+        boolean actual = adminProductCategoryService.existName("衣料品");
 
         assertTrue(actual);
-        verify(productCategoryRepository, times(1)).selectCategoryName("衣料品");
+        verify(productCategoryRepository, times(1)).selectByName("衣料品");
 
     }
 
     @Test
-    public void getCategoryNameTest_NG_case05() {
+    public void existNameTest_NG_case05() {
 
-        when(productCategoryRepository.selectCategoryName("衣料品"))
+        when(productCategoryRepository.selectByName("衣料品"))
                 .thenThrow(new DataRetrievalFailureException("e"));
 
         assertThrows(DataRetrievalFailureException.class, () -> {
-            adminProductCategoryService.getCategoryName("衣料品");
+            adminProductCategoryService.existName("衣料品");
         });
 
     }
 
     @Test
-    public void getProductCategoryNameWithCategoryIdTest_OK_case6() {
+    public void getByIdTest_OK_case6() {
 
-        when(productCategoryRepository.selectCategoryNameWithCategoryId(4))
+        when(productCategoryRepository.selectById(4))
                 .thenReturn(productCategory);
 
-        String actual = adminProductCategoryService
-                .getCategoryNameWithCategoryId(4);
+        ProductCategory actual = adminProductCategoryService
+                .getById(4);
 
-        assertEquals("衣料品", actual);
-        verify(productCategoryRepository, times(1)).selectCategoryNameWithCategoryId(4);
+        assertEquals(productCategory, actual);
+        verify(productCategoryRepository, times(1)).selectById(4);
 
     }
 
     @Test
-    public void getEmployeeNameWithProductCategoryIdTest_NG_case7() {
-        when(productCategoryRepository.selectCategoryNameWithCategoryId(4))
+    public void getByIdTest_NG_case7() {
+        when(productCategoryRepository.selectById(4))
                 .thenThrow(new DataRetrievalFailureException("e"));
         assertThrows(DataRetrievalFailureException.class, () -> {
-            adminProductCategoryService.getCategoryNameWithCategoryId(4);
+            adminProductCategoryService.getById(4);
         });
 
     }

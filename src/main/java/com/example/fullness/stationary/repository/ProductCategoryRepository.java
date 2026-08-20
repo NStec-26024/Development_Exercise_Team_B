@@ -7,10 +7,10 @@ import com.example.fullness.stationary.entity.ProductCategory;
 @Mapper
 public interface ProductCategoryRepository {
 
-    public int insertProductCategory(ProductCategory productCategory);
+    public int insert(ProductCategory productCategory);
 
-    public ProductCategory selectCategoryNameWithCategoryId(int id);
+    public ProductCategory selectById(int id);
 
-    public ProductCategory selectCategoryName(String name);
+    public ProductCategory selectByName(String name);
 
 }

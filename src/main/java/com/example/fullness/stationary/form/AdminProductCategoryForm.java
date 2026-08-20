@@ -5,6 +5,7 @@ import java.io.Serializable;
 import com.example.fullness.stationary.validator.UniqueProductCategoryName;
 import com.example.fullness.stationary.validator.ValidatorGroup1;
 import com.example.fullness.stationary.validator.ValidatorGroup2;
+import com.example.fullness.stationary.validator.ValidatorGroup3;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -17,7 +18,7 @@ public class AdminProductCategoryForm implements Serializable {
 
     @NotBlank(groups = ValidatorGroup1.class, message = "カテゴリ名は入力してください")
     @Size(groups = ValidatorGroup2.class, min = 1, max = 30, message = "カテゴリ名は1~30文字で入力してください")
-    @UniqueProductCategoryName
+    @UniqueProductCategoryName(groups = ValidatorGroup3.class)
     private String name;
 
 }
