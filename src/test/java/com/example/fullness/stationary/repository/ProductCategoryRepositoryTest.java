@@ -39,7 +39,7 @@ class ProductCategoryRepositoryTest {
         // 検証：結果が null ではない
         assertThat(result).isNotNull();
 
-        // 検証：複数のカテゴリが取得できている
+        // 検証：複数のカテゴリが取得できている(カテゴリが3件取得できているか)
         assertThat(result).isNotEmpty().hasSize(3);
 
         // 検証：各カテゴリの内容が正しい
@@ -84,7 +84,7 @@ class ProductCategoryRepositoryTest {
 
         // 検証：id / name が正しい
         assertThat(result.getId()).isEqualTo(3);
-        assertThat(result.getName()).isEqualTo("");
+        assertThat(result.getName()).isEqualTo("パソコン周辺機器");
     }
 
     // ============================================================
