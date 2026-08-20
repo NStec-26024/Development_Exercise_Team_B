@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
 
 <body>
 
-    <!-- 上部ヘッダー -->
+    <!-- 上部ヘッダー（site-header に統合） -->
     <div th:replace="~{admin/common/header :: header}"></div>
 
     <!-- メイン -->
@@ -17,7 +17,7 @@
         <img th:src="@{/images/Shop_Img1.jpeg}" alt="メニュー画像" class="menu-image">
     </main>
 
-    <!-- 下部フッター -->
+    <!-- 下部フッター（site-footer に統合） -->
     <div th:replace="~{admin/common/footer :: footer}"></div>
 
 </body>

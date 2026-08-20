@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.fullness.stationary.repository.ProductRepository">
+
+    <!-- Product + Category + Stock をまとめて返す resultMap -->
+    <resultMap id="productResultMap" type="com.example.fullness.stationary.entity.Product">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="categoryId" column="product_category_id"/>
+        <result property="imageUrl" column="image_url"/>
+
+        <!-- カテゴリ情報 -->
+        <association property="category" javaType="com.example.fullness.stationary.entity.ProductCategory">
+            <id property="id" column="product_category_id"/>
+            <result property="name" column="category_name"/>
+        </association>
+
+        <!-- 在庫情報 -->
+        <association property="productStock" javaType="com.example.fullness.stationary.entity.ProductStock">
+            <id property="id" column="stock_id"/>
+            <result property="productId" column="stock_product_id"/>
+            <result property="quantity" column="stock_quantity"/>
+        </association>
+    </resultMap>
+
+    <!-- 全商品件数（削除済み除く） -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM product WHERE delete_flg = 0
+    </select>
+
+    <!-- カテゴリ別商品件数（削除済み除く） -->
+    <select id="countByCategory" resultType="int">
+        SELECT COUNT(*)
+        FROM product
+        WHERE product_category_id = #{categoryId}
+          AND delete_flg = 0
+    </select>
+
+    <!-- 全商品ページング取得（カテゴリ名・在庫含む） -->
+    <select id="findAllWithPaging" resultMap="productResultMap">
+        SELECT
+            p.id,
+            p.name,
+            p.price,
+            p.product_category_id,
+            p.image_url,
+            pc.name AS category_name,
+            ps.id AS stock_id,
+            ps.product_id AS stock_product_id,
+            ps.quantity AS stock_quantity
+        FROM product p
+        LEFT JOIN product_category pc ON p.product_category_id = pc.id
+        LEFT JOIN product_stock ps ON p.id = ps.product_id
+        WHERE p.delete_flg = 0
+        ORDER BY p.id
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- カテゴリ別ページング取得（カテゴリ名・在庫含む） -->
+    <select id="findByCategoryWithPaging" resultMap="productResultMap">
+        SELECT
+            p.id,
+            p.name,
+            p.price,
+            p.product_category_id,
+            p.image_url,
+            pc.name AS category_name,
+            ps.id AS stock_id,
+            ps.product_id AS stock_product_id,
+            ps.quantity AS stock_quantity
+        FROM product p
+        LEFT JOIN product_category pc ON p.product_category_id = pc.id
+        LEFT JOIN product_stock ps ON p.id = ps.product_id
+        WHERE p.product_category_id = #{categoryId}
+          AND p.delete_flg = 0
+        ORDER BY p.id
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 商品 ID 取得（削除済み除く） -->
+    <select id="findById" resultMap="productResultMap">
+        SELECT
+            p.id,
+            p.name,
+            p.price,
+            p.product_category_id,
+            p.image_url,
+            pc.name AS category_name,
+            ps.id AS stock_id,
+            ps.product_id AS stock_product_id,
+            ps.quantity AS stock_quantity
+        FROM product p
+        LEFT JOIN product_category pc ON p.product_category_id = pc.id
+        LEFT JOIN product_stock ps ON p.id = ps.product_id
+        WHERE p.id = #{id}
+          AND p.delete_flg = 0
+    </select>
+
+</mapper>
