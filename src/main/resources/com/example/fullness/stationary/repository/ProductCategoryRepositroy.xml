@@ -5,16 +5,16 @@
 <mapper namespace="com.example.fullness.stationary.repository.ProductCategoryRepository">
 
 
- <resultMap id="productCategoryResultMap" type="com.example.fullness.stationary.entity.ProductCategory">
-    <id property="id" column="id"/>
-    <result property="name" column="name"/>
- </resultMap>
+    <resultMap id="productCategoryResultMap" type="com.example.fullness.stationary.entity.ProductCategory">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
 
     <select id="findAll" resultMap="productCategoryResultMap">
         <![CDATA[
             SELECT 
-                id,
-                name
+            id,
+            name
             FROM product_category
             ORDER BY id ASC
         ]]>
@@ -23,8 +23,8 @@
     <select id="findById" resultMap="productCategoryResultMap">
         <![CDATA[
             SELECT
-                id,
-                name
+            id,
+            name
             FROM product_category
             WHERE id = #{id}
         ]]>

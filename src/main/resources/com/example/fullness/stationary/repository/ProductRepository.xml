@@ -16,18 +16,18 @@
     <select id="findAllWithPaging" resultType="com.example.fullness.stationary.entity.Product">
          <![CDATA[
             SELECT 
-                p.id,
-                p.name,
-                p.price,
-                p.product_category_id,
-                p.image_url AS imageUrl,
-                pc.name AS categoryName
+            p.id,
+            p.name,
+            p.price,
+            p.product_category_id,
+            p.image_url AS imageUrl,
+            pc.name AS categoryName
             FROM 
-                product p
+            product p
             LEFT JOIN 
-                product_category pc ON p.product_category_id = pc.id
+            product_category pc ON p.product_category_id = pc.id
             ORDER BY 
-                p.id
+            p.id
             LIMIT #{limit} OFFSET #{offset}
             ]]>
     </select>
@@ -35,53 +35,53 @@
     <!-- カテゴリ別商品件数を取得 -->
     <select id="countByCategory" resultType="int">
          <![CDATA[
-          SELECT 
+            SELECT 
             COUNT(*) 
             FROM 
-                product
+            product
             WHERE 
             product_category_id = #{categoryId}
-    ]]>
+        ]]>
     </select>
 
     <!-- ★ カテゴリ別商品をページングで取得（カテゴリ名も取得） -->
     <select id="findByCategoryWithPaging" resultType="com.example.fullness.stationary.entity.Product">
          <![CDATA[
             SELECT 
-                p.id,
-                p.name,
-                p.price,
-                p.product_category_id,
-                p.image_url AS imageUrl,
-                pc.name AS categoryName
+            p.id,
+            p.name,
+            p.price,
+            p.product_category_id,
+            p.image_url AS imageUrl,
+            pc.name AS categoryName
             FROM 
-                product p
+            product p
             LEFT JOIN 
-                product_category pc ON p.product_category_id = pc.id
+            product_category pc ON p.product_category_id = pc.id
             WHERE 
-                p.product_category_id = #{categoryId}
+            p.product_category_id = #{categoryId}
             ORDER BY 
-                p.id
+            p.id
             LIMIT #{limit} OFFSET #{offset}
-            ]]>
+        ]]>
     </select>
 
     <!-- IDで商品を取得 -->
     <select id="findById" resultType="com.example.fullness.stationary.entity.Product">
          <![CDATA[
             SELECT 
-                p.id,
-                p.name,
-                p.price,
-                p.product_category_id,
-                p.image_url AS imageUrl,
-                pc.name AS categoryName
+            p.id,
+            p.name,
+            p.price,
+            p.product_category_id,
+            p.image_url AS imageUrl,
+            pc.name AS categoryName
             FROM 
-                product p
+            product p
             LEFT JOIN 
-                product_category pc ON p.product_category_id = pc.id
+            product_category pc ON p.product_category_id = pc.id
             WHERE 
-                p.id = #{id}
+            p.id = #{id}
         ]]>
     </select>
 
