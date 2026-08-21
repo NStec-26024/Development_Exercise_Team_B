@@ -12,20 +12,24 @@
 
     <!-- 全カテゴリ取得 -->
     <select id="findAll" resultMap="productCategoryResultMap">
+        <![CDATA[
         SELECT
             id,
             name
         FROM product_category
         ORDER BY id ASC
+        ]]>
     </select>
 
     <!-- ID でカテゴリ取得 -->
     <select id="findById" resultMap="productCategoryResultMap">
+        <![CDATA[
         SELECT
             id,
             name
         FROM product_category
         WHERE id = #{id}
+        ]]>
     </select>
 
 </mapper>
