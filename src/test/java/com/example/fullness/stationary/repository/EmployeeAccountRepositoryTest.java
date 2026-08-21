@@ -2,6 +2,7 @@ package com.example.fullness.stationary.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class EmployeeAccountRepositoryTest {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectAccountName("yamadatarou1001");
         assertEquals(1, employeeAccount.getId());
         assertEquals("yamadatarou1001", employeeAccount.getName());
-        assertEquals("yamadapassword1001", employeeAccount.getPassword());
+        assertEquals("$2a$10$nOMKs31N.scADyHLn1KfyOagrb52vXDEokqGp4MueMbqAam1iaS1e", employeeAccount.getPassword());
         assertEquals(1, employeeAccount.getEmployeeId());
 
     }
@@ -102,6 +103,41 @@ public class EmployeeAccountRepositoryTest {
     public void selectEmployeeNameWithEmployeeAccountIdTest_null_case10() {
         EmployeeAccount employeeAccount = adminEmployeeAccountRepository.selectEmployeeNameWithEmployeeAccountId(2);
         assertEquals(null, employeeAccount);
+
+    }
+
+    // ============================================================
+    // 正常系：指定したユーザー名で DB から正しい情報を取得できること
+    // ============================================================
+    @Test
+    void findByNameTest_case01_Ok() {
+
+        // 実行
+        EmployeeAccount result = adminEmployeeAccountRepository.findByName("yamadatarou1001");
+
+        // 検証：null ではない
+        assertThat(result).isNotNull();
+
+        // 検証：id / employeeId が正しい
+        assertThat(result.getId()).isEqualTo(1);
+        assertThat(result.getEmployeeId()).isEqualTo(1);
+
+        // 検証：bcrypt パスワードが正しく取得できている
+        assertThat(result.getPassword())
+                .isEqualTo("$2a$10$nOMKs31N.scADyHLn1KfyOagrb52vXDEokqGp4MueMbqAam1iaS1e");
+    }
+
+    // ============================================================
+    // 異常系：存在しないユーザー名の場合 null が返ること
+    // ============================================================
+    @Test
+    void findByNameTest_case02_Ok() {
+
+        // 実行
+        EmployeeAccount result = adminEmployeeAccountRepository.findByName("unknown");
+
+        // 検証：null が返る
+        assertThat(result).isNull();
 
     }
 
