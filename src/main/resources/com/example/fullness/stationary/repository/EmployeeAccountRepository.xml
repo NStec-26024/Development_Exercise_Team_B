@@ -10,12 +10,12 @@
         <result property="employeeId" column="employee_id" />
         <result property="name" column="name" />
         <result property="password" column="password" />
-        <association property="employee" javaType="Employee">
-            <id property="id" column="employee_id" />
-            <result property="departmentId" column="department_id" />
-            <result property="name" column="employee_name" />
-            <result property="nameKana" column="name_kana" />
-        </association>
+            <association property="employee" javaType="Employee">
+                <id property="id" column="employee_id" />
+                <result property="departmentId" column="department_id" />
+                <result property="name" column="employee_name" />
+                <result property="nameKana" column="name_kana" />
+            </association>
         </resultMap>
         
         <select id="selectEmployeeNameWithEmployeeAccount" resultMap="employeeAccountResult">
@@ -32,16 +32,16 @@
         </select>
 
         <insert id="insertEmployeeAccount" parameterType="EmployeeAccount" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
-    
-        <![CDATA[
-            INSERT INTO 
-            employee_account (employee_id, name, password)
-            VALUES(#{employeeId},#{name},#{password})
-        ]]>
-    </insert>
+        
+            <![CDATA[
+                INSERT INTO 
+                employee_account (employee_id, name, password)
+                VALUES(#{employeeId},#{name},#{password})
+            ]]>
+        </insert>
 
-    <select id="selectNotHasEmployeeAccount" resultMap="employeeAccountResult">
-        <![CDATA[
+        <select id="selectNotHasEmployeeAccount" resultMap="employeeAccountResult">
+            <![CDATA[
                 SELECT e.name AS employee_name,e.id AS employee_id
                 FROM
                 employee e
@@ -53,36 +53,38 @@
                 AND
                 e.id = #{employeeId}
             ]]>
-    </select>
+        </select>
 
-    <select id="selectAccountName" resultMap="employeeAccountResult">
-        <![CDATA[
+        <select id="selectAccountName" resultMap="employeeAccountResult">
+            <![CDATA[
                 SELECT *
                 FROM employee_account
                 WHERE name=#{name}
             ]]>
-    </select>
+        </select>
 
-    <select id="selectEmployeeNameWithEmployeeAccountId" resultMap="employeeAccountResult">
-        <![CDATA[
+        <select id="selectEmployeeNameWithEmployeeAccountId" resultMap="employeeAccountResult">
+            <![CDATA[
                 SELECT e.name AS employee_name,a.name
                 FROM employee e
                 JOIN employee_account a
                 ON e.id=a.employee_id
                 WHERE a.id=#{id}
             ]]>
-    </select>
+        </select>
 
-      <!-- name で 1件取得（EmployeeAccount を返す） -->
-    <select id="findByName" resultType="com.example.fullness.stationary.entity.EmployeeAccount">
-    SELECT 
-        id,
-        employee_id AS employeeId,
-        name,
-        password
-    FROM employee_account
-    WHERE name = #{name}
-    </select>
+        <!-- name で 1件取得（EmployeeAccount を返す） -->
+        <select id="findByName" resultType="com.example.fullness.stationary.entity.EmployeeAccount">
+            <![CDATA[
+                SELECT 
+                id,
+                employee_id AS employeeId,
+                name,
+                password
+                FROM employee_account
+                WHERE name = #{name}
+            ]]>
+        </select>
 
 
     </mapper>

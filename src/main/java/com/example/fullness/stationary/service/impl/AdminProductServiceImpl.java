@@ -14,7 +14,7 @@ import com.example.fullness.stationary.repository.ProductCategoryRepository;
 import com.example.fullness.stationary.repository.ProductRepository;
 import com.example.fullness.stationary.service.AdminProductService;
 
-@Service("productService")
+@Service
 @Transactional
 public class AdminProductServiceImpl implements AdminProductService {
     /**
