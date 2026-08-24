@@ -13,12 +13,9 @@
             <div class="text-center mb-2">
                 <a th:href="@{/admin}" class="admin-title fs-4">フルネス文具 管理画面</a>
             </div>
-            <<<<<<< HEAD <nav class="d-flex justify-content-center align-items-center gap-4 flex-wrap"
-                th:if="${loggedIn}">
-                =======
+            <nav class="d-flex justify-content-center align-items-center gap-4 flex-wrap" th:if="${loggedIn}">
                 <nav class="d-flex justify-content-center align-items-center gap-4 flex-wrap"
                     sec:authorize="isAuthenticated()">
-                    >>>>>>> 22d0399 (画面変更)
                     <a th:href="@{/admin/product}" class="nav-link">商品情報メンテナンス</a>
                     <a th:href="@{/admin/category/add}" class="nav-link">商品カテゴリ登録</a>
                     <a th:href="@{/admin/order/search}" class="nav-link">購入履歴検索</a>
@@ -27,12 +24,10 @@
                         <button type="submit" class="btn btn-fs btn-sm">ログアウト</button>
                     </form>
                 </nav>
-                <<<<<<< HEAD <nav class="d-flex justify-content-center" th:unless="${loggedIn}">
-                    =======
-                    <nav class="d-flex justify-content-center" sec:authorize="!isAuthenticated()">
-                        >>>>>>> 22d0399 (画面変更)
-                        <a th:href="@{/admin/login}" class="btn btn-fs btn-sm">ログイン</a>
-                    </nav>
+
+                <nav class="d-flex justify-content-center" sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/admin/login}" class="btn btn-fs btn-sm">ログイン</a>
+                </nav>
         </div>
     </header>
 
