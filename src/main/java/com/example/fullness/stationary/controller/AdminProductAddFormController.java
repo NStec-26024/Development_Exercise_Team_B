@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 import com.example.fullness.stationary.service.AdminProductRegistrationService;
+import com.example.fullness.stationary.service.AdminProductService;
 
 @Controller
 @RequestMapping("admin/product")
 public class AdminProductAddFormController {
 
     @Autowired
-    AdminProductRegistrationService adminProductRegistrationService;
+    AdminProductService adminProductService;
 
     @ModelAttribute("form")
     public AdminProductRegistrationForm setUpForm() {
@@ -27,8 +28,7 @@ public class AdminProductAddFormController {
 
     @GetMapping("/add")
     public String showInput(Model model) {
-        List<ProductCategory> productCategoryList = adminProductRegistrationService.getAllCategories();
-
+        List<ProductCategory> productCategoryList = adminProductService.getAllCategories();
         if (productCategoryList.isEmpty()) {
             model.addAttribute("errorMessages", "カテゴリ情報の取得に失敗しました");
         } else {

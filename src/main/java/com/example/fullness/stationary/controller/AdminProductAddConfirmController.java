@@ -13,14 +13,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
+import com.example.fullness.stationary.service.AdminProductCategoryService;
 import com.example.fullness.stationary.service.AdminProductRegistrationService;
+import com.example.fullness.stationary.service.AdminProductService;
 
 @Controller
 @RequestMapping("admin/product/add")
 public class AdminProductAddConfirmController {
 
     @Autowired
-    AdminProductRegistrationService adminProductRegistrationService;
+    AdminProductCategoryService adminProductCategoryService;
 
     @ModelAttribute("form")
     public AdminProductRegistrationForm setUpForm() {
@@ -40,8 +42,8 @@ public class AdminProductAddConfirmController {
             return "redirect:/admin/product/add";
 
         } else {
-            ProductCategory productCategory = adminProductRegistrationService
-                    .getCategoryNameById(adminProductRegistrationForm.getCategoryId());
+            ProductCategory productCategory = adminProductCategoryService
+                    .getById(adminProductRegistrationForm.getCategoryId());
             adminProductRegistrationForm.setCategoryName(productCategory.getName());
             redirectAttributes.addFlashAttribute("form", adminProductRegistrationForm);
 
