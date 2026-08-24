@@ -37,23 +37,28 @@ public class AdminProductModificationServiceImpl implements AdminProductModifica
     public void updateProduct(Integer id, String name, int price, int stock, Integer categoryId,
             byte[] imageBytes, String originalFileName) {
 
-        Product current = productRepository.findById(id);
-        if (current == null) {
-            throw new AdminBusinessException(
-                    messageSource.getMessage("com.example.fullness.stationary.product.not_found", null,
-                            Locale.JAPAN));
+        try {
+            Product current = productRepository.findById(id);
+            if (current == null) {
+                throw new AdminBusinessException(
+                        messageSource.getMessage("com.example.fullness.stationary.product.not_found", null,
+                                Locale.JAPAN));
+            }
+
+            String imageFileName = current.getImageUrl();
+
+            Product product = new Product();
+            product.setId(id);
+            product.setName(name);
+            product.setPrice(price);
+            product.setCategoryId(categoryId);
+            product.setImageUrl(imageFileName);
+
+            productRepository.update(product);
+            productStockRepository.updateByProductId(id, stock);
+        } catch (Exception e) {
+            throw new AdminBusinessException(messageSource.getMessage("insert.failed", null, Locale.JAPAN));
         }
 
-        String imageFileName = current.getImageUrl();
-
-        Product product = new Product();
-        product.setId(id);
-        product.setName(name);
-        product.setPrice(price);
-        product.setCategoryId(categoryId);
-        product.setImageUrl(imageFileName);
-
-        productRepository.update(product);
-        productStockRepository.updateByProductId(id, stock);
     }
 }

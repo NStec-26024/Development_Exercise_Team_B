@@ -16,8 +16,8 @@ public class AdminProductCategoryForm implements Serializable {
 
     private Integer id;
 
-    @NotBlank(groups = ValidatorGroup1.class, message = "カテゴリ名は入力してください")
-    @Size(groups = ValidatorGroup2.class, min = 1, max = 30, message = "カテゴリ名は1~30文字で入力してください")
+    @NotBlank(groups = ValidatorGroup1.class, message = "{category.emsg2}")
+    @Size(groups = ValidatorGroup2.class, min = 1, max = 30, message = "{category.emsg3}")
     @UniqueProductCategoryName(groups = ValidatorGroup3.class)
     private String name;
 

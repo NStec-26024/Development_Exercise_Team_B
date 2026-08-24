@@ -24,9 +24,9 @@
         <div class="admin-panel p-4 mx-auto" style="max-width: 560px;">
             <h1 class="text-center mb-4">アカウント登録(入力)</h1>
 
-            <ul class="alert alert-danger" th:if="${!#strings.isEmpty(errorMessages)}">
-                <li th:each="msg : ${errorMessages}" th:text="${msg}"></li>
-            </ul>
+            <div class="alert alert-danger" th:if="${!#strings.isEmpty(errorMessages)}">
+                <p th:each="msg : ${errorMessages}" th:text="${msg}"></p>
+            </div>
 
             <form th:action="@{/admin/account/postconfirm}" method="post" th:object="${adminEmployeeAccountForm}">
                 <div class="mb-3 row">

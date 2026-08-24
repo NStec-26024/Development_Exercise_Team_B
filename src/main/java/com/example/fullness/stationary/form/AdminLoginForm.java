@@ -11,10 +11,10 @@ import lombok.Data;
 public class AdminLoginForm {
 
     /** アカウント名（必須） */
-    @NotBlank(message = "アカウント名を入力してください")
+    @NotBlank(message = "{account.name.null}")
     private String name;
 
     /** パスワード（必須） */
-    @NotBlank(message = "パスワードを入力してください")
+    @NotBlank(message = "{account.password.null}")
     private String password;
 }

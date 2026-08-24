@@ -15,22 +15,22 @@ public class AdminProductForm {
     private Integer id;
 
     /** 商品名（必須、2〜20文字） */
-    @NotBlank(message = "商品名を入力してください")
-    @Pattern(regexp = "^.{2,20}$", message = "商品名は2～20文字で入力してください")
+    @NotBlank(message = "{product.name.null}")
+    @Pattern(regexp = "^.{2,20}$", message = "{product.emsg1}")
     private String name;
 
     /** 単価（必須、半角数字のみ。上限チェックはValidator側） */
-    @NotBlank(message = "価格を入力してください")
-    @Pattern(regexp = "^[0-9]+$", message = "正しい価格形式で入力してください")
+    @NotBlank(message = "{product.price.null}")
+    @Pattern(regexp = "^[0-9]+$", message = "{product.price.right}")
     private String price;
 
     /** 在庫数（必須、半角数字のみ。上限チェックはValidator側） */
-    @NotBlank(message = "在庫数を入力してください")
-    @Pattern(regexp = "^[0-9]+$", message = "正しい在庫数形式で入力してください")
+    @NotBlank(message = "{product.emsg5}")
+    @Pattern(regexp = "^[0-9]+$", message = "{product.emsg6}")
     private String stock;
 
     /** カテゴリID（必須） */
-    @NotNull(message = "カテゴリを選択してください")
+    @NotNull(message = "{product.category.choose}")
     private Integer categoryId;
 
     /** 確認画面表示用のカテゴリ名（コントローラー側でcategoryIdから解決して設定） */

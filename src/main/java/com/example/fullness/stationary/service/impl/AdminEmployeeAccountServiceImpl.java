@@ -1,10 +1,12 @@
 package com.example.fullness.stationary.service.impl;
 
 import java.util.List;
+import java.util.Locale;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.exception.AdminBusinessException;
@@ -23,6 +25,9 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    MessageSource messageSource;
+
     @Override
     public int addEmployeeAccount(EmployeeAccount employeeAccount) {
         try {
@@ -34,7 +39,7 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
             return accountId;
         } catch (Exception e) {
             throw new AdminBusinessException(
-                    "登録処理に失敗しました。管理者に連絡してください");
+                    messageSource.getMessage("insert.failed", null, Locale.JAPAN));
         }
 
     }
@@ -44,7 +49,7 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
         try {
             return employeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
         } catch (Exception e) {
-            throw new AdminBusinessException("社員情報の取得に失敗しました");
+            throw new AdminBusinessException(messageSource.getMessage("employee.account.emsg9", null, Locale.JAPAN));
         }
     }
 
@@ -66,7 +71,7 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
             }
         } catch (Exception e) {
             throw new AdminBusinessException(
-                    "登録処理に失敗しました。管理者に連絡してください");
+                    messageSource.getMessage("insert.failed", null, Locale.JAPAN));
         }
 
     }

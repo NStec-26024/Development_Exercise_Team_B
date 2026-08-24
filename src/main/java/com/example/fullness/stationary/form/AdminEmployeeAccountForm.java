@@ -1,12 +1,12 @@
 package com.example.fullness.stationary.form;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import com.example.fullness.stationary.validator.UniqueAccountName;
-
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -24,7 +24,7 @@ public class AdminEmployeeAccountForm implements Serializable {
      * <li>必須入力（未選択は不可）</li>
      * </ul>
      */
-    @NotNull(message = "社員名を選択してください")
+    @NotNull(message = "{employee.account.emsg1}")
     private Integer employeeId;
 
     /**
@@ -35,9 +35,9 @@ public class AdminEmployeeAccountForm implements Serializable {
      * <li>使用可能文字: 半角英数字のみ</li>
      * </ul>
      */
-    @NotNull(message = "アカウント名を入力してください")
-    @Size(min = 5, max = 20, message = "アカウント名は5～20文字で入力してください")
-    @Pattern(regexp = "[0-9a-zA-Z]+", message = "アカウント名は半角英数字で入力してください")
+    @NotBlank(message = "{account.name.null}")
+    @Pattern(regexp = "^$|^.{5,20}$", message = "{employee.account.emsg3}")
+    @Pattern(regexp = "^$|^.{0,4}$|^.{21,}$|^[0-9a-zA-Z]{5,20}$", message = "{employee.account.emsg4}")
     @UniqueAccountName
     private String name;
 
@@ -49,9 +49,9 @@ public class AdminEmployeeAccountForm implements Serializable {
      * <li>使用可能文字: 半角英数字のみ</li>
      * </ul>
      */
-    @NotNull(message = "パスワードを入力してください")
-    @Size(min = 5, max = 20, message = "パスワードは5～20文字で入力してください")
-    @Pattern(regexp = "[0-9a-zA-Z]+", message = "パスワードは半角英数字で入力してください")
+    @NotBlank(message = "{account.password.null}")
+    @Pattern(regexp = "^$|^.{5,20}$", message = "{employee.account.emsg7}")
+    @Pattern(regexp = "^$|^.{0,4}$|^.{21,}$|^[0-9a-zA-Z]{5,20}$", message = "{employee.account.emsg8}")
     private String password;
 
 }

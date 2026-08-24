@@ -126,7 +126,7 @@ public class AdminGlobalExceptionHandler {
             errorMessage = "システムエラーが発生しました。";
         }
 
-        model.addAttribute("errorMessage", errorMessage);
+        redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
 
         // ログイン画面へ戻すための初期化処理
         HttpSession session = request.getSession(false);
@@ -135,7 +135,7 @@ public class AdminGlobalExceptionHandler {
         if (session != null) {
             String loginError = (String) session.getAttribute("loginErrorMessage");
             if (loginError != null) {
-                model.addAttribute("securityErrorMessage", loginError);
+                redirectAttributes.addFlashAttribute("securityErrorMessage", loginError);
                 session.removeAttribute("loginErrorMessage");
             }
 
@@ -146,12 +146,12 @@ public class AdminGlobalExceptionHandler {
             }
         }
 
-        model.addAttribute("adminLoginForm", adminLoginForm);
-        model.addAttribute(
+        redirectAttributes.addFlashAttribute("adminLoginForm", adminLoginForm);
+        redirectAttributes.addFlashAttribute(
                 BindingResult.MODEL_KEY_PREFIX + "adminLoginForm",
                 new BeanPropertyBindingResult(adminLoginForm, "adminLoginForm"));
 
-        return "admin/login";
+        return "redirect:/admin/error";
     }
 
     @ExceptionHandler(AdminBusinessException.class)
@@ -162,4 +162,5 @@ public class AdminGlobalExceptionHandler {
         redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
         return "redirect:/admin/error";
     }
+
 }

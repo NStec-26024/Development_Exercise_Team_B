@@ -2,13 +2,15 @@ package com.example.fullness.stationary.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.entity.ProductCategory;
+import com.example.fullness.stationary.exception.AdminBusinessException;
 import com.example.fullness.stationary.repository.ProductCategoryRepository;
 import com.example.fullness.stationary.repository.ProductRepository;
 import com.example.fullness.stationary.service.AdminProductQueryService;
@@ -21,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-@Transactional(readOnly = true)
 public class AdminProductQueryServiceImpl implements AdminProductQueryService {
 
     /** 1ページあたりの表示件数。 */
@@ -33,13 +34,20 @@ public class AdminProductQueryServiceImpl implements AdminProductQueryService {
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
 
+    @Autowired
+    private MessageSource messageSource;
+
     /**
      * 商品カテゴリの一覧を取得する。
      */
     @Override
     public List<ProductCategory> getAllCategories() {
-        List<ProductCategory> categories = productCategoryRepository.findAll();
-        return (categories != null) ? categories : new ArrayList<>();
+        try {
+            List<ProductCategory> categories = productCategoryRepository.findAll();
+            return (categories != null) ? categories : new ArrayList<>();
+        } catch (Exception e) {
+            throw new AdminBusinessException(messageSource.getMessage("product.info.failed", null, Locale.JAPAN));
+        }
     }
 
     /**
@@ -47,11 +55,15 @@ public class AdminProductQueryServiceImpl implements AdminProductQueryService {
      */
     @Override
     public String getCategoryName(Integer categoryId) {
-        if (categoryId == null || categoryId == 0) {
-            return null;
+        try {
+            if (categoryId == null || categoryId == 0) {
+                return null;
+            }
+            ProductCategory category = productCategoryRepository.findById(categoryId);
+            return (category != null) ? category.getName() : null;
+        } catch (Exception e) {
+            throw new AdminBusinessException(messageSource.getMessage("product.info.failed", null, Locale.JAPAN));
         }
-        ProductCategory category = productCategoryRepository.findById(categoryId);
-        return (category != null) ? category.getName() : null;
     }
 
     /**
@@ -59,10 +71,14 @@ public class AdminProductQueryServiceImpl implements AdminProductQueryService {
      */
     @Override
     public Product getProductById(Integer id) {
-        if (id == null) {
-            return null;
+        try {
+            if (id == null) {
+                return null;
+            }
+            return productRepository.findById(id);
+        } catch (Exception e) {
+            throw new AdminBusinessException(messageSource.getMessage("product.info.failed", null, Locale.JAPAN));
         }
-        return productRepository.findById(id);
     }
 
     /**

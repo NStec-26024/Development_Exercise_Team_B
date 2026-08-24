@@ -2,20 +2,21 @@ package com.example.fullness.stationary.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.entity.ProductCategory;
+import com.example.fullness.stationary.exception.AdminBusinessException;
 import com.example.fullness.stationary.repository.ProductCategoryRepository;
 import com.example.fullness.stationary.repository.ProductRepository;
 import com.example.fullness.stationary.service.AdminProductService;
 
 @Service("productService")
-@Transactional
 public class AdminProductServiceImpl implements AdminProductService {
     /**
      * 1ページあたりの表示件数。
@@ -27,6 +28,9 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
+
+    @Autowired
+    private MessageSource messageSource;
 
     /**
      * 商品サービスの具体実装です。
@@ -128,7 +132,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
             // 商品が見つからない場合
             if (products.isEmpty()) {
-                model.addAttribute("infoMessage", "該当する商品情報がありません");
+                model.addAttribute("infoMessage", messageSource.getMessage("product.emsg12", null, Locale.JAPAN));
                 model.addAttribute("searched", true);
                 model.addAttribute("selectedCategoryId", 0);
                 return false;
@@ -144,11 +148,7 @@ public class AdminProductServiceImpl implements AdminProductService {
             return true;
 
         } catch (Exception e) {
-            System.out.println("ERROR in searchAllProductsAndSetModel:");
-            e.printStackTrace();
-            model.addAttribute("errorMessage", "商品情報の取得に失敗しました: " + e.getMessage());
-            model.addAttribute("searched", true);
-            return false;
+            throw new AdminBusinessException(messageSource.getMessage("product.info.failed", null, Locale.JAPAN));
         }
     }
 
@@ -202,7 +202,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 
             // 商品が見つからない場合
             if (products.isEmpty()) {
-                model.addAttribute("infoMessage", "該当する商品情報がありません");
+                model.addAttribute("infoMessage", messageSource.getMessage("product.emsg12", null, Locale.JAPAN));
                 model.addAttribute("searched", true);
                 model.addAttribute("selectedCategoryId", categoryId);
                 model.addAttribute("selectedCategoryName", categoryName);
@@ -219,12 +219,9 @@ public class AdminProductServiceImpl implements AdminProductService {
             return true;
 
         } catch (Exception e) {
-            System.out.println("ERROR in searchProductsByCategoryAndSetModel:");
-            e.printStackTrace();
-            model.addAttribute("errorMessage", "商品情報の取得に失敗しました: " + e.getMessage());
-            model.addAttribute("searched", true);
-            return false;
+            throw new AdminBusinessException(messageSource.getMessage("product.info.failed", null, Locale.JAPAN));
         }
+
     }
 
     /**

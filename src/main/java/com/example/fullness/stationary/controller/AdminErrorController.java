@@ -12,11 +12,14 @@ public class AdminErrorController {
     @GetMapping("/admin/error")
     public String showErrorPage(HttpSession session, Model model) {
 
-        // // failureHandler がセットしたエラーメッセージを取得
-        // String errorMessage = (String) session.getAttribute("errorMessage");
+        if (session.getAttribute("errorMessage") != null) {
+            // failureHandler がセットしたエラーメッセージを取得
+            String errorMessage = (String) session.getAttribute("errorMessage");
 
-        // // 画面へ渡す
-        // model.addAttribute("errorMessage", errorMessage);
+            // 画面へ渡す
+            model.addAttribute("errorMessage", errorMessage);
+
+        }
 
         return "admin/error"; // admin/error.html を表示
     }

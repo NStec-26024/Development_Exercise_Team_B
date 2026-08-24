@@ -1,6 +1,9 @@
 package com.example.fullness.stationary.controller;
 
+import java.util.Locale;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +32,9 @@ public class AdminProductCategoryController {
 
     @Autowired
     ProductCategoryHelper productCategoryHelper;
+
+    @Autowired
+    MessageSource messageSource;
 
     /**
      * リクエスト毎にアカウント登録Formオブジェクトを初期化
@@ -102,7 +108,8 @@ public class AdminProductCategoryController {
 
         if (adminProductCategoryForm.getName() == null || adminProductCategoryForm.getName().isEmpty()) {
 
-            redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
+            redirectAttributes.addFlashAttribute("errorMessages",
+                    messageSource.getMessage("access.failed", null, Locale.JAPAN));
             return "redirect:/admin/category/add";
         }
 
@@ -124,7 +131,8 @@ public class AdminProductCategoryController {
         ProductCategory productCategory = productCategoryHelper.formToEntity(adminProductCategoryForm);
         if (!adminProductCategoryService.existName(productCategory.getName())) {
 
-            redirectAttributes.addFlashAttribute("errorMessages", "入力されたカテゴリ名は既に登録されています");
+            redirectAttributes.addFlashAttribute("errorMessages",
+                    messageSource.getMessage("category.emsg1", null, Locale.JAPAN));
             redirectAttributes.addFlashAttribute("adminProductCategoryForm", adminProductCategoryForm);
             return "redirect:/admin/category/add";
         }
@@ -169,7 +177,8 @@ public class AdminProductCategoryController {
             Model model) {
         if (model.getAttribute("categoryName") == null) {
 
-            redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
+            redirectAttributes.addFlashAttribute("errorMessages",
+                    messageSource.getMessage("access.failed", null, Locale.JAPAN));
             return "redirect:/admin";
         }
 

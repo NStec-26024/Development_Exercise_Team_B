@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.form.AdminEmployeeAccountForm;
 import com.example.fullness.stationary.helper.EmployeeAccountHelper;
@@ -38,6 +41,9 @@ public class AdminEmployeeAccountController {
     @Autowired
     EmployeeAccountHelper employeeAccountHelper;
 
+    @Autowired
+    MessageSource messageSource;
+
     /**
      * リクエスト毎にアカウント登録Formオブジェクトを初期化
      * 
@@ -60,7 +66,8 @@ public class AdminEmployeeAccountController {
         List<EmployeeAccount> employeeNameList = adminEmployeeAccountService.getEmployeeNameWithEmployeeAccount();
 
         if (employeeNameList.isEmpty()) {
-            model.addAttribute("errorMessages", "アカウント登録可能な社員が存在しません");
+            model.addAttribute("errorMessages",
+                    messageSource.getMessage("employee.account.emsg10", null, Locale.JAPAN));
         } else {
             model.addAttribute("employeeName", employeeNameList);
         }
@@ -121,7 +128,8 @@ public class AdminEmployeeAccountController {
                 adminEmployeeAccountForm.getName() == null || adminEmployeeAccountForm.getName().isEmpty() ||
                 adminEmployeeAccountForm.getPassword() == null || adminEmployeeAccountForm.getPassword().isEmpty()) {
 
-            redirectAttributes.addFlashAttribute("errorMessages", "入力情報が見つかりません。再度入力してください");
+            redirectAttributes.addFlashAttribute("errorMessages",
+                    messageSource.getMessage("com.example.fullness.stationary.product.not_found", null, Locale.JAPAN));
             return "redirect:/admin/account/form";
         }
 
@@ -144,7 +152,8 @@ public class AdminEmployeeAccountController {
         if (!adminEmployeeAccountService.getAccountName(employeeAccount.getName())
                 || !adminEmployeeAccountService.getNotHasEmployeeAccount(employeeAccount.getEmployeeId())) {
 
-            redirectAttributes.addFlashAttribute("errorMessages", "このアカウント名は既に使用されています");
+            redirectAttributes.addFlashAttribute("errorMessages",
+                    messageSource.getMessage("employee.account.emsg5", null, Locale.JAPAN));
             redirectAttributes.addFlashAttribute("adminEmployeeAccountForm", adminEmployeeAccountForm);
             return "redirect:/admin/account/form";
         }
@@ -190,7 +199,8 @@ public class AdminEmployeeAccountController {
             Model model) {
         if (model.getAttribute("employee") == null) {
 
-            redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
+            redirectAttributes.addFlashAttribute("errorMessages",
+                    messageSource.getMessage("com.example.fullness.stationary.product.not_found", null, Locale.JAPAN));
             return "redirect:/admin";
         }
 
