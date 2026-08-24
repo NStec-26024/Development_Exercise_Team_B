@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
+import com.example.fullness.stationary.exception.AdminBusinessException;
 import com.example.fullness.stationary.repository.EmployeeAccountRepository;
 import com.example.fullness.stationary.service.AdminEmployeeAccountService;
 
@@ -14,7 +15,6 @@ import com.example.fullness.stationary.service.AdminEmployeeAccountService;
  * サービス実装クラス
  */
 @Service
-@Transactional
 public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountService {
 
     @Autowired
@@ -25,19 +25,27 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
 
     @Override
     public int addEmployeeAccount(EmployeeAccount employeeAccount) {
-
-        // パスワードのハッシュ化
-        String encodePassword = passwordEncoder.encode(employeeAccount.getPassword());
-        employeeAccount.setPassword(encodePassword);
-        employeeAccountRepository.insertEmployeeAccount(employeeAccount);
-        int accountId = employeeAccount.getId();
-        return accountId;
+        try {
+            // パスワードのハッシュ化
+            String encodePassword = passwordEncoder.encode(employeeAccount.getPassword());
+            employeeAccount.setPassword(encodePassword);
+            employeeAccountRepository.insertEmployeeAccount(employeeAccount);
+            int accountId = employeeAccount.getId();
+            return accountId;
+        } catch (Exception e) {
+            throw new AdminBusinessException(
+                    "登録処理に失敗しました。管理者に連絡してください");
+        }
 
     }
 
     @Override
     public List<EmployeeAccount> getEmployeeNameWithEmployeeAccount() {
-        return employeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
+        try {
+            return employeeAccountRepository.selectEmployeeNameWithEmployeeAccount();
+        } catch (Exception e) {
+            throw new AdminBusinessException("社員情報の取得に失敗しました");
+        }
     }
 
     @Override
@@ -48,12 +56,17 @@ public class AdminEmployeeAccountServiceImpl implements AdminEmployeeAccountServ
 
     @Override
     public boolean getAccountName(String accountName) {
-        EmployeeAccount employeeAccount = new EmployeeAccount();
-        employeeAccount = employeeAccountRepository.selectAccountName(accountName);
-        if (employeeAccount != null) {
-            return false;
-        } else {
-            return true;
+        try {
+            EmployeeAccount employeeAccount = new EmployeeAccount();
+            employeeAccount = employeeAccountRepository.selectAccountName(accountName);
+            if (employeeAccount != null) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+            throw new AdminBusinessException(
+                    "登録処理に失敗しました。管理者に連絡してください");
         }
 
     }

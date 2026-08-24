@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.example.fullness.stationary.exception.AdminBusinessException;
 import com.example.fullness.stationary.form.AdminLoginForm;
 
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -59,6 +61,28 @@ public class AdminGlobalExceptionHandler {
         }
     }
 
+    private boolean isDbError(Throwable t) {
+        Throwable cur = t;
+        while (cur != null) {
+
+            if (cur instanceof org.springframework.jdbc.CannotGetJdbcConnectionException ||
+                    cur instanceof org.springframework.transaction.CannotCreateTransactionException) {
+                return true;
+            }
+
+            String cn = cur.getClass().getName();
+            if (cn.contains("JDBCConnectionException") ||
+                    cn.contains("CommunicationsException") ||
+                    cn.contains("SQLException") ||
+                    cn.contains("SQLTimeoutException")) {
+                return true;
+            }
+
+            cur = cur.getCause();
+        }
+        return false;
+    }
+
     /**
      * 管理画面で発生した例外を共通処理する。
      * 認証関連の例外は Spring Security に委譲し、それ以外はメッセージを設定して
@@ -71,7 +95,8 @@ public class AdminGlobalExceptionHandler {
      * @throws Exception 認証関連例外の場合は再スローされる
      */
     @ExceptionHandler(Exception.class)
-    public String handleAllExceptions(HttpServletRequest request, Exception ex, Model model) throws Exception {
+    public String handleAllExceptions(HttpServletRequest request, Exception ex, Model model,
+            RedirectAttributes redirectAttributes) throws Exception {
 
         // 認証関連の例外は Spring Security に委譲
         if (ex instanceof AuthenticationException || ex instanceof AccessDeniedException) {
@@ -80,50 +105,40 @@ public class AdminGlobalExceptionHandler {
 
         log.info("例外検知: URL={}, type={}", request.getRequestURI(), ex.getClass().getSimpleName());
 
-        String errorMessage = ex.getMessage();
-        boolean isDisplayErrorPage = false;
+        String errorMessage;
 
+        if (isDbError(ex)) {
+            errorMessage = messageSource.getMessage(
+                    "com.example.fullness.stationary.security.db_error",
+                    null,
+                    Locale.JAPAN);
+            redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
+            return "redirect:/admin/error";
+        }
+
+        // その他の例外
         try {
-            // DB 接続エラー
-            if (ex instanceof org.springframework.jdbc.CannotGetJdbcConnectionException ||
-                    ex.getCause() instanceof org.springframework.jdbc.CannotGetJdbcConnectionException) {
-
-                isDisplayErrorPage = true;
-                errorMessage = messageSource.getMessage(
-                        "com.example.fullness.stationary.security.db_error", null, Locale.JAPAN);
-
-            } else if (errorMessage == null || errorMessage.isBlank()) {
-
-                errorMessage = messageSource.getMessage(
-                        "com.example.fullness.stationary.security.system_error", null, Locale.JAPAN);
-            }
-
+            errorMessage = messageSource.getMessage(
+                    "com.example.fullness.stationary.security.system_error",
+                    null,
+                    Locale.JAPAN);
         } catch (NoSuchMessageException e) {
             errorMessage = "システムエラーが発生しました。";
         }
 
-        // 画面にエラーメッセージを渡す
         model.addAttribute("errorMessage", errorMessage);
-
-        // DB エラーは専用画面へ
-        if (isDisplayErrorPage) {
-            return "admin/error";
-        }
 
         // ログイン画面へ戻すための初期化処理
         HttpSession session = request.getSession(false);
         AdminLoginForm adminLoginForm = new AdminLoginForm();
 
         if (session != null) {
-
-            // loginErrorMessage（認証失敗時のメッセージ）
             String loginError = (String) session.getAttribute("loginErrorMessage");
             if (loginError != null) {
                 model.addAttribute("securityErrorMessage", loginError);
                 session.removeAttribute("loginErrorMessage");
             }
 
-            // loginUsername（前回入力したユーザー名の復元）
             String savedUsername = (String) session.getAttribute("loginUsername");
             if (savedUsername != null) {
                 adminLoginForm.setName(savedUsername);
@@ -137,5 +152,14 @@ public class AdminGlobalExceptionHandler {
                 new BeanPropertyBindingResult(adminLoginForm, "adminLoginForm"));
 
         return "admin/login";
+    }
+
+    @ExceptionHandler(AdminBusinessException.class)
+    public String dbHaldler(HttpServletRequest request, AdminBusinessException ex, Model model,
+            RedirectAttributes redirectAttributes) {
+
+        String errorMessage = ex.getMessage();
+        redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
+        return "redirect:/admin/error";
     }
 }
