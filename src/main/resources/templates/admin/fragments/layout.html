@@ -14,7 +14,7 @@
                 <a th:href="@{/admin}" class="admin-title fs-4">フルネス文具 管理画面</a>
             </div>
             <nav class="d-flex justify-content-center align-items-center gap-4 flex-wrap"
-                sec:authorize="isAuthenticated()">
+                sec:authorize="hasRole('ADMIN')">
                 <a th:href="@{/admin/product}" class="nav-link">商品情報メンテナンス</a>
                 <a th:href="@{/admin/category/add}" class="nav-link">商品カテゴリ登録</a>
                 <a th:href="@{/admin/order/search}" class="nav-link">購入履歴検索</a>
@@ -23,9 +23,11 @@
                     <button type="submit" class="btn btn-fs btn-sm">ログアウト</button>
                 </form>
             </nav>
+
             <nav class="d-flex justify-content-center" sec:authorize="!isAuthenticated()">
                 <a th:href="@{/admin/login}" class="btn btn-fs btn-sm">ログイン</a>
             </nav>
+
         </div>
     </header>
 
