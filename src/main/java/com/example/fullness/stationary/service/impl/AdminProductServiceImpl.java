@@ -14,7 +14,7 @@ import com.example.fullness.stationary.repository.ProductCategoryRepository;
 import com.example.fullness.stationary.repository.ProductRepository;
 import com.example.fullness.stationary.service.AdminProductService;
 
-@Service
+@Service("productService")
 @Transactional
 public class AdminProductServiceImpl implements AdminProductService {
     /**
@@ -27,6 +27,17 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
+
+    /**
+     * 商品サービスの具体実装です。
+     * <p>
+     * {@link AdminProductService} で定義された契約を実体化し、
+     * {@link ProductRepository} と {@link ProductCategoryRepository} を利用して
+     * 商品検索・カテゴリ検索・ページング情報の付与を行います。
+     */
+    public AdminProductServiceImpl() {
+        // Spring による自動生成用コンストラクタ
+    }
 
     /**
      * 全カテゴリを取得します。
@@ -243,7 +254,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         System.out.println("totalCount: " + totalCount);
 
         // Modelに設定
-        model.addAttribute("products", products);
+        model.addAttribute("productList", products);
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("totalCount", totalCount);
