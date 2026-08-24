@@ -16,33 +16,34 @@ import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 import com.example.fullness.stationary.service.AdminProductRegistrationService;
 
 @Controller
-@RequestMapping("/admin/product")
+@RequestMapping("admin/product/add")
 public class AdminProductAddConfirmController {
 
     @Autowired
     AdminProductRegistrationService adminProductRegistrationService;
 
-    @ModelAttribute
+    @ModelAttribute("form")
     public AdminProductRegistrationForm setUpForm() {
         return new AdminProductRegistrationForm();
     }
 
     @PostMapping("/postconfirm")
     public String validateInput(
-            @Validated @ModelAttribute("AdminProductRegistrationForm") AdminProductRegistrationForm adminProductRegistrationForm,
+            @Validated @ModelAttribute("form") AdminProductRegistrationForm adminProductRegistrationForm,
             BindingResult result,
             RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("adminProductRegistrationForm", adminProductRegistrationForm);
+        redirectAttributes.addFlashAttribute("form", adminProductRegistrationForm);
 
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute(
-                    BindingResult.MODEL_KEY_PREFIX + "adminProductRegistrationForm", result);
+                    BindingResult.MODEL_KEY_PREFIX + "form", result);
             return "redirect:/admin/product/add";
 
         } else {
             ProductCategory productCategory = adminProductRegistrationService
-                    .getCategoryNameById(adminProductRegistrationForm.getProductCategoryId());
-            redirectAttributes.addFlashAttribute("productCategory", productCategory);
+                    .getCategoryNameById(adminProductRegistrationForm.getCategoryId());
+            adminProductRegistrationForm.setCategoryName(productCategory.getName());
+            redirectAttributes.addFlashAttribute("form", adminProductRegistrationForm);
 
             return "redirect:/admin/product/add/confirm";
         }
@@ -51,28 +52,28 @@ public class AdminProductAddConfirmController {
 
     @GetMapping("/confirm")
     public String showConfirm(
-            @ModelAttribute("adminProductRegistrationForm") AdminProductRegistrationForm adminProductRegistrationForm,
+            @ModelAttribute("form") AdminProductRegistrationForm adminProductRegistrationForm,
             RedirectAttributes redirectAttributes) {
 
-        if (adminProductRegistrationForm.getProductName() == null
-                || adminProductRegistrationForm.getProductName().isEmpty() ||
+        if (adminProductRegistrationForm.getName() == null
+                || adminProductRegistrationForm.getName().isEmpty() ||
                 adminProductRegistrationForm.getPrice() == null ||
-                adminProductRegistrationForm.getQuantity() == null ||
-                adminProductRegistrationForm.getProductCategoryId() == null) {
+                adminProductRegistrationForm.getStock() == null ||
+                adminProductRegistrationForm.getCategoryId() == null) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
-            return "redirect:/admin/product/add/form";
+            return "redirect:/admin/product/add/";
         }
 
-        return "/admin/product/add/confirm";
+        return "/admin/product/add_confirm";
     }
 
     @PostMapping("/back")
     public String back(
-            @ModelAttribute("adminProductRegistrationForm") AdminProductRegistrationForm adminProductRegistrationForm,
-            RedirectAttributes redirectAttributes, Model model) {
-        redirectAttributes.addFlashAttribute("adminProductRegistrationForm", adminProductRegistrationForm);
-        return "/admin/product/add/form";
+            AdminProductRegistrationForm adminProductRegistrationForm,
+            RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("form", adminProductRegistrationForm);
+        return "redirect:/admin/product/add";
 
     }
 }

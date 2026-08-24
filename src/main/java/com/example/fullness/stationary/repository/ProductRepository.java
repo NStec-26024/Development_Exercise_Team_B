@@ -85,8 +85,4 @@ public interface ProductRepository {
      */
     public Product selectById(int id);
 
-    public void insertStock(Product product);
-
-    public void insertCategory(Product product);
-
 }

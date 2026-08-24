@@ -2,10 +2,14 @@ package com.example.fullness.stationary.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 
+@Service
 public interface AdminProductRegistrationService {
     /**
      * 全ての商品カテゴリを取得します。
@@ -28,7 +32,8 @@ public interface AdminProductRegistrationService {
      * @param product 登録する商品
      * @return 自動採番されたアカウントID(serial値)
      */
-    public int addProduct(AdminProductRegistrationForm adminProductRegistrationForm);
+    @Transactional
+    public void addProduct(AdminProductRegistrationForm adminProductRegistrationForm);
 
     /**
      * 商品IDから商品を取得

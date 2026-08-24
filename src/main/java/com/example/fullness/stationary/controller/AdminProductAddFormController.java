@@ -14,27 +14,27 @@ import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 import com.example.fullness.stationary.service.AdminProductRegistrationService;
 
 @Controller
-@RequestMapping("/admin/product")
+@RequestMapping("admin/product")
 public class AdminProductAddFormController {
 
     @Autowired
     AdminProductRegistrationService adminProductRegistrationService;
 
-    @ModelAttribute
+    @ModelAttribute("form")
     public AdminProductRegistrationForm setUpForm() {
         return new AdminProductRegistrationForm();
     }
 
     @GetMapping("/add")
     public String showInput(Model model) {
-        List<ProductCategory> productCategoriesList = adminProductRegistrationService.getAllCategories();
+        List<ProductCategory> productCategoryList = adminProductRegistrationService.getAllCategories();
 
-        if (productCategoriesList.isEmpty()) {
+        if (productCategoryList.isEmpty()) {
             model.addAttribute("errorMessages", "カテゴリ情報の取得に失敗しました");
         } else {
-            model.addAttribute("productCategory", productCategoriesList);
+            model.addAttribute("categories", productCategoryList);
         }
 
-        return "/admin/product/add";
+        return "admin/product/add_form";
     }
 }

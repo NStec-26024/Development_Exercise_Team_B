@@ -30,11 +30,11 @@ class ProductCategoryRepositoryTest {
     // 正常系：全カテゴリを取得できること
     // ============================================================
     @Test
-    @DisplayName("findAll - 全カテゴリを取得できる")
-    void findAllTest_case01_Ok() {
+    @DisplayName("selectAll - 全カテゴリを取得できる")
+    void selectAllTest_case01_Ok() {
 
         // 実行
-        List<ProductCategory> result = repository.findAll();
+        List<ProductCategory> result = repository.selectAll();
 
         // 検証：結果が null ではない
         assertThat(result).isNotNull();
@@ -55,11 +55,11 @@ class ProductCategoryRepositoryTest {
     // 正常系：ID を指定してカテゴリを取得できること
     // ============================================================
     @Test
-    @DisplayName("findById - ID で特定のカテゴリを取得できる")
-    void findByIdTest_case01_Ok() {
+    @DisplayName("selectById - ID で特定のカテゴリを取得できる")
+    void selectByIdTest_case01_Ok() {
 
         // 実行
-        ProductCategory result = repository.findById(1);
+        ProductCategory result = repository.selectById(1);
 
         // 検証：null ではない
         assertThat(result).isNotNull();
@@ -73,11 +73,11 @@ class ProductCategoryRepositoryTest {
     // 正常系：複数のカテゴリから正しいカテゴリが取得できること
     // ============================================================
     @Test
-    @DisplayName("findById - 複数カテゴリから正しいカテゴリを取得できる")
-    void findByIdTest_case02_Ok() {
+    @DisplayName("selectById - 複数カテゴリから正しいカテゴリを取得できる")
+    void selectByIdTest_case02_Ok() {
 
         // 実行
-        ProductCategory result = repository.findById(3);
+        ProductCategory result = repository.selectById(3);
 
         // 検証：null ではない
         assertThat(result).isNotNull();
@@ -91,11 +91,11 @@ class ProductCategoryRepositoryTest {
     // 異常系：存在しない ID の場合 null が返ること
     // ============================================================
     @Test
-    @DisplayName("findById - 存在しない ID の場合は null が返る")
-    void findByIdTest_case03_Ok() {
+    @DisplayName("selectById - 存在しない ID の場合は null が返る")
+    void selectByIdTest_case03_Ok() {
 
         // 実行
-        ProductCategory result = repository.findById(99999);
+        ProductCategory result = repository.selectById(99999);
 
         // 検証：null が返る
         assertThat(result).isNull();
@@ -105,11 +105,11 @@ class ProductCategoryRepositoryTest {
     // 異常系：null ID を渡した場合 null が返ること
     // ============================================================
     @Test
-    @DisplayName("findById - null ID を渡した場合は null が返る")
-    void findByIdTest_case04_Ok() {
+    @DisplayName("selectById - null ID を渡した場合は null が返る")
+    void selectByIdTest_case04_Ok() {
 
         // 実行
-        ProductCategory result = repository.findById(null);
+        ProductCategory result = repository.selectById(null);
 
         // 検証：null が返る
         assertThat(result).isNull();

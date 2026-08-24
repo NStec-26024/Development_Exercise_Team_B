@@ -2,8 +2,6 @@ package com.example.fullness.stationary.helper;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 
@@ -18,13 +16,13 @@ public class ProductHelper {
      */
     public Product formToEntity(AdminProductRegistrationForm adminProductRegistrationForm) {
         Product product = new Product();
-        product.setName(adminProductRegistrationForm.getProductName());
+        product.setName(adminProductRegistrationForm.getName());
         product.setPrice(adminProductRegistrationForm.getPrice());
-        product.setStock(adminProductRegistrationForm.getQuantity());
-        product.setCategoryId(adminProductRegistrationForm.getProductCategoryId());
+        product.setStock(adminProductRegistrationForm.getStock());
+        product.setCategoryId(adminProductRegistrationForm.getCategoryId());
 
         // 修正箇所：MultipartFileから「ファイル名（String）」を取り出してセットする
-        MultipartFile imageFile = adminProductRegistrationForm.getImageFile(); // Formの型がMultipartFileの場合
+        MultipartFile imageFile = adminProductRegistrationForm.getImage(); // Formの型がMultipartFileの場合
         if (imageFile != null && !imageFile.isEmpty()) {
             product.setImageUrl(imageFile.getOriginalFilename());
         } else {

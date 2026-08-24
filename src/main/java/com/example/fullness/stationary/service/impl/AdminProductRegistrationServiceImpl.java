@@ -9,10 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.entity.ProductCategory;
+import com.example.fullness.stationary.entity.ProductStock;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 import com.example.fullness.stationary.helper.ProductHelper;
 import com.example.fullness.stationary.repository.ProductCategoryRepository;
 import com.example.fullness.stationary.repository.ProductRepository;
+import com.example.fullness.stationary.repository.ProductStockRepository;
 import com.example.fullness.stationary.service.AdminProductRegistrationService;
 
 @Service
@@ -26,6 +28,9 @@ public class AdminProductRegistrationServiceImpl implements AdminProductRegistra
     ProductCategoryRepository productCategoryRepository;
 
     @Autowired
+    ProductStockRepository productStockRepository;
+
+    @Autowired
     ProductHelper productHelper;
 
     /**
@@ -36,7 +41,7 @@ public class AdminProductRegistrationServiceImpl implements AdminProductRegistra
     @Override
     public List<ProductCategory> getAllCategories() {
         try {
-            List<ProductCategory> categories = productCategoryRepository.findAll();
+            List<ProductCategory> categories = productCategoryRepository.selectAll();
 
             if (categories == null) {
                 System.out.println("WARN: categories is null");
@@ -65,19 +70,21 @@ public class AdminProductRegistrationServiceImpl implements AdminProductRegistra
      */
     @Override
     public ProductCategory getCategoryNameById(Integer categoryId) {
-        return productCategoryRepository.findById(categoryId);
+        return productCategoryRepository.selectById(categoryId);
     }
 
     @Override
-    public int addProduct(AdminProductRegistrationForm adminProductRegistrationForm) {
+    public void addProduct(AdminProductRegistrationForm adminProductRegistrationForm) {
         Product product = productHelper.formToEntity(adminProductRegistrationForm);
 
         productRepository.insertProduct(product);
-        productRepository.insertCategory(product);
-        productRepository.insertStock(product);
 
-        int accountId = product.getId();
-        return accountId;
+        ProductStock stock = new ProductStock();
+        stock.setProductId(product.getId());
+        stock.setQuantity(adminProductRegistrationForm.getStock());
+        productStockRepository.insertStock(stock);
+
+        productStockRepository.insertStock(stock);
     }
 
     @Override

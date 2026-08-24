@@ -94,4 +94,22 @@
         ]]>
     </update>
 
+    <insert id="insertProduct" useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+            INSERT INTO product (
+            product_category_id,
+            name,
+            price,
+            image_url) 
+
+            VALUES (
+            #{categoryId},
+            #{name},
+            #{price},
+            #{imageUrl})
+        ]]>
+    </insert>
+
+
+
 </mapper>

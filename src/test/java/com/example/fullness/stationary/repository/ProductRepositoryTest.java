@@ -30,10 +30,10 @@ class ProductRepositoryTest {
     // 正常系：全商品取得（削除済み除く）
     // ============================================================
     @Test
-    @DisplayName("findAllWithPaging - 商品リストが返る")
-    void findAllWithPaging_case01_Ok() {
+    @DisplayName("selectAllWithPaging - 商品リストが返る")
+    void selectAllWithPaging_case01_Ok() {
 
-        List<Product> result = repository.findAllWithPaging(0, 10);
+        List<Product> result = repository.selectAllWithPaging(0, 10);
 
         assertThat(result).isNotNull();
         assertThat(result).isNotEmpty();
@@ -46,10 +46,10 @@ class ProductRepositoryTest {
     // 異常系：全商品取得（空リスト）
     // ============================================================
     @Test
-    @DisplayName("findAllWithPaging - 空リストが返る")
-    void findAllWithPaging_case02_Empty() {
+    @DisplayName("selectAllWithPaging - 空リストが返る")
+    void selectAllWithPaging_case02_Empty() {
 
-        List<Product> result = repository.findAllWithPaging(999, 10);
+        List<Product> result = repository.selectAllWithPaging(999, 10);
 
         assertThat(result).isEmpty();
     }
@@ -58,10 +58,10 @@ class ProductRepositoryTest {
     // 正常系：カテゴリ別商品取得（削除済み除く）
     // ============================================================
     @Test
-    @DisplayName("findByCategoryWithPaging - カテゴリの商品が返る")
-    void findByCategoryWithPaging_case01_Ok() {
+    @DisplayName("selectByCategoryWithPaging - カテゴリの商品が返る")
+    void selectByCategoryWithPaging_case01_Ok() {
 
-        List<Product> result = repository.findByCategoryWithPaging(1, 0, 10);
+        List<Product> result = repository.selectByCategoryWithPaging(1, 0, 10);
 
         assertThat(result).isNotNull();
         assertThat(result).isNotEmpty();
@@ -72,10 +72,10 @@ class ProductRepositoryTest {
     // 異常系：カテゴリ別商品取得（空リスト）
     // ============================================================
     @Test
-    @DisplayName("findByCategoryWithPaging - 空リストが返る")
-    void findByCategoryWithPaging_case02_Empty() {
+    @DisplayName("selectByCategoryWithPaging - 空リストが返る")
+    void selectByCategoryWithPaging_case02_Empty() {
 
-        List<Product> result = repository.findByCategoryWithPaging(999, 0, 10);
+        List<Product> result = repository.selectByCategoryWithPaging(999, 0, 10);
 
         assertThat(result).isEmpty();
     }
@@ -120,10 +120,10 @@ class ProductRepositoryTest {
     // 正常系：ID検索
     // ============================================================
     @Test
-    @DisplayName("findById - 商品が返る")
-    void findById_case01_Ok() {
+    @DisplayName("selectById - 商品が返る")
+    void selectById_case01_Ok() {
 
-        Product result = repository.findById(1);
+        Product result = repository.selectById(1);
 
         assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo("マーカー(青)");
@@ -133,10 +133,10 @@ class ProductRepositoryTest {
     // 異常系：ID検索（存在しない ID）
     // ============================================================
     @Test
-    @DisplayName("findById - null が返る（存在しない ID）")
-    void findById_case02_NotFound() {
+    @DisplayName("selectById - null が返る（存在しない ID）")
+    void selectById_case02_NotFound() {
 
-        Product result = repository.findById(99999);
+        Product result = repository.selectById(99999);
 
         assertThat(result).isNull();
     }
@@ -145,10 +145,10 @@ class ProductRepositoryTest {
     // 異常系：ID検索（null）
     // ============================================================
     @Test
-    @DisplayName("findById - null が返る（ID = null）")
-    void findById_case03_Null() {
+    @DisplayName("selectById - null が返る（ID = null）")
+    void selectById_case03_Null() {
 
-        Product result = repository.findById(null);
+        Product result = repository.selectById(null);
 
         assertThat(result).isNull();
     }

@@ -53,7 +53,7 @@ public class AdminProductServiceimplTest {
 
                 List<ProductCategory> categories = Arrays.asList(category1, category2);
 
-                when(productCategoryRepository.findAll())
+                when(productCategoryRepository.selectAll())
                                 .thenReturn(categories);
 
                 List<ProductCategory> result = adminProductService.getAllCategories();
@@ -63,7 +63,7 @@ public class AdminProductServiceimplTest {
                 assertSame(category1, result.get(0));
                 assertSame(category2, result.get(1));
 
-                verify(productCategoryRepository, times(1)).findAll();
+                verify(productCategoryRepository, times(1)).selectAll();
         }
 
         /**
@@ -73,7 +73,7 @@ public class AdminProductServiceimplTest {
         @DisplayName("全カテゴリ取得でRepositoryがnullを返した場合は空リスト")
         void testGetAllCategoriesReturnsEmptyWhenNull() {
 
-                when(productCategoryRepository.findAll())
+                when(productCategoryRepository.selectAll())
                                 .thenReturn(null);
 
                 List<ProductCategory> result = adminProductService.getAllCategories();
@@ -81,7 +81,7 @@ public class AdminProductServiceimplTest {
                 assertNotNull(result);
                 assertTrue(result.isEmpty());
 
-                verify(productCategoryRepository, times(1)).findAll();
+                verify(productCategoryRepository, times(1)).selectAll();
         }
 
         /**
@@ -91,7 +91,7 @@ public class AdminProductServiceimplTest {
         @DisplayName("全カテゴリ取得で例外が発生した場合は空リスト")
         void testGetAllCategoriesReturnsEmptyWhenException() {
 
-                when(productCategoryRepository.findAll())
+                when(productCategoryRepository.selectAll())
                                 .thenThrow(new RuntimeException("DB error"));
 
                 List<ProductCategory> result = adminProductService.getAllCategories();
@@ -99,7 +99,7 @@ public class AdminProductServiceimplTest {
                 assertNotNull(result);
                 assertTrue(result.isEmpty());
 
-                verify(productCategoryRepository, times(1)).findAll();
+                verify(productCategoryRepository, times(1)).selectAll();
         }
 
         /**
@@ -112,7 +112,7 @@ public class AdminProductServiceimplTest {
                 ProductCategory category = mock(ProductCategory.class);
 
                 when(category.getName()).thenReturn("ノート");
-                when(productCategoryRepository.findById(1))
+                when(productCategoryRepository.selectById(1))
                                 .thenReturn(category);
 
                 String result = adminProductService.getCategoryName(1);
@@ -120,7 +120,7 @@ public class AdminProductServiceimplTest {
                 assertEquals("ノート", result);
 
                 verify(productCategoryRepository, times(1))
-                                .findById(1);
+                                .selectById(1);
         }
 
         /**
@@ -135,7 +135,7 @@ public class AdminProductServiceimplTest {
                 assertNull(result);
 
                 verify(productCategoryRepository, never())
-                                .findById(anyInt());
+                                .selectById(anyInt());
         }
 
         /**
@@ -150,7 +150,7 @@ public class AdminProductServiceimplTest {
                 assertNull(result);
 
                 verify(productCategoryRepository, never())
-                                .findById(anyInt());
+                                .selectById(anyInt());
         }
 
         /**
@@ -160,7 +160,7 @@ public class AdminProductServiceimplTest {
         @DisplayName("存在しないカテゴリIDの場合はnullを返す")
         void testGetCategoryNameWhenNotFound() {
 
-                when(productCategoryRepository.findById(999))
+                when(productCategoryRepository.selectById(999))
                                 .thenReturn(null);
 
                 String result = adminProductService.getCategoryName(999);
@@ -168,7 +168,7 @@ public class AdminProductServiceimplTest {
                 assertNull(result);
 
                 verify(productCategoryRepository, times(1))
-                                .findById(999);
+                                .selectById(999);
         }
 
         /**
@@ -178,7 +178,7 @@ public class AdminProductServiceimplTest {
         @DisplayName("カテゴリ取得で例外が発生した場合はnull")
         void testGetCategoryNameWhenException() {
 
-                when(productCategoryRepository.findById(1))
+                when(productCategoryRepository.selectById(1))
                                 .thenThrow(new RuntimeException("DB error"));
 
                 String result = adminProductService.getCategoryName(1);
@@ -186,7 +186,7 @@ public class AdminProductServiceimplTest {
                 assertNull(result);
 
                 verify(productCategoryRepository, times(1))
-                                .findById(1);
+                                .selectById(1);
         }
 
         /**
@@ -201,7 +201,7 @@ public class AdminProductServiceimplTest {
 
                 List<Product> products = Arrays.asList(product1, product2);
 
-                when(productRepository.findAllWithPaging(0, 10))
+                when(productRepository.selectAllWithPaging(0, 10))
                                 .thenReturn(products);
 
                 when(productRepository.countAll())
@@ -225,7 +225,7 @@ public class AdminProductServiceimplTest {
                 assertEquals(true, model.getAttribute("searched"));
 
                 verify(productRepository, times(1))
-                                .findAllWithPaging(0, 10);
+                                .selectAllWithPaging(0, 10);
 
                 verify(productRepository, times(1))
                                 .countAll();
@@ -240,7 +240,7 @@ public class AdminProductServiceimplTest {
 
                 List<Product> products = Collections.singletonList(mock(Product.class));
 
-                when(productRepository.findAllWithPaging(0, 10))
+                when(productRepository.selectAllWithPaging(0, 10))
                                 .thenReturn(products);
 
                 when(productRepository.countAll())
@@ -257,7 +257,7 @@ public class AdminProductServiceimplTest {
                 assertEquals(1, model.getAttribute("totalPages"));
 
                 verify(productRepository, times(1))
-                                .findAllWithPaging(0, 10);
+                                .selectAllWithPaging(0, 10);
         }
 
         /**
@@ -269,7 +269,7 @@ public class AdminProductServiceimplTest {
 
                 List<Product> products = Collections.singletonList(mock(Product.class));
 
-                when(productRepository.findAllWithPaging(10, 10))
+                when(productRepository.selectAllWithPaging(10, 10))
                                 .thenReturn(products);
 
                 when(productRepository.countAll())
@@ -288,7 +288,7 @@ public class AdminProductServiceimplTest {
                 assertEquals(true, model.getAttribute("hasNext"));
 
                 verify(productRepository, times(1))
-                                .findAllWithPaging(10, 10);
+                                .selectAllWithPaging(10, 10);
         }
 
         /**
@@ -298,7 +298,7 @@ public class AdminProductServiceimplTest {
         @DisplayName("全商品検索で商品が0件の場合はfalse")
         void testSearchAllProductsWhenEmpty() {
 
-                when(productRepository.findAllWithPaging(0, 10))
+                when(productRepository.selectAllWithPaging(0, 10))
                                 .thenReturn(Collections.emptyList());
 
                 Model model = new ExtendedModelMap();
@@ -326,7 +326,7 @@ public class AdminProductServiceimplTest {
         @DisplayName("商品Repositoryがnullを返した場合はfalse")
         void testSearchAllProductsWhenRepositoryReturnsNull() {
 
-                when(productRepository.findAllWithPaging(0, 10))
+                when(productRepository.selectAllWithPaging(0, 10))
                                 .thenReturn(null);
 
                 Model model = new ExtendedModelMap();
@@ -350,7 +350,7 @@ public class AdminProductServiceimplTest {
         @DisplayName("全商品検索で例外が発生した場合はfalse")
         void testSearchAllProductsWhenException() {
 
-                when(productRepository.findAllWithPaging(0, 10))
+                when(productRepository.selectAllWithPaging(0, 10))
                                 .thenThrow(new RuntimeException("DB error"));
 
                 Model model = new ExtendedModelMap();
@@ -381,7 +381,7 @@ public class AdminProductServiceimplTest {
                 when(category.getName())
                                 .thenReturn("ノート");
 
-                when(productCategoryRepository.findById(1))
+                when(productCategoryRepository.selectById(1))
                                 .thenReturn(category);
 
                 Product product1 = mock(Product.class);
@@ -389,7 +389,7 @@ public class AdminProductServiceimplTest {
 
                 List<Product> products = Arrays.asList(product1, product2);
 
-                when(productRepository.findByCategoryWithPaging(
+                when(productRepository.selectByCategoryWithPaging(
                                 eq(1), eq(0), eq(10)))
                                 .thenReturn(products);
 
@@ -441,13 +441,13 @@ public class AdminProductServiceimplTest {
                                 model.getAttribute("hasNext"));
 
                 verify(productRepository, times(1))
-                                .findByCategoryWithPaging(1, 0, 10);
+                                .selectByCategoryWithPaging(1, 0, 10);
 
                 verify(productRepository, times(1))
                                 .countByCategory(1);
 
                 verify(productCategoryRepository, times(1))
-                                .findById(1);
+                                .selectById(1);
         }
 
         /**
@@ -462,12 +462,12 @@ public class AdminProductServiceimplTest {
                 when(category.getName())
                                 .thenReturn("ペン");
 
-                when(productCategoryRepository.findById(2))
+                when(productCategoryRepository.selectById(2))
                                 .thenReturn(category);
 
                 List<Product> products = Collections.singletonList(mock(Product.class));
 
-                when(productRepository.findByCategoryWithPaging(
+                when(productRepository.selectByCategoryWithPaging(
                                 eq(2), eq(10), eq(10)))
                                 .thenReturn(products);
 
@@ -499,7 +499,7 @@ public class AdminProductServiceimplTest {
                                 model.getAttribute("hasNext"));
 
                 verify(productRepository, times(1))
-                                .findByCategoryWithPaging(2, 10, 10);
+                                .selectByCategoryWithPaging(2, 10, 10);
         }
 
         /**
@@ -514,10 +514,10 @@ public class AdminProductServiceimplTest {
                 when(category.getName())
                                 .thenReturn("ノート");
 
-                when(productCategoryRepository.findById(1))
+                when(productCategoryRepository.selectById(1))
                                 .thenReturn(category);
 
-                when(productRepository.findByCategoryWithPaging(
+                when(productRepository.selectByCategoryWithPaging(
                                 eq(1), eq(0), eq(10)))
                                 .thenReturn(Collections.emptyList());
 
@@ -559,7 +559,7 @@ public class AdminProductServiceimplTest {
 
                 List<Product> products = Collections.singletonList(mock(Product.class));
 
-                when(productRepository.findAllWithPaging(0, 10))
+                when(productRepository.selectAllWithPaging(0, 10))
                                 .thenReturn(products);
 
                 when(productRepository.countAll())
@@ -582,14 +582,14 @@ public class AdminProductServiceimplTest {
                                 model.getAttribute("selectedCategoryId"));
 
                 verify(productRepository, times(1))
-                                .findAllWithPaging(0, 10);
+                                .selectAllWithPaging(0, 10);
 
                 verify(productRepository, times(1))
                                 .countAll();
 
                 // カテゴリ検索用Repositoryは呼ばれない
                 verify(productRepository, never())
-                                .findByCategoryWithPaging(
+                                .selectByCategoryWithPaging(
                                                 anyInt(), anyInt(), anyInt());
 
                 verify(productRepository, never())
@@ -605,7 +605,7 @@ public class AdminProductServiceimplTest {
 
                 List<Product> products = Collections.singletonList(mock(Product.class));
 
-                when(productRepository.findAllWithPaging(0, 10))
+                when(productRepository.selectAllWithPaging(0, 10))
                                 .thenReturn(products);
 
                 when(productRepository.countAll())
@@ -628,7 +628,7 @@ public class AdminProductServiceimplTest {
                                 model.getAttribute("selectedCategoryId"));
 
                 verify(productRepository, times(1))
-                                .findAllWithPaging(0, 10);
+                                .selectAllWithPaging(0, 10);
         }
 
         /**
@@ -643,12 +643,12 @@ public class AdminProductServiceimplTest {
                 when(category.getName())
                                 .thenReturn("ノート");
 
-                when(productCategoryRepository.findById(1))
+                when(productCategoryRepository.selectById(1))
                                 .thenReturn(category);
 
                 List<Product> products = Collections.singletonList(mock(Product.class));
 
-                when(productRepository.findByCategoryWithPaging(
+                when(productRepository.selectByCategoryWithPaging(
                                 eq(1), eq(0), eq(10)))
                                 .thenReturn(products);
 
@@ -668,7 +668,7 @@ public class AdminProductServiceimplTest {
                                 model.getAttribute("currentPage"));
 
                 verify(productRepository, times(1))
-                                .findByCategoryWithPaging(1, 0, 10);
+                                .selectByCategoryWithPaging(1, 0, 10);
         }
 
         /**
@@ -678,7 +678,7 @@ public class AdminProductServiceimplTest {
         @DisplayName("カテゴリ別検索で例外が発生した場合はfalse")
         void testSearchProductsByCategoryWhenException() {
 
-                when(productRepository.findByCategoryWithPaging(
+                when(productRepository.selectByCategoryWithPaging(
                                 eq(1), eq(0), eq(10)))
                                 .thenThrow(new RuntimeException("DB error"));
 
