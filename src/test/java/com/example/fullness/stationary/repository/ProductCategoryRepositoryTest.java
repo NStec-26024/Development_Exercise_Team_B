@@ -1,117 +1,60 @@
 package com.example.fullness.stationary.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlConfig;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.ProductCategory;
 
-@SpringBootTest
-@Transactional
-@Sql(scripts = {
-        "classpath:sql/clear.sql",
-        "classpath:sql/data.sql"
-}, config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED))
-@DisplayName("ProductCategoryRepository テスト")
-class ProductCategoryRepositoryTest {
+@MybatisTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Sql(scripts = { "/sql/schema.sql", "/sql/data.sql" }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+public class ProductCategoryRepositoryTest {
 
     @Autowired
-    private ProductCategoryRepository repository;
+    ProductCategoryRepository productCategoryRepository;
 
-    // ============================================================
-    // 正常系：全カテゴリを取得できること
-    // ============================================================
     @Test
-    @DisplayName("findAll - 全カテゴリを取得できる")
-    void findAllTest_case01_Ok() {
-
-        // 実行
-        List<ProductCategory> result = repository.findAll();
-
-        // 検証：結果が null ではない
-        assertThat(result).isNotNull();
-
-        // 検証：複数のカテゴリが取得できている(カテゴリが3件取得できているか)
-        assertThat(result).isNotEmpty().hasSize(3);
-
-        // 検証：各カテゴリの内容が正しい
-        assertThat(result.get(0)).extracting("id", "name")
-                .containsExactly(1, "文具");
-        assertThat(result.get(1)).extracting("id", "name")
-                .containsExactly(2, "雑貨");
-        assertThat(result.get(2)).extracting("id", "name")
-                .containsExactly(3, "パソコン周辺機器");
+    public void InsertTest_case1() {
+        ProductCategory productCategory = new ProductCategory();
+        productCategory.setName("衣料品");
+        productCategoryRepository.insert(productCategory);
+        int actual = productCategory.getId();
+        assertEquals(4, actual);
+        assertInstanceOf(ProductCategory.class, productCategory);
     }
 
-    // ============================================================
-    // 正常系：ID を指定してカテゴリを取得できること
-    // ============================================================
     @Test
-    @DisplayName("findById - ID で特定のカテゴリを取得できる")
-    void findByIdTest_case01_Ok() {
+    public void selectByNameTest_OK_case2() {
+        ProductCategory productCategory = productCategoryRepository.selectByName("文具");
+        assertEquals(1, productCategory.getId());
+        assertEquals("文具", productCategory.getName());
+        assertInstanceOf(ProductCategory.class, productCategory);
 
-        // 実行
-        ProductCategory result = repository.findById(1);
-
-        // 検証：null ではない
-        assertThat(result).isNotNull();
-
-        // 検証：id / name が正しい
-        assertThat(result.getId()).isEqualTo(1);
-        assertThat(result.getName()).isEqualTo("文具");
     }
 
-    // ============================================================
-    // 正常系：複数のカテゴリから正しいカテゴリが取得できること
-    // ============================================================
     @Test
-    @DisplayName("findById - 複数カテゴリから正しいカテゴリを取得できる")
-    void findByIdTest_case02_Ok() {
-
-        // 実行
-        ProductCategory result = repository.findById(3);
-
-        // 検証：null ではない
-        assertThat(result).isNotNull();
-
-        // 検証：id / name が正しい
-        assertThat(result.getId()).isEqualTo(3);
-        assertThat(result.getName()).isEqualTo("パソコン周辺機器");
+    public void selectByNameTest_null_case3() {
+        ProductCategory productCategory = productCategoryRepository.selectByName("衣料品");
+        assertEquals(null, productCategory);
     }
 
-    // ============================================================
-    // 異常系：存在しない ID の場合 null が返ること
-    // ============================================================
     @Test
-    @DisplayName("findById - 存在しない ID の場合は null が返る")
-    void findByIdTest_case03_Ok() {
+    public void selectByIdTest_OK_case4() {
+        ProductCategory productCategory = productCategoryRepository.selectById(1);
+        assertEquals("文具", productCategory.getName());
+        assertInstanceOf(ProductCategory.class, productCategory);
 
-        // 実行
-        ProductCategory result = repository.findById(99999);
-
-        // 検証：null が返る
-        assertThat(result).isNull();
     }
 
-    // ============================================================
-    // 異常系：null ID を渡した場合 null が返ること
-    // ============================================================
     @Test
-    @DisplayName("findById - null ID を渡した場合は null が返る")
-    void findByIdTest_case04_Ok() {
-
-        // 実行
-        ProductCategory result = repository.findById(null);
-
-        // 検証：null が返る
-        assertThat(result).isNull();
+    public void selectByIdTest_null_case5() {
+        ProductCategory productCategory = productCategoryRepository.selectById(4);
+        assertEquals(null, productCategory);
     }
 }

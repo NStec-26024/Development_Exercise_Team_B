@@ -14,7 +14,7 @@
     <main class="container">
         <div class="admin-panel p-4 mx-auto text-center" style="max-width: 560px;">
             <h1 class="mb-4">アカウント登録(完了)</h1>
-            <p th:text="|${form.employeeName}さんのアカウントを${form.accountName}で作成しました。|"></p>
+            <p th:text="|${employee.employee.name}さんのアカウントを${employee.name}で作成しました。|"></p>
             <div class="mt-4">
                 <a th:href="@{/admin}" class="btn btn-fs-solid px-4">メニューへ</a>
                 <a th:href="@{/admin/account/form}" class="btn btn-fs px-4">入力に戻る</a>
