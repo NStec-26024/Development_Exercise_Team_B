@@ -1,5 +1,7 @@
 package com.example.fullness.stationary.repository;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,11 +14,20 @@ import java.util.List;
 @Mapper
 public interface ProductCategoryRepository {
 
-    public int insert(ProductCategory productCategory);
+    /**
+     * 全カテゴリを取得
+     * 
+     * @return カテゴリリスト
+     */
+    List<ProductCategory> findAll();
 
-    public ProductCategory selectById(int id);
-
-    public ProductCategory selectByName(String name);
+    /**
+     * IDでカテゴリを取得
+     * 
+     * @param id カテゴリID
+     * @return カテゴリ情報
+     */
+    ProductCategory findById(@Param("id") Integer id);
 
     /**
      * 全カテゴリを取得
