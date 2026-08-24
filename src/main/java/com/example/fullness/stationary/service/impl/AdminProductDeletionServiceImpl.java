@@ -25,7 +25,7 @@ public class AdminProductDeletionServiceImpl implements AdminProductDeletionServ
     // 商品を論理削除する
     @Override
     public void deleteProduct(Integer id) {
-        Product current = productRepository.findById(id);
+        Product current = productRepository.selectById(id);
         if (current == null) {
             throw new AdminBusinessException(
                     messageSource.getMessage(

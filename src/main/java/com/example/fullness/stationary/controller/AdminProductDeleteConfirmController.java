@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.entity.Product;
@@ -45,7 +44,6 @@ public class AdminProductDeleteConfirmController {
             Model model,
             RedirectAttributes redirectAttributes) {
         Product product = productQueryService.getProductById(id);
-        System.out.println("\n\n\n\n" + product);
         if (product == null) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     messageSource.getMessage(

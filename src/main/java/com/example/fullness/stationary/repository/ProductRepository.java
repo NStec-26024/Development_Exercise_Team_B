@@ -21,7 +21,7 @@ public interface ProductRepository {
          * @param limit  取得件数
          * @return 商品リスト
          */
-        List<Product> findAllWithPaging(
+        List<Product> selectAllWithPaging(
                         @Param("offset") int offset,
                         @Param("limit") int limit);
 
@@ -33,7 +33,7 @@ public interface ProductRepository {
          * @param limit      取得件数
          * @return 商品リスト
          */
-        List<Product> findByCategoryWithPaging(
+        List<Product> selectByCategoryWithPaging(
                         @Param("categoryId") Integer categoryId,
                         @Param("offset") int offset,
                         @Param("limit") int limit);
@@ -59,7 +59,7 @@ public interface ProductRepository {
          * @param id 商品ID
          * @return 商品情報
          */
-        Product findById(@Param("id") Integer id);
+        Product selectById(@Param("id") Integer id);
 
         /**
          * 商品論理削除

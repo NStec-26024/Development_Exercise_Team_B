@@ -35,7 +35,7 @@ public class AdminProductServiceImpl implements AdminProductService {
      */
     public List<ProductCategory> getAllCategories() {
         try {
-            List<ProductCategory> categories = productCategoryRepository.findAll();
+            List<ProductCategory> categories = productCategoryRepository.selectAll();
 
             if (categories == null) {
                 System.out.println("WARN: categories is null");
@@ -70,7 +70,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
 
         try {
-            ProductCategory category = productCategoryRepository.findById(categoryId);
+            ProductCategory category = productCategoryRepository.selectById(categoryId);
             return (category != null) ? category.getName() : null;
         } catch (Exception e) {
             System.out.println("ERROR in getCategoryName:");
@@ -106,7 +106,7 @@ public class AdminProductServiceImpl implements AdminProductService {
             System.out.println("offset: " + offset + ", limit: " + PAGE_SIZE);
 
             // 商品を取得
-            List<Product> products = productRepository.findAllWithPaging(offset, PAGE_SIZE);
+            List<Product> products = productRepository.selectAllWithPaging(offset, PAGE_SIZE);
 
             if (products == null) {
                 System.out.println("ERROR: products is null");
@@ -175,7 +175,7 @@ public class AdminProductServiceImpl implements AdminProductService {
             System.out.println("offset: " + offset + ", limit: " + PAGE_SIZE);
 
             // カテゴリ別商品を取得
-            List<Product> products = productRepository.findByCategoryWithPaging(
+            List<Product> products = productRepository.selectByCategoryWithPaging(
                     categoryId, offset, PAGE_SIZE);
 
             if (products == null) {

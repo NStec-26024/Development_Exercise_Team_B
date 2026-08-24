@@ -18,7 +18,7 @@ public interface ProductCategoryRepository {
      * 
      * @return カテゴリリスト
      */
-    List<ProductCategory> findAll();
+    List<ProductCategory> selectAll();
 
     /**
      * IDでカテゴリを取得
@@ -26,6 +26,8 @@ public interface ProductCategoryRepository {
      * @param id カテゴリID
      * @return カテゴリ情報
      */
-    ProductCategory findById(@Param("id") Integer id);
+    ProductCategory selectById(@Param("id") Integer id);
+
+    public ProductCategory selectByName(String name);
 
 }

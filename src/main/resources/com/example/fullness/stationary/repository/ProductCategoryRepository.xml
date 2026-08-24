@@ -11,7 +11,7 @@
     </resultMap>
 
     <!-- 全カテゴリ取得 -->
-    <select id="findAll" resultMap="productCategoryResultMap">
+    <select id="selectAll" resultMap="productCategoryResultMap">
         <![CDATA[
         SELECT
             id,
@@ -22,7 +22,7 @@
     </select>
 
     <!-- ID でカテゴリ取得 -->
-    <select id="findById" resultMap="productCategoryResultMap">
+    <select id="selectById" resultMap="productCategoryResultMap">
         <![CDATA[
         SELECT
             id,
