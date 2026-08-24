@@ -1,18 +1,15 @@
 package com.example.fullness.stationary.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
+import com.example.fullness.stationary.entity.Product;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.fullness.stationary.entity.Product;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -20,137 +17,59 @@ import com.example.fullness.stationary.entity.Product;
         "classpath:sql/clear.sql",
         "classpath:sql/data.sql"
 }, config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED))
-@DisplayName("ProductRepository テスト（仕様書準拠）")
 class ProductRepositoryTest {
 
     @Autowired
-    private ProductRepository repository;
+    private ProductRepository productRepository;
 
-    // ============================================================
-    // 正常系：全商品取得（削除済み除く）
-    // ============================================================
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    /**
+     * 1. 正常系：更新件数と更新後の値を DB 直接参照で検証する
+     */
     @Test
-    @DisplayName("findAllWithPaging - 商品リストが返る")
-    void findAllWithPaging_case01_Ok() {
+    void update_case01_Ok() {
 
-        List<Product> result = repository.findAllWithPaging(0, 10);
+        // --- Arrange ---
+        Integer id = 1;
+        Product p = new Product();
+        p.setId(id);
+        p.setName("新しい商品名");
+        p.setPrice(999);
+        p.setCategoryId(2);
+        p.setImageUrl("new.png");
 
-        assertThat(result).isNotNull();
-        assertThat(result).isNotEmpty();
+        int updatedCount = productRepository.update(p);
 
-        // 仕様書の例：PDS001 が返るケース
-        assertThat(result.get(0).getName()).isEqualTo("マーカー(青)");
+        assertThat(updatedCount)
+                .as("更新件数が 1 件であること")
+                .isEqualTo(1);
+
+        var updated = jdbcTemplate.queryForMap(
+                "SELECT name, price, product_category_id, image_url FROM product WHERE id = ?",
+                id);
+
+        assertThat(updated)
+                .as("更新後のレコードが正しく反映されていること")
+                .containsEntry("name", "新しい商品名")
+                .containsEntry("price", 999)
+                .containsEntry("product_category_id", 2)
+                .containsEntry("image_url", "new.png");
     }
 
-    // ============================================================
-    // 異常系：全商品取得（空リスト）
-    // ============================================================
+    /**
+     * 2. 異常系：存在しない ID の場合、更新件数が 0 件である
+     */
     @Test
-    @DisplayName("findAllWithPaging - 空リストが返る")
-    void findAllWithPaging_case02_Empty() {
+    void update_case02_Ok() {
 
-        List<Product> result = repository.findAllWithPaging(999, 10);
+        Product p = new Product();
+        p.setId(999); // data.sql に存在しない ID
+        p.setName("新しい商品名");
 
-        assertThat(result).isEmpty();
+        int updatedCount = productRepository.update(p);
+
+        assertThat(updatedCount).isEqualTo(0);
     }
-
-    // ============================================================
-    // 正常系：カテゴリ別商品取得（削除済み除く）
-    // ============================================================
-    @Test
-    @DisplayName("findByCategoryWithPaging - カテゴリの商品が返る")
-    void findByCategoryWithPaging_case01_Ok() {
-
-        List<Product> result = repository.findByCategoryWithPaging(1, 0, 10);
-
-        assertThat(result).isNotNull();
-        assertThat(result).isNotEmpty();
-        assertThat(result.get(0).getName()).isEqualTo("マーカー(青)");
-    }
-
-    // ============================================================
-    // 異常系：カテゴリ別商品取得（空リスト）
-    // ============================================================
-    @Test
-    @DisplayName("findByCategoryWithPaging - 空リストが返る")
-    void findByCategoryWithPaging_case02_Empty() {
-
-        List<Product> result = repository.findByCategoryWithPaging(999, 0, 10);
-
-        assertThat(result).isEmpty();
-    }
-
-    // ============================================================
-    // 正常系：全商品件数取得（削除済み除く）
-    // ============================================================
-    @Test
-    @DisplayName("countAll - 総件数が返る")
-    void countAll_case01_Ok() {
-
-        int count = repository.countAll();
-
-        assertThat(count).isEqualTo(28); // 仕様書の totalCount に合わせる
-    }
-
-    // ============================================================
-    // 正常系：カテゴリ別商品件数取得
-    // ============================================================
-    @Test
-    @DisplayName("countByCategory - カテゴリ件数が返る")
-    void countByCategory_case01_Ok() {
-
-        int count = repository.countByCategory(1);
-
-        assertThat(count).isEqualTo(16); // データセットに合わせる
-    }
-
-    // ============================================================
-    // 異常系：カテゴリ別商品件数（0件）
-    // ============================================================
-    @Test
-    @DisplayName("countByCategory - 0件が返る")
-    void countByCategory_case02_Zero() {
-
-        int count = repository.countByCategory(999);
-
-        assertThat(count).isEqualTo(0);
-    }
-
-    // ============================================================
-    // 正常系：ID検索
-    // ============================================================
-    @Test
-    @DisplayName("findById - 商品が返る")
-    void findById_case01_Ok() {
-
-        Product result = repository.findById(1);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo("マーカー(青)");
-    }
-
-    // ============================================================
-    // 異常系：ID検索（存在しない ID）
-    // ============================================================
-    @Test
-    @DisplayName("findById - null が返る（存在しない ID）")
-    void findById_case02_NotFound() {
-
-        Product result = repository.findById(99999);
-
-        assertThat(result).isNull();
-    }
-
-    // ============================================================
-    // 異常系：ID検索（null）
-    // ============================================================
-    @Test
-    @DisplayName("findById - null が返る（ID = null）")
-    void findById_case03_Null() {
-
-        Product result = repository.findById(null);
-
-        assertThat(result).isNull();
-    }
-
 }

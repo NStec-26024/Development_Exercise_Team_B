@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品検索 - フルネス文具 管理画面</title>
+    <link rel="stylesheet" th:href="@{/css/product-search.css}">
+</head>
+
+<body>
+    <div class="container">
+        <!-- ========================================
+             ヘッダー読み込み（ログイン時）
+        ======================================== -->
+        <div th:replace="~{common/header :: header-admin}"></div>
+
+        <!-- ========================================
+             メインコンテンツ
+        ======================================== -->
+        <div class="main-content">
+            <h1>商品検索</h1>
+
+            <!-- エラーメッセージ -->
+            <div th:if="${errorMessage}" class="message error-message">
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <!-- 情報メッセージ -->
+            <div th:if="${infoMessage}" class="message info-message">
+                <span th:text="${infoMessage}"></span>
+            </div>
+
+            <!-- 検索フォーム（GETで/admin/productへ送信） -->
+            <div class="search-form-wrapper">
+                <form th:action="@{/admin/product}" method="get" class="search-form">
+                    <div class="form-group">
+                        <select id="category" name="category" class="form-select">
+                            <!-- ★ 全カテゴリ表示オプション -->
+                            <option value="" th:selected="${selectedCategoryId == null or selectedCategoryId == 0}">
+                            </option>
+
+                            <!-- ★ データベースから取得したカテゴリを動的に生成 -->
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
+                                th:selected="${cat.id == selectedCategoryId}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">カテゴリ検索</button>
+                        <button type="button" class="btn btn-success"
+                            th:onclick="|location.href='@{/admin/product/add(category=${selectedCategoryId})}'|">
+                            商品追加
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 検索条件表示 -->
+            <div th:if="${searched}" class="search-info">
+                <p>
+                    <span th:if="${selectedCategoryId != null and selectedCategoryId > 0}">
+                        検索条件:
+                        <strong th:text="${selectedCategoryName}"></strong>
+                    </span>
+                    <span th:unless="${selectedCategoryId != null and selectedCategoryId > 0}">
+                    </span>
+
+                </p>
+            </div>
+
+            <!-- ========================================
+                 商品一覧テーブル
+            ======================================== -->
+            <div th:if="${searched}" class="product-table-wrapper">
+                <table class="product-table" th:if="${productList != null and !productList.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th class="product-image-cell">商品画像</th>
+                            <th>商品名</th>
+                            <th class="product-price-cell">単価</th>
+                            <th class="action-cell">修正</th>
+                            <th class="action-cell">削除</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${productList}">
+                            <td class="product-image-cell">
+                                <img th:if="${product.imageUrl != null and product.imageUrl != ''}"
+                                    th:src="@{|/images/${product.imageUrl}|}" th:alt="${product.name}"
+                                    class="product-image"
+                                    onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22 stroke=%22%23999%22/%3E%3Ctext fill=%22%23666%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22%3E画像%3C/text%3E%3C/svg%3E'" />
+                                <img th:unless="${product.imageUrl != null and product.imageUrl != ''}"
+                                    src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22 stroke=%22%23999%22/%3E%3Ctext fill=%22%23666%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22%3E画像%3C/text%3E%3C/svg%3E"
+                                    alt="No image" class="product-image" />
+                            </td>
+                            <td class="product-name-cell">
+                                <span th:text="${product.name}"></span>
+                            </td>
+                            <td class="product-price-cell">
+                                <span th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '円'}"></span>
+                            </td>
+
+                            <td class="action-cell">
+                                <button type="button" class="btn-action btn-edit"
+                                    th:onclick="|location.href='@{/admin/product/edit/{id}(id=${product.id}, category=${selectedCategoryId}, page=${currentPage})}'|">修正</button>
+                            </td>
+                            <td class="action-cell">
+                                <button type="button" class="btn-action btn-delete"
+                                    th:onclick="|if(confirm('この商品を削除してもよろしいですか？')) location.href='@{/admin/product/delete/{id}(id=${product.id}, category=${selectedCategoryId}, page=${currentPage})}'|">削除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 商品が見つからない場合 -->
+                <div th:if="${productList == null or productList.isEmpty()}" class="no-data">
+                    <p>該当する商品がありません</p>
+                </div>
+
+                <!-- ========================================
+                     ページネーション（GETで/admin/productへ送信）
+                ======================================== -->
+                <div th:if="${totalPages > 1}" class="pagination">
+                    <!-- 最初へ -->
+                    <a th:if="${hasPrevious}" th:href="@{/admin/product(category=${selectedCategoryId}, page=1)}"
+                        class="page-link">最初</a>
+                    <span th:unless="${hasPrevious}" class="page-link disabled">最初</span>
+
+                    <!-- 前へ -->
+                    <a th:if="${hasPrevious}"
+                        th:href="@{/admin/product(category=${selectedCategoryId}, page=${currentPage - 1})}"
+                        class="page-link">前へ</a>
+                    <span th:unless="${hasPrevious}" class="page-link disabled">前へ</span>
+
+                    <!-- ページ番号 -->
+                    <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+                        <a th:if="${i != currentPage}"
+                            th:href="@{/admin/product(category=${selectedCategoryId}, page=${i})}" class="page-link"
+                            th:text="${i}"></a>
+                        <span th:if="${i == currentPage}" class="page-link current" th:text="${i}"></span>
+                    </th:block>
+
+                    <!-- 次へ -->
+                    <a th:if="${hasNext}"
+                        th:href="@{/admin/product(category=${selectedCategoryId}, page=${currentPage + 1})}"
+                        class="page-link">次へ</a>
+                    <span th:unless="${hasNext}" class="page-link disabled">次へ</span>
+
+                    <!-- 最後へ -->
+                    <a th:if="${hasNext}"
+                        th:href="@{/admin/product(category=${selectedCategoryId}, page=${totalPages})}"
+                        class="page-link">最後</a>
+                    <span th:unless="${hasNext}" class="page-link disabled">最後</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             フッター読み込み
+        ======================================== -->
+        <div th:replace="~{common/footer :: footer}"></div>
+    </div>
+</body>
+
+</html>

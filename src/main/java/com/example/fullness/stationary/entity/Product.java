@@ -10,6 +10,7 @@ import lombok.Data;
  */
 @Data
 public class Product implements Serializable {
+
     private Integer id;
     private String name;
     private Integer price;
@@ -17,6 +18,7 @@ public class Product implements Serializable {
     private Integer stock;
     private String imageUrl;
 
-    // ★ カテゴリ名を追加（JOIN時に使用）
+    private ProductStock productStock;
+    // Join用
     private String categoryName;
 }
