@@ -23,7 +23,7 @@ WHERE name = 'システム開発部';
 
 -- employee_account
 INSERT INTO employee_account (employee_id, name, password)
-SELECT id, 'yamadatarou1001', 'yamadapassword1001'
+SELECT id, 'yamadatarou1001', '$2a$10$nOMKs31N.scADyHLn1KfyOagrb52vXDEokqGp4MueMbqAam1iaS1e'
 FROM employee
 WHERE name = '山田太郎';
 

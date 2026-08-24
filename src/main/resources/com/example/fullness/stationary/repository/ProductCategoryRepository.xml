@@ -44,14 +44,5 @@
         ]]>
     </select>
 
-    <!-- ID でカテゴリ取得 -->
-    <select id="selectById" resultMap="productCategoryResultMap">
-        <![CDATA[
-        SELECT
-            id,
-            name
-        FROM product_category
-        WHERE id = #{id}
-        ]]>
-    </select>
+   
 </mapper>
