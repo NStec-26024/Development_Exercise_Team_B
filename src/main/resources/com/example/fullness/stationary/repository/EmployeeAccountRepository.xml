@@ -6,10 +6,10 @@
     <mapper namespace="com.example.fullness.stationary.repository.EmployeeAccountRepository">
 
         <resultMap id="employeeAccountResult" type="EmployeeAccount">
-        <id property="id" column="id" />
-        <result property="employeeId" column="employee_id" />
-        <result property="name" column="name" />
-        <result property="password" column="password" />
+            <id property="id" column="id" />
+            <result property="employeeId" column="employee_id" />
+            <result property="name" column="name" />
+            <result property="password" column="password" />
             <association property="employee" javaType="Employee">
                 <id property="id" column="employee_id" />
                 <result property="departmentId" column="department_id" />
