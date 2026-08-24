@@ -9,8 +9,8 @@
 </head>
 
 <body>
-    <!-- 上部ヘッダー -->
-    <div th:replace="~{admin/common/header :: header}"></div>
+    <div th:replace="~{admin/fragments/layout :: header}"></div>
+
     <main class="container">
         <div class="admin-panel p-4 mx-auto" style="max-width: 560px;">
             <h1 class="text-center mb-4">商品修正(入力)</h1>
@@ -53,8 +53,8 @@
                         <input type="file" name="image" class="form-control">
                     </div>
                 </div>
-                <div class="text-center mb-3">
-                    <img th:src="@{${form.imagePath}}" th:alt="${form.name}" class="img-fluid"
+                <div class="text-center mb-3" th:if="${form.imagePath}">
+                    <img th:src="@{/images/{image}(image=${form.imagePath})}" th:alt="${form.name}" class="img-fluid"
                         style="max-height: 160px;">
                 </div>
                 <div class="text-center mt-4">

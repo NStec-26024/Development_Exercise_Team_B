@@ -9,8 +9,8 @@
 </head>
 
 <body>
-    <!-- 上部ヘッダー -->
     <div th:replace="~{admin/fragments/layout :: header}"></div>
+
     <main class="container">
         <div class="admin-panel p-4 mx-auto text-center" style="max-width: 480px;">
             <h1 class="mb-4">商品修正(確認)</h1>
@@ -35,7 +35,8 @@
                     </tr>
                 </tbody>
             </table>
-            <img th:src="@{${form.imagePath}}" th:alt="${form.name}" class="img-fluid mb-4" style="max-height: 160px;">
+            <img th:if="${form.imagePath}" th:src="@{/images/{image}(image=${form.imagePath})}" th:alt="${form.name}"
+                class="img-fluid mb-4" style="max-height: 160px;">
 
             <form th:action="@{/admin/product/edit/confirm}" method="post">
                 <a th:href="@{/admin/product}" class="btn btn-link link-fs">キャンセル</a>

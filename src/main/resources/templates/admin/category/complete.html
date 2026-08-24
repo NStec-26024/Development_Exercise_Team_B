@@ -9,12 +9,12 @@
 </head>
 
 <body>
-    <!-- 上部ヘッダー -->
     <div th:replace="~{admin/fragments/layout :: header}"></div>
+
     <main class="container">
         <div class="admin-panel p-4 mx-auto text-center" style="max-width: 480px;">
             <h1 class="mb-4">商品カテゴリ登録(完了)</h1>
-            <p th:text="|商品カテゴリ${categoryName}を登録しました。|"></p>
+            <p th:text="|商品カテゴリ${categoryName.name}を登録しました。|"></p>
             <div class="mt-4">
                 <a th:href="@{/admin}" class="btn btn-fs-solid px-4">メニューへ</a>
             </div>

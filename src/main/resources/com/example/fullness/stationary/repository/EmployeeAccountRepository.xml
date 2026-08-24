@@ -55,7 +55,7 @@
             ]]>
     </select>
 
-    <select id="selectAccountName" resultType="EmployeeAccount">
+    <select id="selectAccountName" resultMap="employeeAccountResult">
         <![CDATA[
                 SELECT *
                 FROM employee_account

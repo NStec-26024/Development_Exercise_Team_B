@@ -2,6 +2,7 @@ package com.example.fullness.stationary.repository;
 
 import com.example.fullness.stationary.entity.Product;
 import org.junit.jupiter.api.Test;
+
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,18 +27,20 @@ class ProductRepositoryTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    // === HEAD ブランチのテスト ===
+
     @Test
-    void selectAllWithPaging_returnsPagedProducts() {
+    void sele
+
+    WithPaging_returnsPagedProducts() {
         List<Product> products = productRepository.selectAllWithPaging(0, 10);
 
         assertThat(products).hasSize(10);
         assertThat(products.get(0).getId()).isEqualTo(1);
         assertThat(products.get(1).getId()).isEqualTo(2);
-        assertThat(products.get(2).getId()).isEqualTo(3);
-    }
+        assertThat(products.get(2).get
 
-    @Test
-    void selectByCategoryWithPaging_returnsCategoryProducts() {
+    selectByCategoryWithPaging_returnsCategoryProducts() {
         List<Product> products = productRepository.selectByCategoryWithPaging(1, 0, 10);
 
         assertThat(products).hasSize(10);
@@ -95,4 +98,55 @@ class ProductRepositoryTest {
         assertEquals(0, beforeDeleteFlg);
         assertEquals(1, afterDeleteFlg);
     }
+
+    // === development ブランチのテスト ===
+
+    /**
+     * 1. 正常系：更新件数と更新後の値を DB 直接参照で検証する
+     */
+    @Test
+    void update_case01_Ok() {
+
+        // --- Arrange ---
+        Integer id = 1;
+        Product p = new Product();
+        p.setId(id);
+        p.setName("新しい商品名");
+        p.setPrice(999);
+        p.setCategoryId(2);
+        p.setImageUrl("new.png");
+
+        int updatedCount = productRepository.update(p);
+
+        assertThat(updatedCount)
+                .as("更新件数が 1 件であること")
+                .isEqualTo(1);
+
+        var updated = jdbcTemplate.queryForMap(
+                "SELECT name, price, product_category_id, image_url FROM product WHERE id = ?",
+                id);
+
+        assertThat(updated)
+                .as("更新後のレコードが正しく反映されていること")
+                .containsEntry("name", "新しい商品名")
+                .containsEntry("price", 999)
+                .containsEntry("product_category_id", 2)
+                .containsEntry("image_url", "new.png");
+    }
+
+    /**
+     * 2. 異常系：存在しない ID の場合、更新件数が 0 件である
+     */
+    @Test
+    void update_case02_Ok() {
+
+        Product p = new Product();
+        p.setId(999); // data.sql に存在しない ID
+        p.setName("新しい商品名");
+
+        int updatedCount = productRepository.update(p);
+
+        assertThat(updatedCount).isEqualTo(0);
+    }
+}
 }

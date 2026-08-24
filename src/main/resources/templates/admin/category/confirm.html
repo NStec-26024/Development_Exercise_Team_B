@@ -9,16 +9,18 @@
 </head>
 
 <body>
-    <!-- 上部ヘッダー -->
     <div th:replace="~{admin/fragments/layout :: header}"></div>
+
     <main class="container">
         <div class="admin-panel p-4 mx-auto text-center" style="max-width: 480px;">
             <h1 class="mb-4">商品カテゴリ登録(確認)</h1>
-            <p>カテゴリ名　<strong th:text="${form.name}"></strong></p>
+            <p>カテゴリ名　<strong th:text="${categoryName}"></strong></p>
 
-            <form th:action="@{/admin/category/add/confirm}" method="post">
-                <button type="submit" name="action" value="back" class="btn btn-fs px-4">戻る</button>
-                <button type="submit" name="action" value="register" class="btn btn-fs-solid px-4">登録</button>
+            <form th:action="@{/admin/category/add/postcomplete}" method="post" th:object="${adminProductCategoryForm}">
+                <input type="hidden" th:field="*{name}">
+                <button type="submit" name="action" th:formaction="@{/admin/category/add/back}"
+                    class="btn btn-fs px-4">戻る</button>
+                <button type="submit" name="action" class="btn btn-fs-solid px-4">登録</button>
             </form>
         </div>
     </main>

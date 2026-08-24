@@ -8,11 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 商品登録・修正画面（BP012/BP009）の入力値を保持するフォーム。
- * 価格・在庫数は数値ではなく文字列として受け取り、桁数・形式チェックまでをこのフォームで行い、
- * 上限値チェックは{@link com.example.fullness.stationary.validator.AdminProductValidator}側で行う。
+ * 価格・在庫数は数値ではなく文字列として受け取り、桁数・形式チェックをこのフォームで行う。
  */
-// 価格・在庫数を文字列で受け取っているのは、「未入力」「形式不正」「上限超過」を
-// それぞれ区別したメッセージで表示するため。
 @Data
 public class AdminProductForm {
     private Integer id;
@@ -35,6 +32,10 @@ public class AdminProductForm {
     /** カテゴリID（必須） */
     @NotNull(message = "カテゴリを選択してください")
     private Integer categoryId;
+
+    /** 確認画面表示用のカテゴリ名（コントローラー側でcategoryIdから解決して設定） */
+    private String categoryName;
+
     private String imagePath;
 
     /**

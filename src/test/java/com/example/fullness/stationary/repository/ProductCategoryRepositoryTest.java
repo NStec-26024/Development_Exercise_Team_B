@@ -1,6 +1,7 @@
 package com.example.fullness.stationary.repository;
 
-import com.example.fullness.stationary.entity.ProductCategory;
+import om.e
+
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,8 @@ class ProductCategoryRepositoryTest {
         assertThat(category.getName()).isEqualTo("文具");
     }
 
-    @Test
-    void findById_returnsNullWhenMissing() {
+
+void findById_returnsNullWhenMissing() {
         ProductCategory category = productCategoryRepository.selectById(99);
 
         assertThat(category).isNull();

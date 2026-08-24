@@ -5,7 +5,6 @@
 
 <mapper namespace="com.example.fullness.stationary.repository.ProductRepository">
 
-    <!-- Product + Category + Stock をまとめて返す resultMap -->
     <resultMap id="productResultMap" type="com.example.fullness.stationary.entity.Product">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
@@ -23,7 +22,6 @@
             <result property="name" column="category_name"/>
         </association>
 
-        <!-- 在庫情報 -->
         <association property="productStock" javaType="com.example.fullness.stationary.entity.ProductStock">
             <id property="id" column="stock_id"/>
             <result property="productId" column="stock_product_id"/>
@@ -124,6 +122,21 @@
             UPDATE product
             SET delete_flg = 1
             WHERE id = #{id}
+        ]]>
+    </update>
+
+    
+    <!-- 商品情報更新（商品名・単価・カテゴリ・画像URL） -->
+    <update id="update" parameterType="com.example.fullness.stationary.entity.Product">
+        <![CDATA[
+            UPDATE product
+            SET
+                name = #{name},
+                price = #{price},
+                product_category_id = #{categoryId},
+                image_url = #{imageUrl}
+            WHERE id = #{id}
+              AND delete_flg = 0
         ]]>
     </update>
 
