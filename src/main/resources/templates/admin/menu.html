@@ -14,7 +14,9 @@
     <main class="container">
         <div class="admin-panel p-4 mx-auto" style="max-width: 640px;">
             <h1 class="text-center mb-4">メニュー</h1>
-            <p class="text-center" th:if="${loggedIn}">ようこそ、<span th:text="${loginEmployeeName}">担当者名</span>さん</p>
+            <div class="alert alert-danger" th:if="${errorMessages}">
+                <p th:each="msg : ${errorMessages}" th:text="${msg}"></p>
+            </div>
             <div class="text-center">
                 <img th:src="@{/images/Shop_Img1.jpeg}" alt="ようこそ" class="img-fluid rounded" style="max-height: 240px;">
             </div>
