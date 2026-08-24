@@ -54,6 +54,6 @@ public class AdminProductRegistrationForm implements Serializable {
     /**
      * 画像URL
      */
-    private MultipartFile imageUrl;
+    private MultipartFile imageFile;
 
 }

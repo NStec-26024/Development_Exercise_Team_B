@@ -3,6 +3,8 @@ package com.example.fullness.stationary.repository;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.repository.query.Param;
+
 import com.example.fullness.stationary.entity.ProductCategory;
 
 /**
@@ -16,7 +18,7 @@ public interface ProductCategoryRepository {
      * 
      * @return カテゴリリスト
      */
-    List<ProductCategory> findAll();
+    List<ProductCategory> selectAll();
 
     /**
      * IDでカテゴリを取得
@@ -24,6 +26,5 @@ public interface ProductCategoryRepository {
      * @param id カテゴリID
      * @return カテゴリ情報
      */
-    ProductCategory findById(Integer id);
-
+    ProductCategory selectById(@Param("id") Integer id);
 }

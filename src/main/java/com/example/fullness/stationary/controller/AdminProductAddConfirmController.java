@@ -2,6 +2,7 @@ package com.example.fullness.stationary.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,6 +54,25 @@ public class AdminProductAddConfirmController {
             @ModelAttribute("adminProductRegistrationForm") AdminProductRegistrationForm adminProductRegistrationForm,
             RedirectAttributes redirectAttributes) {
 
-        return "";
+        if (adminProductRegistrationForm.getProductName() == null
+                || adminProductRegistrationForm.getProductName().isEmpty() ||
+                adminProductRegistrationForm.getPrice() == null ||
+                adminProductRegistrationForm.getQuantity() == null ||
+                adminProductRegistrationForm.getProductCategoryId() == null) {
+
+            redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
+            return "redirect:/admin/product/add/form";
+        }
+
+        return "/admin/product/add/confirm";
+    }
+
+    @PostMapping("/back")
+    public String back(
+            @ModelAttribute("adminProductRegistrationForm") AdminProductRegistrationForm adminProductRegistrationForm,
+            RedirectAttributes redirectAttributes, Model model) {
+        redirectAttributes.addFlashAttribute("adminProductRegistrationForm", adminProductRegistrationForm);
+        return "/admin/product/add/form";
+
     }
 }

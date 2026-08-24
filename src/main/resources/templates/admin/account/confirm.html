@@ -15,15 +15,15 @@
         <div class="admin-panel p-4 mx-auto" style="max-width: 560px;">
             <h1 class="text-center mb-4">アカウント登録(確認)</h1>
 
-            <table class="table table-borderless" th:object="${adminEmployeeAccountForm}">
+            <table class="table table-borderless">
                 <tbody>
                     <tr>
                         <th class="w-25">社員名</th>
-                        <td th:text="${employee.employee.name}"></td>
+                        <td th:text="${form.employeeName}"></td>
                     </tr>
                     <tr>
                         <th>アカウント名</th>
-                        <td th:text="*{name}"></td>
+                        <td th:text="${form.accountName}"></td>
                     </tr>
                     <tr>
                         <th>パスワード</th>
@@ -32,16 +32,11 @@
                 </tbody>
             </table>
 
-            <form th:action="@{/admin/account/postcomplete}" method="post" th:object="${adminEmployeeAccountForm}">
-
-                <input type="hidden" th:field="*{employeeId}">
-                <input type="hidden" th:field="*{name}">
-                <input type="hidden" th:field="*{password}">
+            <form th:action="@{/admin/account/confirm}" method="post">
                 <div class="text-center mt-4">
                     <a th:href="@{/admin}" class="btn btn-link link-fs">キャンセル</a>
-                    <button type="submit" name="action" th:formaction="@{/admin/account/back}" th:formmethod="post"
-                        class="btn btn-fs px-4">戻る</button>
-                    <button type="submit" name="action" class="btn btn-fs-solid px-4">登録</button>
+                    <button type="submit" name="action" value="back" class="btn btn-fs px-4">戻る</button>
+                    <button type="submit" name="action" value="register" class="btn btn-fs-solid px-4">登録</button>
                 </div>
             </form>
         </div>
