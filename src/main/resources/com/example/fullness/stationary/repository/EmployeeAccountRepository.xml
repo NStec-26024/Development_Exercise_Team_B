@@ -32,7 +32,6 @@
         </select>
 
         <insert id="insertEmployeeAccount" parameterType="EmployeeAccount" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
-        
             <![CDATA[
                 INSERT INTO 
                 employee_account (employee_id, name, password)
