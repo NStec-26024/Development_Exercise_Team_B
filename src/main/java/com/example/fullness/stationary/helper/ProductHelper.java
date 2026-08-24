@@ -15,9 +15,6 @@ public class ProductHelper {
 
     /**
      * 入力データが入ったFormを基に社員アカウントEntityを生成
-     * 
-     * @param 入力データが入ったForm
-     * @return 社員アカウントEntity
      */
     public Product formToEntity(AdminProductRegistrationForm adminProductRegistrationForm) {
         Product product = new Product();
@@ -27,7 +24,7 @@ public class ProductHelper {
         product.setCategoryId(adminProductRegistrationForm.getProductCategoryId());
 
         // 修正箇所：MultipartFileから「ファイル名（String）」を取り出してセットする
-        MultipartFile imageFile = adminProductRegistrationForm.getImageUrl(); // Formの型がMultipartFileの場合
+        MultipartFile imageFile = adminProductRegistrationForm.getImageFile(); // Formの型がMultipartFileの場合
         if (imageFile != null && !imageFile.isEmpty()) {
             product.setImageUrl(imageFile.getOriginalFilename());
         } else {
