@@ -61,7 +61,7 @@ public class AdminProductAddConfirmController {
                 adminProductRegistrationForm.getCategoryId() == null) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
-            return "redirect:/admin/product/add/";
+            return "redirect:/admin/product/add";
         }
 
         return "/admin/product/add_confirm";

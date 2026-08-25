@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.entity.ProductStock;
+import com.example.fullness.stationary.exception.AdminBusinessException;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 import com.example.fullness.stationary.helper.ProductHelper;
 import com.example.fullness.stationary.repository.ProductCategoryRepository;
@@ -14,7 +15,6 @@ import com.example.fullness.stationary.repository.ProductStockRepository;
 import com.example.fullness.stationary.service.AdminProductRegistrationService;
 
 @Service
-@Transactional
 public class AdminProductRegistrationServiceImpl implements AdminProductRegistrationService {
 
     @Autowired
@@ -31,14 +31,19 @@ public class AdminProductRegistrationServiceImpl implements AdminProductRegistra
 
     @Override
     public void addProduct(AdminProductRegistrationForm adminProductRegistrationForm) {
-        Product product = productHelper.formToEntity(adminProductRegistrationForm);
+        try {
+            Product product = productHelper.formToEntity(adminProductRegistrationForm);
 
-        productRepository.insertProduct(product);
+            productRepository.insertProduct(product);
 
-        ProductStock stock = new ProductStock();
-        stock.setProductId(product.getId());
-        stock.setQuantity(adminProductRegistrationForm.getStock());
-        productStockRepository.insertStock(stock);
+            ProductStock stock = new ProductStock();
+            stock.setProductId(product.getId());
+            stock.setQuantity(adminProductRegistrationForm.getStock());
+            productStockRepository.insertStock(stock);
+        } catch (Exception e) {
+            throw new AdminBusinessException("登録処理に失敗しました。管理者に連絡してください");
+
+        }
     }
 
 }

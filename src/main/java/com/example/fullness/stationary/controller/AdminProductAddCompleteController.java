@@ -42,10 +42,12 @@ public class AdminProductAddCompleteController {
     }
 
     @GetMapping("complete")
-    public String showComplete(Model model) {
+    public String showComplete(@ModelAttribute("form") AdminProductRegistrationForm form,
+            RedirectAttributes redirectAttributes) {
 
-        if (!model.containsAttribute("form")) {
-            return "redirect:/admin/product/add";
+        if (form == null || form.getName() == null) {
+            redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
+            return "redirect:/admin";
         }
 
         return "/admin/product/add_complete";
