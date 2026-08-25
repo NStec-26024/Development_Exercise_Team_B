@@ -1,4 +1,4 @@
-package com.example.fullness.stationary.service;
+package com.example.fullness.stationary.service.impl;
 
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.entity.ProductCategory;
@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.*;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
  * 依存先の呼び出しと戻り値に基づくサービス動作を確認する。
  */
 @ExtendWith(MockitoExtension.class)
-class AdminProductServiceImplUnitTest {
+class AdminProductServiceImplTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -48,13 +49,13 @@ class AdminProductServiceImplUnitTest {
 
     @Test
     void getAllCategories_returnsEmptyListWhenRepositoryReturnsNull() {
-        when(productCategoryRepository.findAll()).thenReturn(null);
+        when(productCategoryRepository.selectAll()).thenReturn(null);
 
         List<ProductCategory> result = productService.getAllCategories();
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        verify(productCategoryRepository).findAll();
+        verify(productCategoryRepository).selectAll();
     }
 
     @Test
@@ -62,25 +63,25 @@ class AdminProductServiceImplUnitTest {
         ProductCategory category = new ProductCategory();
         category.setId(1);
         category.setName("文具");
-        when(productCategoryRepository.findAll()).thenReturn(List.of(category));
+        when(productCategoryRepository.selectAll()).thenReturn(List.of(category));
 
         List<ProductCategory> result = productService.getAllCategories();
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("文具", result.get(0).getName());
-        verify(productCategoryRepository).findAll();
+        verify(productCategoryRepository).selectAll();
     }
 
     @Test
     void getAllCategories_handlesException_returnsEmptyList() {
-        when(productCategoryRepository.findAll()).thenThrow(new RuntimeException("DB error"));
+        when(productCategoryRepository.selectAll()).thenThrow(new RuntimeException("DB error"));
 
         List<ProductCategory> result = productService.getAllCategories();
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        verify(productCategoryRepository).findAll();
+        verify(productCategoryRepository).selectAll();
     }
 
     @Test
@@ -88,12 +89,12 @@ class AdminProductServiceImplUnitTest {
         ProductCategory category = new ProductCategory();
         category.setId(2);
         category.setName("文房具");
-        when(productCategoryRepository.findById(2)).thenReturn(category);
+        when(productCategoryRepository.selectById(2)).thenReturn(category);
 
         String name = productService.getCategoryName(2);
 
         assertEquals("文房具", name);
-        verify(productCategoryRepository).findById(2);
+        verify(productCategoryRepository).selectById(2);
     }
 
     @Test
@@ -106,20 +107,20 @@ class AdminProductServiceImplUnitTest {
 
     @Test
     void getCategoryName_handlesException_returnsNull() {
-        when(productCategoryRepository.findById(99)).thenThrow(new RuntimeException("boom"));
+        when(productCategoryRepository.selectById(99)).thenThrow(new RuntimeException("boom"));
 
         assertNull(productService.getCategoryName(99));
-        verify(productCategoryRepository).findById(99);
+        verify(productCategoryRepository).selectById(99);
     }
 
     @Test
     void searchAllProductsAndSetModel_returnsFalseWhenNoProductsFound() {
-        when(productRepository.findAllWithPaging(0, 10)).thenReturn(Collections.emptyList());
+        when(productRepository.selectAllWithPaging(0, 10)).thenReturn(Collections.emptyList());
 
         boolean result = productService.searchAllProductsAndSetModel(1, model);
 
         assertFalse(result);
-        verify(productRepository).findAllWithPaging(0, 10);
+        verify(productRepository).selectAllWithPaging(0, 10);
         verify(model).addAttribute("infoMessage", "該当する商品情報がありません");
         verify(model).addAttribute("searched", true);
         verify(model).addAttribute("selectedCategoryId", 0);
@@ -130,13 +131,13 @@ class AdminProductServiceImplUnitTest {
         Product product = new Product();
         product.setId(1);
         product.setName("ペン");
-        when(productRepository.findAllWithPaging(0, 10)).thenReturn(List.of(product));
+        when(productRepository.selectAllWithPaging(0, 10)).thenReturn(List.of(product));
         when(productRepository.countAll()).thenReturn(1);
 
         boolean result = productService.searchAllProductsAndSetModel(1, model);
 
         assertTrue(result);
-        verify(productRepository).findAllWithPaging(0, 10);
+        verify(productRepository).selectAllWithPaging(0, 10);
         verify(productRepository).countAll();
         verify(model).addAttribute("productList", List.of(product));
         verify(model).addAttribute("currentPage", 1);
@@ -150,19 +151,19 @@ class AdminProductServiceImplUnitTest {
     @Test
     void searchAllProductsAndSetModel_usesPageOneWhenPageLessThanOne() {
         Product product = new Product();
-        when(productRepository.findAllWithPaging(0, 10)).thenReturn(List.of(product));
+        when(productRepository.selectAllWithPaging(0, 10)).thenReturn(List.of(product));
         when(productRepository.countAll()).thenReturn(1);
 
         boolean result = productService.searchAllProductsAndSetModel(-3, model);
 
         assertTrue(result);
-        verify(productRepository).findAllWithPaging(0, 10);
+        verify(productRepository).selectAllWithPaging(0, 10);
         verify(productRepository).countAll();
     }
 
     @Test
     void searchAllProductsAndSetModel_handlesRepositoryException_setsErrorAndReturnsFalse() {
-        when(productRepository.findAllWithPaging(0, 10)).thenThrow(new RuntimeException("db"));
+        when(productRepository.selectAllWithPaging(0, 10)).thenThrow(new RuntimeException("db"));
 
         boolean result = productService.searchAllProductsAndSetModel(1, model);
 
@@ -176,13 +177,13 @@ class AdminProductServiceImplUnitTest {
         ProductCategory category = new ProductCategory();
         category.setId(2);
         category.setName("文具");
-        when(productRepository.findByCategoryWithPaging(2, 0, 10)).thenReturn(Collections.emptyList());
-        when(productCategoryRepository.findById(2)).thenReturn(category);
+        when(productRepository.selectByCategoryWithPaging(2, 0, 10)).thenReturn(Collections.emptyList());
+        when(productCategoryRepository.selectById(2)).thenReturn(category);
 
         boolean result = productService.searchProductsByCategoryAndSetModel(2, 1, model);
 
         assertFalse(result);
-        verify(productRepository).findByCategoryWithPaging(2, 0, 10);
+        verify(productRepository).selectByCategoryWithPaging(2, 0, 10);
         verify(model).addAttribute("infoMessage", "該当する商品情報がありません");
         verify(model).addAttribute("searched", true);
         verify(model).addAttribute("selectedCategoryId", 2);
@@ -196,14 +197,14 @@ class AdminProductServiceImplUnitTest {
         category.setName("文具");
         Product product = new Product();
         product.setId(10);
-        when(productRepository.findByCategoryWithPaging(2, 0, 10)).thenReturn(List.of(product));
+        when(productRepository.selectByCategoryWithPaging(2, 0, 10)).thenReturn(List.of(product));
         when(productRepository.countByCategory(2)).thenReturn(1);
-        when(productCategoryRepository.findById(2)).thenReturn(category);
+        when(productCategoryRepository.selectById(2)).thenReturn(category);
 
         boolean result = productService.searchProductsByCategoryAndSetModel(2, 1, model);
 
         assertTrue(result);
-        verify(productRepository).findByCategoryWithPaging(2, 0, 10);
+        verify(productRepository).selectByCategoryWithPaging(2, 0, 10);
         verify(productRepository).countByCategory(2);
         verify(model).addAttribute("productList", List.of(product));
         verify(model).addAttribute("currentPage", 1);
@@ -216,7 +217,7 @@ class AdminProductServiceImplUnitTest {
 
     @Test
     void searchProductsByCategoryAndSetModel_handlesRepositoryException_setsErrorAndReturnsFalse() {
-        when(productRepository.findByCategoryWithPaging(2, 0, 10)).thenThrow(new RuntimeException("boom"));
+        when(productRepository.selectByCategoryWithPaging(2, 0, 10)).thenThrow(new RuntimeException("boom"));
 
         boolean result = productService.searchProductsByCategoryAndSetModel(2, 1, model);
 
@@ -228,13 +229,13 @@ class AdminProductServiceImplUnitTest {
     @Test
     void searchProductsByCategoryAndSetModel_treatsZeroCategoryAsAllProducts() {
         Product product = new Product();
-        when(productRepository.findAllWithPaging(0, 10)).thenReturn(List.of(product));
+        when(productRepository.selectAllWithPaging(0, 10)).thenReturn(List.of(product));
         when(productRepository.countAll()).thenReturn(1);
 
         boolean result = productService.searchProductsByCategoryAndSetModel(0, 1, model);
 
         assertTrue(result);
-        verify(productRepository).findAllWithPaging(0, 10);
+        verify(productRepository).selectAllWithPaging(0, 10);
         verify(productRepository).countAll();
     }
 }

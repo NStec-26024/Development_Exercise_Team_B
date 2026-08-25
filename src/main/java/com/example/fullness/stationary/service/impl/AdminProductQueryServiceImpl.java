@@ -38,7 +38,7 @@ public class AdminProductQueryServiceImpl implements AdminProductQueryService {
      */
     @Override
     public List<ProductCategory> getAllCategories() {
-        List<ProductCategory> categories = productCategoryRepository.findAll();
+        List<ProductCategory> categories = productCategoryRepository.selectAll();
         return (categories != null) ? categories : new ArrayList<>();
     }
 
@@ -50,7 +50,7 @@ public class AdminProductQueryServiceImpl implements AdminProductQueryService {
         if (categoryId == null || categoryId == 0) {
             return null;
         }
-        ProductCategory category = productCategoryRepository.findById(categoryId);
+        ProductCategory category = productCategoryRepository.selectById(categoryId);
         return (category != null) ? category.getName() : null;
     }
 
@@ -62,7 +62,8 @@ public class AdminProductQueryServiceImpl implements AdminProductQueryService {
         if (id == null) {
             return null;
         }
-        return productRepository.findById(id);
+        System.out.println(productRepository.selectById(id));
+        return productRepository.selectById(id);
     }
 
     /**
@@ -73,7 +74,7 @@ public class AdminProductQueryServiceImpl implements AdminProductQueryService {
         int currentPage = Math.max(page, 1);
         int offset = (currentPage - 1) * PAGE_SIZE;
 
-        List<Product> products = productRepository.findAllWithPaging(offset, PAGE_SIZE);
+        List<Product> products = productRepository.selectAllWithPaging(offset, PAGE_SIZE);
         return (products != null) ? products : new ArrayList<>();
     }
 
@@ -90,7 +91,7 @@ public class AdminProductQueryServiceImpl implements AdminProductQueryService {
         int currentPage = Math.max(page, 1);
         int offset = (currentPage - 1) * PAGE_SIZE;
 
-        List<Product> products = productRepository.findByCategoryWithPaging(categoryId, offset, PAGE_SIZE);
+        List<Product> products = productRepository.selectByCategoryWithPaging(categoryId, offset, PAGE_SIZE);
         return (products != null) ? products : new ArrayList<>();
     }
 

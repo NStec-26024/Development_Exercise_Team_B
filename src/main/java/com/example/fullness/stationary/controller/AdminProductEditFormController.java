@@ -22,7 +22,6 @@ import com.example.fullness.stationary.validator.AdminProductValidator;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
-import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -123,11 +122,6 @@ public class AdminProductEditFormController {
             return "admin/product/edit_form";
         }
 
-        adminProductValidator.validate(form, bindingResult);
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("categories", productQueryService.getAllCategories());
-            return "admin/product/edit_form";
-        }
         Product current = productQueryService.getProductById(id);
         form.setImagePath(current.getImageUrl());
 
@@ -137,6 +131,21 @@ public class AdminProductEditFormController {
         } catch (IOException e) {
             throw new AdminIOException("test");
         }
+
+            RedirectAttributes redirectAttributes) {
+
+        Product current = productQueryService.getProductById(id);
+        if (current == null) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage(
+                            "com.example.fullness.stationary.product.not_found",
+                            null,
+                            Locale.JAPAN));
+            return "redirect:/admin/product";
+        }
+
+        form.setImagePath(current.getImageUrl());
 
         session.setAttribute("adminProductForm", form);
 

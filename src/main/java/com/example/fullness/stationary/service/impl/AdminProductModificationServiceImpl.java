@@ -34,26 +34,27 @@ public class AdminProductModificationServiceImpl implements AdminProductModifica
      * 画像が指定されなかった場合は既存の画像ファイルを維持する。
      */
     @Override
-    public void updateProduct(Integer id, String name, int price, int stock, Integer categoryId,
-            byte[] imageBytes, String originalFileName) {
+    public void updateProduct(Product product) {
 
-        Product current = productRepository.findById(id);
+        Product current = productRepository.selectById(product.getId());
         if (current == null) {
             throw new AdminBusinessException(
-                    messageSource.getMessage("com.example.fullness.stationary.product.not_found", null,
+                    messageSource.getMessage(
+                            "com.example.fullness.stationary.product.not_found",
+                            null,
                             Locale.JAPAN));
         }
 
-        String imageFileName = current.getImageUrl();
-
-        Product product = new Product();
-        product.setId(id);
-        product.setName(name);
-        product.setPrice(price);
-        product.setCategoryId(categoryId);
-        product.setImageUrl(imageFileName);
+        if (product.getImageUrl() == null || product.getImageUrl().isBlank()) {
+            product.setImageUrl(current.getImageUrl());
+        }
 
         productRepository.update(product);
-        productStockRepository.updateByProductId(id, stock);
+
+        if (product.getProductStock() != null) {
+            productStockRepository.updateByProductId(
+                    product.getId(),
+                    product.getProductStock().getQuantity());
+        }
     }
 }
