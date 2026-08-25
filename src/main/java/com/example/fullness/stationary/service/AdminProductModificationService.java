@@ -1,5 +1,7 @@
 package com.example.fullness.stationary.service;
 
+import com.example.fullness.stationary.entity.Product;
+
 /**
  * 商品修正（BP009〜011, UC012）の業務ロジックを担うサービスの契約。
  */
@@ -17,6 +19,7 @@ public interface AdminProductModificationService {
      * @param imageBytes       新しい画像データ（未選択の場合は null）
      * @param originalFileName アップロードされた元のファイル名（拡張子判定に使用）
      */
-    void updateProduct(Integer id, String name, int price, int stock, Integer categoryId,
-            byte[] imageBytes, String originalFileName);
+    // Integer id, String name, int price, int stock, Integer categoryId,byte[]
+    // imageBytes, String originalFileName
+    void updateProduct(Product product);
 }

@@ -4,15 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.fullness.stationary.dto.AdminProductSessionData;
+import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.form.AdminProductForm;
+import com.example.fullness.stationary.helper.AdminProductEntityHelper;
 import com.example.fullness.stationary.service.AdminProductModificationService;
 import com.example.fullness.stationary.service.AdminProductQueryService;
-import com.example.fullness.stationary.service.SessionService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -29,7 +30,7 @@ import jakarta.servlet.http.HttpSession;
 public class AdminProductEditConfirmController {
 
     @Autowired
-    private SessionService sessionService;
+    private AdminProductEntityHelper adminProductEntityHelper;
 
     @Autowired
     private AdminProductQueryService productQueryService;
@@ -52,22 +53,16 @@ public class AdminProductEditConfirmController {
     @GetMapping
     public String showConfirmPage(HttpSession session, Model model) {
 
-        AdminProductSessionData data = sessionService.get(session);
-        if (data == null) {
+        AdminProductForm form = (AdminProductForm) session.getAttribute("adminProductForm");
+
+        if (form == null) {
             return "redirect:/admin/product";
         }
 
-        AdminProductForm form = new AdminProductForm();
-        form.setId(data.targetId);
-        form.setName(data.name);
-        form.setPrice(String.valueOf(data.price));
-        form.setStock(String.valueOf(data.stock));
-        form.setCategoryId(data.categoryId);
-        form.setImagePath(data.existingImageUrl);
-        String categoryName = productQueryService.getCategoryName(data.categoryId);
+        String categoryName = productQueryService.getCategoryName(form.getCategoryId());
         form.setCategoryName(categoryName);
-        model.addAttribute("form", form);
 
+        model.addAttribute("form", form);
         return "admin/product/edit_confirm";
     }
 
@@ -91,25 +86,22 @@ public class AdminProductEditConfirmController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        AdminProductSessionData data = sessionService.get(session);
-        if (data == null) {
+        AdminProductForm form = (AdminProductForm) session.getAttribute("adminProductForm");
+
+        if (form == null) {
             return "redirect:/admin/product";
         }
 
-        adminProductModificationService.updateProduct(
-                data.targetId,
-                data.name,
-                data.price,
-                data.stock,
-                data.categoryId,
-                data.imageBytes,
-                data.imageFileName);
+        Product product = adminProductEntityHelper.toProduct(form);
+
+        adminProductModificationService.updateProduct(product);
 
         redirectAttributes.addFlashAttribute("completed", true);
-        redirectAttributes.addFlashAttribute("productName", data.name);
+        redirectAttributes.addFlashAttribute("productName", form.getName());
 
-        sessionService.clear(session);
+        session.removeAttribute("adminProductForm");
 
         return "redirect:/admin/product/edit/complete";
     }
+
 }

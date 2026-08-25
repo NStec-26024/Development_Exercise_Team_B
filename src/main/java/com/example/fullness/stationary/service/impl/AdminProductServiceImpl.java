@@ -186,7 +186,11 @@ public class AdminProductServiceImpl implements AdminProductService {
             System.out.println("取得した商品件数: " + products.size());
 
             // カテゴリ名を取得
-            String categoryName = getCategoryName(categoryId);
+            String categoryName = null;
+            if (!products.isEmpty() && products.get(0).getProductCategory() != null) {
+                categoryName = products.get(0).getProductCategory().getName();
+            }
+
             System.out.println("カテゴリ名: " + categoryName);
 
             // 商品が見つからない場合
@@ -194,7 +198,13 @@ public class AdminProductServiceImpl implements AdminProductService {
                 model.addAttribute("infoMessage", "該当する商品情報がありません");
                 model.addAttribute("searched", true);
                 model.addAttribute("selectedCategoryId", categoryId);
-                model.addAttribute("selectedCategoryName", categoryName);
+                String resolvedCategoryName = null;
+                if (!products.isEmpty() && products.get(0).getProductCategory() != null) {
+                    resolvedCategoryName = products.get(0).getProductCategory().getName();
+                }
+
+                model.addAttribute("selectedCategoryName", resolvedCategoryName);
+
                 return false;
             }
 

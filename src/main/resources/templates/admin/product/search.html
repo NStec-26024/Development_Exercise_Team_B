@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <!-- 上部ヘッダー -->
+
     <div th:replace="~{admin/fragments/layout :: header}"></div>
 
     <main class="container">
@@ -42,17 +42,17 @@
                 </thead>
                 <tbody>
                     <tr th:each="p : ${productList}">
-                        <td><img th:src="@{/images/{img}(img=${p.imageUrl})}" th:alt="${p.name}" class="table-thumb">
+                        <td>
+                            <img th:src="@{/images/{img}(img=${p.imageUrl})}" th:alt="${p.name}" class="table-thumb">
                         </td>
                         <td th:text="${p.name}"></td>
                         <td th:text="${p.price} + '円'"></td>
-                        <td><a th:href="@{/admin/product/edit/{id}(id=${p.id})}" class="btn btn-fs btn-sm">修正</a>
-                        </td>
-                        <td><a th:href="@{/admin/product/delete/{id}(id=${p.id})}" class="btn btn-fs btn-sm">削除</a>
-                        </td>
+                        <td><a th:href="@{/admin/product/edit/{id}(id=${p.id})}" class="btn btn-fs btn-sm">修正</a></td>
+                        <td><a th:href="@{/admin/product/delete/{id}(id=${p.id})}" class="btn btn-fs btn-sm">削除</a></td>
                     </tr>
                 </tbody>
             </table>
+
 
             <nav th:if="${totalPages > 1}">
                 <ul class="pagination justify-content-center">
