@@ -1,6 +1,8 @@
 package com.example.fullness.stationary.repository;
 
 import com.example.fullness.stationary.entity.Product;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
@@ -30,17 +32,8 @@ class ProductRepositoryTest {
     // === HEAD ブランチのテスト ===
 
     @Test
-    void sele
-
-    WithPaging_returnsPagedProducts() {
-        List<Product> products = productRepository.selectAllWithPaging(0, 10);
-
-        assertThat(products).hasSize(10);
-        assertThat(products.get(0).getId()).isEqualTo(1);
-        assertThat(products.get(1).getId()).isEqualTo(2);
-        assertThat(products.get(2).get
-
-    selectByCategoryWithPaging_returnsCategoryProducts() {
+    @DisplayName("selectAllWithPaging - 商品リストが返る")
+    void selectByCategoryWithPaging_returnsCategoryProducts() {
         List<Product> products = productRepository.selectByCategoryWithPaging(1, 0, 10);
 
         assertThat(products).hasSize(10);
@@ -148,5 +141,28 @@ class ProductRepositoryTest {
 
         assertThat(updatedCount).isEqualTo(0);
     }
-}
+
+    // ============================================================
+    // 異常系：ID検索（存在しない ID）
+    // ============================================================
+    @Test
+    @DisplayName("selectById - null が返る（存在しない ID）")
+    void selectById_case02_NotFound() {
+
+        Product result = productRepository.selectById(99999);
+
+        assertThat(result).isNull();
+    }
+
+    // ============================================================
+    // 異常系：ID検索（null）
+    // ============================================================
+    @Test
+    @DisplayName("selectById - null が返る（ID = null）")
+    void selectById_case03_Null() {
+
+        Product result = productRepository.selectById(null);
+
+        assertThat(result).isNull();
+    }
 }

@@ -22,6 +22,7 @@ import com.example.fullness.stationary.validator.AdminProductValidator;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -111,29 +112,14 @@ public class AdminProductEditFormController {
             Model model,
             RedirectAttributes redirectAttributes) throws IOException {
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("categories", productQueryService.getAllCategories());
-            return "admin/product/edit_form";
-        }
-
+        // --- バリデーション ---
         adminProductValidator.validate(form, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", productQueryService.getAllCategories());
             return "admin/product/edit_form";
         }
 
-        Product current = productQueryService.getProductById(id);
-        form.setImagePath(current.getImageUrl());
-
-        try {
-            form.setImageBytes(form.getImage().getBytes());
-            form.setImageFileName(form.getImage().getOriginalFilename());
-        } catch (IOException e) {
-            throw new AdminIOException("test");
-        }
-
-            RedirectAttributes redirectAttributes) {
-
+        // --- 商品取得 ---
         Product current = productQueryService.getProductById(id);
         if (current == null) {
             redirectAttributes.addFlashAttribute(
@@ -145,8 +131,20 @@ public class AdminProductEditFormController {
             return "redirect:/admin/product";
         }
 
+        // --- 既存画像パス設定 ---
         form.setImagePath(current.getImageUrl());
 
+        // --- 新規画像アップロード ---
+        if (form.getImage() != null && !form.getImage().isEmpty()) {
+            try {
+                form.setImageBytes(form.getImage().getBytes());
+                form.setImageFileName(form.getImage().getOriginalFilename());
+            } catch (IOException e) {
+                throw new AdminIOException("画像の読み込みに失敗しました");
+            }
+        }
+
+        // --- セッション保存 ---
         session.setAttribute("adminProductForm", form);
 
         return "redirect:/admin/product/edit/confirm";

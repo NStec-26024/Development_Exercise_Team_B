@@ -27,11 +27,11 @@
                     </tr>
                     <tr>
                         <th>在庫数</th>
-                        <td th:text="${product.stock}"></td>
+                        <td th:text="${product.productStock.quantity}"></td>
                     </tr>
                     <tr>
                         <th>商品カテゴリ</th>
-                        <td th:text="${product.categoryName}"></td>
+                        <td th:text="${product.productCategory.name}"></td>
                     </tr>
                 </tbody>
             </table>
