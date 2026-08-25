@@ -34,12 +34,6 @@ public interface ProductCategoryRepository {
      */
     ProductCategory selectById(@Param("id") Integer id);
 
-    public int insert(ProductCategory productCategory);
-
-    public ProductCategory selectById(int id);
-
-    public ProductCategory selectByName(String name);
-
     public void insertCategory(Product product);
 
 }
