@@ -37,7 +37,7 @@ public class AdminProductModificationServiceImpl implements AdminProductModifica
     public void updateProduct(Integer id, String name, int price, int stock, Integer categoryId,
             byte[] imageBytes, String originalFileName) {
 
-        Product current = productRepository.findById(id);
+        Product current = productRepository.selectById(id);
         if (current == null) {
             throw new AdminBusinessException(
                     messageSource.getMessage("com.example.fullness.stationary.product.not_found", null,
