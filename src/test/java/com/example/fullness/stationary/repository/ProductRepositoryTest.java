@@ -30,24 +30,6 @@ class ProductRepositoryTest {
     // === HEAD ブランチのテスト ===
 
     @Test
-    void sele
-
-    WithPaging_returnsPagedProducts() {
-        List<Product> products = productRepository.selectAllWithPaging(0, 10);
-
-        assertThat(products).hasSize(10);
-        assertThat(products.get(0).getId()).isEqualTo(1);
-        assertThat(products.get(1).getId()).isEqualTo(2);
-        assertThat(products.get(2).get
-
-    selectByCategoryWithPaging_returnsCategoryProducts() {
-        List<Product> products = productRepository.selectByCategoryWithPaging(1, 0, 10);
-
-        assertThat(products).hasSize(10);
-        assertThat(products).extracting(Product::getCategoryId).containsOnly(1);
-    }
-
-    @Test
     void countAll_returnsTotalCount() {
         int count = productRepository.countAll();
 
@@ -148,5 +130,4 @@ class ProductRepositoryTest {
 
         assertThat(updatedCount).isEqualTo(0);
     }
-}
 }
