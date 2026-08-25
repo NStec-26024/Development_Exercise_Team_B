@@ -48,8 +48,6 @@ public class AdminProductAddCompleteController {
             return "redirect:/admin/product/add";
         }
 
-        // model.addAttribute("form", adminProductRegistrationForm);
-
         return "/admin/product/add_complete";
 
     }

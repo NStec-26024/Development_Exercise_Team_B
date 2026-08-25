@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
-import com.example.fullness.stationary.service.AdminProductRegistrationService;
 import com.example.fullness.stationary.service.AdminProductService;
 
 @Controller

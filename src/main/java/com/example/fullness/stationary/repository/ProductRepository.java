@@ -14,75 +14,67 @@ import java.util.List;
 @Mapper
 public interface ProductRepository {
 
-    /**
-     * 全商品取得（削除済み除く）ページング対応
-     * 
-     * @param offset オフセット
-     * @param limit  取得件数
-     * @return 商品リスト
-     */
-    List<Product> selectAllWithPaging(
-            @Param("offset") int offset,
-            @Param("limit") int limit);
+        /**
+         * 全商品取得（削除済み除く）ページング対応
+         * 
+         * @param offset オフセット
+         * @param limit  取得件数
+         * @return 商品リスト
+         */
+        List<Product> selectAllWithPaging(
+                        @Param("offset") int offset,
+                        @Param("limit") int limit);
 
-    /**
-     * カテゴリ別商品取得（削除済み除く）ページング対応
-     * 
-     * @param categoryId カテゴリID
-     * @param offset     オフセット
-     * @param limit      取得件数
-     * @return 商品リスト
-     */
-    List<Product> selectByCategoryWithPaging(
-            @Param("categoryId") Integer categoryId,
-            @Param("offset") int offset,
-            @Param("limit") int limit);
+        /**
+         * カテゴリ別商品取得（削除済み除く）ページング対応
+         * 
+         * @param categoryId カテゴリID
+         * @param offset     オフセット
+         * @param limit      取得件数
+         * @return 商品リスト
+         */
+        List<Product> selectByCategoryWithPaging(
+                        @Param("categoryId") Integer categoryId,
+                        @Param("offset") int offset,
+                        @Param("limit") int limit);
 
-    /**
-     * 全商品件数取得（削除済み除く）
-     * 
-     * @return 商品件数
-     */
-    int countAll();
+        /**
+         * 全商品件数取得（削除済み除く）
+         * 
+         * @return 商品件数
+         */
+        int countAll();
 
-    /**
-     * カテゴリ別商品件数取得（削除済み除く）
-     * 
-     * @param categoryId カテゴリID
-     * @return 商品件数
-     */
-    int countByCategory(@Param("categoryId") Integer categoryId);
+        /**
+         * カテゴリ別商品件数取得（削除済み除く）
+         * 
+         * @param categoryId カテゴリID
+         * @return 商品件数
+         */
+        int countByCategory(@Param("categoryId") Integer categoryId);
 
-    /**
-     * 商品ID検索（削除済み除く）
-     * 
-     * @param id 商品ID
-     * @return 商品情報
-     */
-    Product selectById(@Param("id") Integer id);
+        /**
+         * 商品ID検索（削除済み除く）
+         * 
+         * @param id 商品ID
+         * @return 商品情報
+         */
+        Product selectById(@Param("id") Integer id);
 
-    /**
-     * 商品論理削除
-     * 
-     * @param id 商品ID
-     * @return 更新件数
-     */
-    int deleteById(@Param("id") Integer id);
+        /**
+         * 商品論理削除
+         * 
+         * @param id 商品ID
+         * @return 更新件数
+         */
+        int deleteById(@Param("id") Integer id);
 
-    /**
-     * 新商品をデータベースに登録
-     * 
-     * @param product 登録する商品
-     * @return 挿入された行数（通常は1）
-     */
-    public int insertProduct(Product product);
-
-    /**
-     * 商品IDから商品を取得
-     * 
-     * @param id
-     * @return 商品IDに紐づいた商品
-     */
-    public Product selectById(int id);
+        /**
+         * 新商品をデータベースに登録(UC010)
+         * 
+         * @param product 登録する商品
+         * @return 挿入された行数（通常は1）
+         */
+        public int insertProduct(Product product);
 
 }

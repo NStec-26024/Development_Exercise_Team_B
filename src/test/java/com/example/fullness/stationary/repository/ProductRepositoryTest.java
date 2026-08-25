@@ -153,4 +153,27 @@ class ProductRepositoryTest {
         assertThat(result).isNull();
     }
 
+    // ============================================================
+    // 正常系：商品登録
+    // ============================================================
+    @Test
+    @Sql(scripts = { "/repository-schema.sql",
+            "/repository-data.sql" }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+
+    void testInsertProduct() {
+
+        Product inputProduct = new Product();
+        inputProduct.setName("くまのぬいぐるみ<>限定</>");
+        inputProduct.setPrice(2300);
+
+        int count = repository.insertProduct(inputProduct);
+
+        // 挿入された行数が1
+        assertThat(count).isEqualTo(1);
+
+        // 自動採番されたIDが4か
+        assertThat(inputProduct.getId()).isEqualTo(4);
+
+    }
+
 }

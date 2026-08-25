@@ -7,9 +7,9 @@ import com.example.fullness.stationary.entity.ProductStock;
 @Mapper
 public interface ProductStockRepository {
     /**
-     * 新しい在庫情報を登録する
+     * 新しい在庫情報を登録する(UC010)
      * 
      * @param stock 登録する在庫情報（商品ID、初期在庫数が含まれる）
      */
-    public void insertStock(ProductStock stock);
+    public int insertStock(ProductStock stock);
 }

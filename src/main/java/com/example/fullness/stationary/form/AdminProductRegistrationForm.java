@@ -7,17 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class AdminProductRegistrationForm implements Serializable {
-
-    /**
-     * 商品ID
-     */
-    private Integer id;
 
     /**
      * 商品カテゴリ名

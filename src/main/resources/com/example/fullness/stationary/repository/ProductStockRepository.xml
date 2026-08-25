@@ -5,7 +5,7 @@
 
 <mapper namespace="com.example.fullness.stationary.repository.ProductStockRepository">
 
-    <insert id="insertStock">
+    <insert id="insertStock" useGeneratedKeys="true" keyProperty="id">
         <![CDATA[
             INSERT INTO product_stock (
             product_id,

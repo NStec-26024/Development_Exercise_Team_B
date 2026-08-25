@@ -1,6 +1,5 @@
 package com.example.fullness.stationary.service.impl;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.example.fullness.stationary.entity.Product;
-import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.entity.ProductStock;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 import com.example.fullness.stationary.helper.ProductHelper;
@@ -26,53 +24,58 @@ import com.example.fullness.stationary.repository.ProductStockRepository;
 public class AdminProductRegistrationServiceImplTest {
 
     @InjectMocks
-    private AdminProductRegistrationServiceImpl service;
+    private AdminProductRegistrationServiceImpl adminProductRegistrationServiceImpl;
 
     @Mock
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
     @Mock
-    ProductCategoryRepository productCategoryRepository;
+    private ProductCategoryRepository productCategoryRepository;
 
     @Mock
-    ProductStockRepository productStockRepository;
+    private ProductStockRepository productStockRepository;
 
     @Mock
-    ProductHelper productHelper;
+    private ProductHelper productHelper;
 
-    private ProductCategory productCategory;
-    private Product product;
+    private AdminProductRegistrationForm inputForm;
+    private Product inputProduct;
     private ProductStock productStock;
 
     @BeforeEach
     void setUp() {
-        product = new Product();
+        inputForm = new AdminProductRegistrationForm();
+        inputForm.setName("くまのぬいぐるみ<>限定</>");
+        inputForm.setPrice(2300);
+        inputForm.setStock(900);
+        inputForm.setCategoryId(2);
+
+        inputProduct = new Product();
+        inputProduct.setId(4);
+        inputProduct.setName("くまのぬいぐるみ<>限定</>");
+        inputProduct.setPrice(2300);
+
+        productStock = new ProductStock();
+        productStock.setProductId(inputProduct.getId());
+        productStock.setQuantity(900);
+
+        inputProduct.setProductStock(productStock);
 
     }
 
     @Test
     @DisplayName("addProduct: 商品と在庫の情報が正常に登録できること")
-    void testAddProduct_Success() {
-        // 入力フォームの準備
-        AdminProductRegistrationForm form = new AdminProductRegistrationForm();
-        form.setStock(50);
+    void testAddProductOk_case1() {
+        when(productHelper.formToEntity(inputForm)).thenReturn(inputProduct);
+        when(productRepository.insertProduct(inputProduct)).thenReturn(1);
+        when(productStockRepository.insertStock(inputProduct.getProductStock())).thenReturn(1);
 
-        // ヘルパーから変換されるエンティティの準備（IDが1として登録される想定）
-        Product mockProduct = new Product();
-        mockProduct.setId(100);
+        adminProductRegistrationServiceImpl.addProduct(inputForm);
 
-        // モックの振る舞いを定義
-        when(productHelper.formToEntity(form)).thenReturn(mockProduct);
+        verify(productHelper, times(1)).formToEntity(inputForm);
+        verify(productRepository, times(1)).insertProduct(inputProduct);
+        verify(productStockRepository, times(1)).insertStock(inputProduct.getProductStock());
 
-        // テスト対象メソッドの実行
-        service.addProduct(form);
-
-        // 検証：各リポジトリやヘルパーが意図した回数・引数で呼ばれたか
-        verify(productHelper, times(1)).formToEntity(form);
-        verify(productRepository, times(1)).insertProduct(mockProduct);
-
-        // 実装コード内で「productStockRepository.insertStock(stock)」が2回重複して呼ばれているため、times(2)で検証しています
-        verify(productStockRepository, times(2)).insertStock(any(ProductStock.class));
     }
 
 }

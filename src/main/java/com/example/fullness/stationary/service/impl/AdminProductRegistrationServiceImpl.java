@@ -1,14 +1,10 @@
 package com.example.fullness.stationary.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.Product;
-import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.entity.ProductStock;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 import com.example.fullness.stationary.helper.ProductHelper;
@@ -42,8 +38,6 @@ public class AdminProductRegistrationServiceImpl implements AdminProductRegistra
         ProductStock stock = new ProductStock();
         stock.setProductId(product.getId());
         stock.setQuantity(adminProductRegistrationForm.getStock());
-        productStockRepository.insertStock(stock);
-
         productStockRepository.insertStock(stock);
     }
 
