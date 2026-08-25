@@ -54,7 +54,7 @@ class AdminProductModificationServiceImplTest {
         existing.setCategoryId(1);
         existing.setImageUrl("old.png");
 
-        when(productRepository.findById(id)).thenReturn(existing);
+        when(productRepository.selectById(id)).thenReturn(existing);
 
         // 更新対象の商品（Form → EntityHelper で生成される想定）
         Product updateTarget = new Product();
@@ -95,7 +95,7 @@ class AdminProductModificationServiceImplTest {
 
         Integer nonExistId = 999;
 
-        when(productRepository.findById(nonExistId)).thenReturn(null);
+        when(productRepository.selectById(nonExistId)).thenReturn(null);
         when(messageSource.getMessage(
                 eq("com.example.fullness.stationary.product.not_found"),
                 any(),

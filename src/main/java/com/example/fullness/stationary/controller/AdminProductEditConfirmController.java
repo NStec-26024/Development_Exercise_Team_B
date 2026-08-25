@@ -114,7 +114,7 @@ public class AdminProductEditConfirmController {
                             java.nio.file.Paths.get(uploadDir + fileName),
                             form.getImageBytes());
                 } catch (IOException e) {
-                    throw new AdminIOException("画像保存に失敗しました", e);
+                    throw new AdminIOException("画像保存に失敗しました");
                 }
 
                 product.setImageUrl(fileName);
