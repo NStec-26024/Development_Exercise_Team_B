@@ -9,6 +9,7 @@
 </head>
 
 <body>
+
     <div th:replace="~{admin/fragments/layout :: header}"></div>
 
     <main class="container">
@@ -25,11 +26,11 @@
                 <a th:href="@{/admin/product/add}" class="btn btn-fs-solid">商品追加</a>
             </form>
 
-            <div class="alert alert-info text-center" th:if="${#lists.isEmpty(products)}">
+            <div class="alert alert-info text-center" th:if="${#lists.isEmpty(productList)}">
                 該当する商品情報がありません
             </div>
 
-            <table class="table align-middle" th:unless="${#lists.isEmpty(products)}">
+            <table class="table align-middle" th:unless="${#lists.isEmpty(productList)}">
                 <thead>
                     <tr>
                         <th>商品画像</th>
@@ -40,8 +41,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="p : ${products}">
-                        <td><img th:src="@{|/images/${p.imageUrl}|}" th:alt="${p.name}" class="table-thumb"></td>
+                    <tr th:each="p : ${productList}">
+                        <td>
+                            <img th:src="@{/images/{img}(img=${p.imageUrl})}" th:alt="${p.name}" class="table-thumb">
+                        </td>
                         <td th:text="${p.name}"></td>
                         <td th:text="${p.price} + '円'"></td>
                         <td><a th:href="@{/admin/product/edit/{id}(id=${p.id})}" class="btn btn-fs btn-sm">修正</a></td>
@@ -49,6 +52,7 @@
                     </tr>
                 </tbody>
             </table>
+
 
             <nav th:if="${totalPages > 1}">
                 <ul class="pagination justify-content-center">

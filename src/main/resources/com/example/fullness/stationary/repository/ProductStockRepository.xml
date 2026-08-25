@@ -16,3 +16,21 @@
         ]]>
     </insert>
 </mapper>
+    <!-- 在庫レコード新規登録 -->
+    <insert id="insert">
+        <![CDATA[
+            INSERT INTO product_stock (product_id, quantity)
+            VALUES (#{productId}, #{quantity})
+        ]]>
+    </insert>
+
+    <!-- 商品IDに対応する在庫数を更新 -->
+    <update id="updateByProductId">
+        <![CDATA[
+            UPDATE product_stock
+            SET quantity = #{quantity}
+            WHERE product_id = #{productId}
+        ]]>
+    </update>
+
+</mapper>

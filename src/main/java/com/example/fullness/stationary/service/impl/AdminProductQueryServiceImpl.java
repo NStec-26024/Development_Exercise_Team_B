@@ -1,0 +1,116 @@
+package com.example.fullness.stationary.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.fullness.stationary.entity.Product;
+import com.example.fullness.stationary.entity.ProductCategory;
+import com.example.fullness.stationary.repository.ProductCategoryRepository;
+import com.example.fullness.stationary.repository.ProductRepository;
+import com.example.fullness.stationary.service.AdminProductQueryService;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * {@link AdminProductQueryService} の実装。
+ * 商品・商品カテゴリの参照（検索・一覧取得）のみを責務とする。
+ */
+@Slf4j
+@Service
+@Transactional(readOnly = true)
+public class AdminProductQueryServiceImpl implements AdminProductQueryService {
+
+    /** 1ページあたりの表示件数。 */
+    private static final int PAGE_SIZE = 10;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private ProductCategoryRepository productCategoryRepository;
+
+    /**
+     * 商品カテゴリの一覧を取得する。
+     */
+    @Override
+    public List<ProductCategory> getAllCategories() {
+        List<ProductCategory> categories = productCategoryRepository.selectAll();
+        return (categories != null) ? categories : new ArrayList<>();
+    }
+
+    /**
+     * カテゴリIDからカテゴリ名を取得する。
+     */
+    @Override
+    public String getCategoryName(Integer categoryId) {
+        if (categoryId == null || categoryId == 0) {
+            return null;
+        }
+        ProductCategory category = productCategoryRepository.selectById(categoryId);
+        return (category != null) ? category.getName() : null;
+    }
+
+    /**
+     * 商品IDから商品情報を取得する。
+     */
+    @Override
+    public Product getProductById(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        System.out.println(productRepository.selectById(id));
+        return productRepository.selectById(id);
+    }
+
+    /**
+     * 全商品を検索し、指定ページの結果を返す。
+     */
+    @Override
+    public List<Product> searchAllProducts(int page) {
+        int currentPage = Math.max(page, 1);
+        int offset = (currentPage - 1) * PAGE_SIZE;
+
+        List<Product> products = productRepository.selectAllWithPaging(offset, PAGE_SIZE);
+        return (products != null) ? products : new ArrayList<>();
+    }
+
+    /**
+     * 指定カテゴリの商品を検索し、指定ページの結果を返す。
+     * categoryId が null または 0 の場合は全商品検索にフォールバックする。
+     */
+    @Override
+    public List<Product> searchProductsByCategory(Integer categoryId, int page) {
+        if (categoryId == null || categoryId == 0) {
+            return searchAllProducts(page);
+        }
+
+        int currentPage = Math.max(page, 1);
+        int offset = (currentPage - 1) * PAGE_SIZE;
+
+        List<Product> products = productRepository.selectByCategoryWithPaging(categoryId, offset, PAGE_SIZE);
+        return (products != null) ? products : new ArrayList<>();
+    }
+
+    /**
+     * 全商品の総件数を返す。
+     */
+    @Override
+    public int countAllProducts() {
+        return productRepository.countAll();
+    }
+
+    /**
+     * 指定カテゴリの商品総件数を返す。
+     */
+    @Override
+    public int countProductsByCategory(Integer categoryId) {
+        if (categoryId == null || categoryId == 0) {
+            return countAllProducts();
+        }
+        return productRepository.countByCategory(categoryId);
+    }
+}

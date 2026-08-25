@@ -11,4 +11,5 @@ import lombok.Data;
 public class ProductCategory implements Serializable {
     private int id;
     private String name;
+
 }

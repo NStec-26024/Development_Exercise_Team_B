@@ -13,7 +13,7 @@ public class FullnessStationaryApplication {
 
 	/**
 	 * アプリケーションの起動メソッド。
-	 *
+	 * 
 	 * @param args コマンドライン引数
 	 */
 	public static void main(String[] args) {

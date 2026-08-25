@@ -1,132 +1,145 @@
 package com.example.fullness.stationary.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
+import com.example.fullness.stationary.entity.Product;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlConfig;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import com.example.fullness.stationary.entity.Product;
+import java.util.List;
 
-@SpringBootTest
-@Transactional
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@MybatisTest
 @Sql(scripts = {
-        "classpath:sql/clear.sql",
-        "classpath:sql/data.sql"
-}, config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED))
-@DisplayName("ProductRepository テスト（仕様書準拠）")
+        "/repository-schema.sql",
+        "/repository-data.sql"
+}, executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 class ProductRepositoryTest {
 
     @Autowired
-    private ProductRepository repository;
+    private ProductRepository productRepository;
 
-    // ============================================================
-    // 正常系：全商品取得（削除済み除く）
-    // ============================================================
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    // === HEAD ブランチのテスト ===
+
     @Test
     @DisplayName("selectAllWithPaging - 商品リストが返る")
-    void selectAllWithPaging_case01_Ok() {
+    void selectByCategoryWithPaging_returnsCategoryProducts() {
+        List<Product> products = productRepository.selectByCategoryWithPaging(1, 0, 10);
 
-        List<Product> result = repository.selectAllWithPaging(0, 10);
-
-        assertThat(result).isNotNull();
-        assertThat(result).isNotEmpty();
-
-        // 仕様書の例：PDS001 が返るケース
-        assertThat(result.get(0).getName()).isEqualTo("マーカー(青)");
+        assertThat(products).hasSize(10);
+        assertThat(products).extracting(Product::getCategoryId).containsOnly(1);
     }
 
-    // ============================================================
-    // 異常系：全商品取得（空リスト）
-    // ============================================================
     @Test
-    @DisplayName("selectAllWithPaging - 空リストが返る")
-    void selectAllWithPaging_case02_Empty() {
+    void countAll_returnsTotalCount() {
+        int count = productRepository.countAll();
 
-        List<Product> result = repository.selectAllWithPaging(999, 10);
-
-        assertThat(result).isEmpty();
+        assertThat(count).isEqualTo(28);
     }
 
-    // ============================================================
-    // 正常系：カテゴリ別商品取得（削除済み除く）
-    // ============================================================
     @Test
-    @DisplayName("selectByCategoryWithPaging - カテゴリの商品が返る")
-    void selectByCategoryWithPaging_case01_Ok() {
+    void countByCategory_returnsCategoryCount() {
+        int count = productRepository.countByCategory(1);
 
-        List<Product> result = repository.selectByCategoryWithPaging(1, 0, 10);
-
-        assertThat(result).isNotNull();
-        assertThat(result).isNotEmpty();
-        assertThat(result.get(0).getName()).isEqualTo("マーカー(青)");
+        assertThat(count).isEqualTo(16);
     }
 
-    // ============================================================
-    // 異常系：カテゴリ別商品取得（空リスト）
-    // ============================================================
     @Test
-    @DisplayName("selectByCategoryWithPaging - 空リストが返る")
-    void selectByCategoryWithPaging_case02_Empty() {
+    void selectById_returnsProductWhenExists() {
+        Product product = productRepository.selectById(10);
 
-        List<Product> result = repository.selectByCategoryWithPaging(999, 0, 10);
-
-        assertThat(result).isEmpty();
+        assertThat(product).isNotNull();
+        assertThat(product.getName()).isEqualTo("油性ボールペン(赤)");
     }
 
-    // ============================================================
-    // 正常系：全商品件数取得（削除済み除く）
-    // ============================================================
     @Test
-    @DisplayName("countAll - 総件数が返る")
-    void countAll_case01_Ok() {
+    void selectById_returnsNullWhenMissing() {
+        Product product = productRepository.selectById(99);
 
-        int count = repository.countAll();
-
-        assertThat(count).isEqualTo(28); // 仕様書の totalCount に合わせる
+        assertThat(product).isNull();
     }
 
-    // ============================================================
-    // 正常系：カテゴリ別商品件数取得
-    // ============================================================
     @Test
-    @DisplayName("countByCategory - カテゴリ件数が返る")
-    void countByCategory_case01_Ok() {
+    void deleteById_softDeletion() {
+        // Arrange
+        Integer id = 1;
 
-        int count = repository.countByCategory(1);
+        Integer beforeDeleteFlg = jdbcTemplate.queryForObject(
+                "SELECT delete_flg FROM product WHERE id = ?",
+                Integer.class,
+                id);
 
-        assertThat(count).isEqualTo(16); // データセットに合わせる
+        // Act
+        productRepository.deleteById(id);
+
+        // Assert
+        Integer afterDeleteFlg = jdbcTemplate.queryForObject(
+                "SELECT delete_flg FROM product WHERE id = ?",
+                Integer.class,
+                id);
+
+        assertEquals(0, beforeDeleteFlg);
+        assertEquals(1, afterDeleteFlg);
     }
 
-    // ============================================================
-    // 異常系：カテゴリ別商品件数（0件）
-    // ============================================================
+    // === development ブランチのテスト ===
+
+    /**
+     * 1. 正常系：更新件数と更新後の値を DB 直接参照で検証する
+     */
     @Test
-    @DisplayName("countByCategory - 0件が返る")
-    void countByCategory_case02_Zero() {
+    void update_case01_Ok() {
 
-        int count = repository.countByCategory(999);
+        // --- Arrange ---
+        Integer id = 1;
+        Product p = new Product();
+        p.setId(id);
+        p.setName("新しい商品名");
+        p.setPrice(999);
+        p.setCategoryId(2);
+        p.setImageUrl("new.png");
 
-        assertThat(count).isEqualTo(0);
+        int updatedCount = productRepository.update(p);
+
+        assertThat(updatedCount)
+                .as("更新件数が 1 件であること")
+                .isEqualTo(1);
+
+        var updated = jdbcTemplate.queryForMap(
+                "SELECT name, price, product_category_id, image_url FROM product WHERE id = ?",
+                id);
+
+        assertThat(updated)
+                .as("更新後のレコードが正しく反映されていること")
+                .containsEntry("name", "新しい商品名")
+                .containsEntry("price", 999)
+                .containsEntry("product_category_id", 2)
+                .containsEntry("image_url", "new.png");
     }
 
-    // ============================================================
-    // 正常系：ID検索
-    // ============================================================
+    /**
+     * 2. 異常系：存在しない ID の場合、更新件数が 0 件である
+     */
     @Test
-    @DisplayName("selectById - 商品が返る")
-    void selectById_case01_Ok() {
+    void update_case02_Ok() {
 
-        Product result = repository.selectById(1);
+        Product p = new Product();
+        p.setId(999); // data.sql に存在しない ID
+        p.setName("新しい商品名");
 
-        assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo("マーカー(青)");
+        int updatedCount = productRepository.update(p);
+
+        assertThat(updatedCount).isEqualTo(0);
     }
 
     // ============================================================
@@ -136,7 +149,7 @@ class ProductRepositoryTest {
     @DisplayName("selectById - null が返る（存在しない ID）")
     void selectById_case02_NotFound() {
 
-        Product result = repository.selectById(99999);
+        Product result = productRepository.selectById(99999);
 
         assertThat(result).isNull();
     }
@@ -148,7 +161,7 @@ class ProductRepositoryTest {
     @DisplayName("selectById - null が返る（ID = null）")
     void selectById_case03_Null() {
 
-        Product result = repository.selectById(null);
+        Product result = productRepository.selectById(null);
 
         assertThat(result).isNull();
     }
@@ -166,7 +179,7 @@ class ProductRepositoryTest {
         inputProduct.setName("くまのぬいぐるみ<>限定</>");
         inputProduct.setPrice(2300);
 
-        int count = repository.insertProduct(inputProduct);
+        int count = productRepository.insertProduct(inputProduct);
 
         // 挿入された行数が1
         assertThat(count).isEqualTo(1);
