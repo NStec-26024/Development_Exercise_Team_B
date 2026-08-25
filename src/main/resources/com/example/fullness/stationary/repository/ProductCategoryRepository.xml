@@ -8,8 +8,8 @@
         <id property="id" column="id"/>
         <result property="name" column="name"/>
     </resultMap>
-    <insert id="insert" parameterType="ProductCategory" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 
+    <insert id="insert" parameterType="ProductCategory" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         <![CDATA[
             INSERT INTO 
             product_category (name)
@@ -19,30 +19,29 @@
 
     <select id="selectById" resultType="ProductCategory">
         <![CDATA[
-                SELECT name
-                FROM product_category
-                WHERE id=#{id}
-            ]]>
+            SELECT name
+            FROM product_category
+            WHERE id=#{id}
+         ]]>
     </select>
 
     <select id="selectByName" resultType="ProductCategory">
         <![CDATA[
-                SELECT *
-                FROM product_category
-                WHERE name=#{name}
-            ]]>
+            SELECT *
+            FROM product_category
+            WHERE name=#{name}
+        ]]>
     </select>
 
     <!-- 全カテゴリ取得 -->
     <select id="selectAll" resultMap="productCategoryResultMap">
         <![CDATA[
-        SELECT
+            SELECT
             id,
             name
-        FROM product_category
-        ORDER BY id ASC
+            FROM product_category
+            ORDER BY id ASC
         ]]>
     </select>
-
    
 </mapper>
