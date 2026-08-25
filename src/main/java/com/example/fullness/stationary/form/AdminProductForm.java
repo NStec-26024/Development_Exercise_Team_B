@@ -43,4 +43,10 @@ public class AdminProductForm {
      * 新規登録時は必須、修正時は未選択なら既存画像を維持する
      */
     private MultipartFile image;
+
+    /** 新規アップロードされた画像データ（修正時に未選択なら null）。 */
+    public byte[] imageBytes;
+
+    /** 元のファイル名（拡張子・Content-Type判定用）。 */
+    public String imageFileName;
 }

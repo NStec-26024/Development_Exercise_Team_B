@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,12 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.entity.Product;
+import com.example.fullness.stationary.exception.AdminIOException;
 import com.example.fullness.stationary.form.AdminProductForm;
-import com.example.fullness.stationary.helper.AdminProductFormHelper;
+import com.example.fullness.stationary.helper.AdminProductHelper;
 import com.example.fullness.stationary.service.AdminProductQueryService;
+import com.example.fullness.stationary.validator.AdminProductValidator;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
+import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -37,10 +42,13 @@ public class AdminProductEditFormController {
     private AdminProductQueryService productQueryService;
 
     @Autowired
-    private AdminProductFormHelper ProductFormHelper;
+    private AdminProductHelper ProductFormHelper;
 
     @Autowired
     private MessageSource messageSource;
+
+    @Autowired
+    private AdminProductValidator adminProductValidator;
 
     /**
      * 商品編集フォームの初期表示処理。
@@ -71,7 +79,7 @@ public class AdminProductEditFormController {
             return "redirect:/admin/product";
         }
 
-        AdminProductForm form = ProductFormHelper.fromProduct(product);
+        AdminProductForm form = ProductFormHelper.fromToForm(product);
 
         model.addAttribute("form", form);
         model.addAttribute("categories", productQueryService.getAllCategories());
@@ -98,10 +106,20 @@ public class AdminProductEditFormController {
     @PostMapping("/{id}")
     public String submitEditForm(
             @PathVariable Integer id,
-            @ModelAttribute("form") AdminProductForm form,
+            @Valid @ModelAttribute("form") AdminProductForm form,
+            BindingResult bindingResult,
             HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            Model model,
+            RedirectAttributes redirectAttributes) throws IOException {
 
+        // --- バリデーション ---
+        adminProductValidator.validate(form, bindingResult);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", productQueryService.getAllCategories());
+            return "admin/product/edit_form";
+        }
+
+        // --- 商品取得 ---
         Product current = productQueryService.getProductById(id);
         if (current == null) {
             redirectAttributes.addFlashAttribute(
@@ -113,8 +131,20 @@ public class AdminProductEditFormController {
             return "redirect:/admin/product";
         }
 
+        // --- 既存画像パス設定 ---
         form.setImagePath(current.getImageUrl());
 
+        // --- 新規画像アップロード ---
+        if (form.getImage() != null && !form.getImage().isEmpty()) {
+            try {
+                form.setImageBytes(form.getImage().getBytes());
+                form.setImageFileName(form.getImage().getOriginalFilename());
+            } catch (IOException e) {
+                throw new AdminIOException("画像の読み込みに失敗しました");
+            }
+        }
+
+        // --- セッション保存 ---
         session.setAttribute("adminProductForm", form);
 
         return "redirect:/admin/product/edit/confirm";
