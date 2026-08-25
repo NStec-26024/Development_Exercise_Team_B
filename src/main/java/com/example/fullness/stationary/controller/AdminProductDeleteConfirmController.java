@@ -38,8 +38,9 @@ public class AdminProductDeleteConfirmController {
     @Autowired
     private MessageSource messageSource;
 
+    // 削除する商品を表示する
     @GetMapping("/{id}")
-    public String showDeleteComplete(
+    public String showDeleteProduct(
             @PathVariable("id") Integer id,
             Model model,
             RedirectAttributes redirectAttributes) {
