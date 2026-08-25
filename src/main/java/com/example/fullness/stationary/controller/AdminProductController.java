@@ -83,25 +83,6 @@ public class AdminProductController {
     }
 
     /**
-     * 削除確認ページへのリダイレクトを行うエンドポイント。
-     *
-     * @param id         削除対象の商品ID
-     * @param categoryId 検索時のカテゴリID（リダイレクト先に付与）
-     * @param page       検索時のページ番号（リダイレクト先に付与）
-     * @return 削除確認画面へのリダイレクト URL
-     */
-    @GetMapping("/product/delete/{id}")
-    public String deleteProduct(
-            @PathVariable("id") Integer id,
-            @RequestParam(name = "category", required = false, defaultValue = "0") Integer categoryId,
-            @RequestParam(name = "page", defaultValue = "1") int page) {
-
-        return "redirect:/admin/product/delete/" + id
-                + "?category=" + categoryId
-                + "&page=" + page;
-    }
-
-    /**
      * 追加画面へのリダイレクトを行うエンドポイント。
      *
      * @param category カテゴリID の文字列（省略可）。指定がある場合はリダイレクト URL に付与する。

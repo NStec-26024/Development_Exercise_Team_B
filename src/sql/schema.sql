@@ -1,3 +1,17 @@
+DROP TABLE IF EXISTS order_detail CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS payment_method CASCADE;
+DROP TABLE IF EXISTS customer CASCADE;
+DROP TABLE IF EXISTS order_status CASCADE;
+
+DROP TABLE IF EXISTS product_stock CASCADE;
+DROP TABLE IF EXISTS product CASCADE;
+DROP TABLE IF EXISTS product_category CASCADE;
+
+DROP TABLE IF EXISTS employee_account CASCADE;
+DROP TABLE IF EXISTS employee CASCADE;
+DROP TABLE IF EXISTS department CASCADE;
+
 create table department(
   id serial,
   name VARCHAR(100),
@@ -18,7 +32,7 @@ create table employee_account(
     employee_id integer,
     name VARCHAR(20),
     password VARCHAR(255),
-    primary key (id) ,
+    primary key (id),
     FOREIGN key (employee_id) REFERENCES employee(id)
 );
 
