@@ -123,7 +123,7 @@ public class AdminGlobalExceptionHandler {
                     null,
                     Locale.JAPAN);
         } catch (NoSuchMessageException e) {
-            errorMessage = "システムエラーが発生しました。";
+            errorMessage = "システムエラーが発生しました。管理者に連絡してください";
         }
 
         redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
