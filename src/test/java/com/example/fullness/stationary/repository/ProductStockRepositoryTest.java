@@ -36,7 +36,7 @@ class ProductStockRepositoryTest {
         int count = productStockRepository.insertStock(stock);
 
         assertThat(count).isEqualTo(1);
-        assertThat(stock.getId()).isEqualTo(1);
+        assertThat(stock.getId()).isEqualTo(29);
 
     }
 

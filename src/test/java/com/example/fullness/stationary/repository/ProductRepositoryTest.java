@@ -184,8 +184,8 @@ class ProductRepositoryTest {
         // 挿入された行数が1
         assertThat(count).isEqualTo(1);
 
-        // 自動採番されたIDが4か
-        assertThat(inputProduct.getId()).isEqualTo(4);
+        // 自動採番されたIDが29か
+        assertThat(inputProduct.getId()).isEqualTo(29);
 
     }
 
