@@ -1,13 +1,15 @@
 package com.example.fullness.stationary.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+
+import com.example.fullness.stationary.entity.ProductStock;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -19,6 +21,24 @@ class ProductStockRepositoryTest {
 
     @Autowired
     private ProductStockRepository productStockRepository;
+
+    private ProductStock stock;
+
+    @Test
+    @Sql(scripts = { "/repository-schema.sql",
+            "/repository-data.sql" }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void testInsertStockOK() {
+
+        stock = new ProductStock();
+        stock.setProductId(3);
+        stock.setQuantity(1000);
+
+        int count = productStockRepository.insertStock(stock);
+
+        assertThat(count).isEqualTo(1);
+        assertThat(stock.getId()).isEqualTo(29);
+
+    }
 
     @Test
     void updateByProductId_case01_Ok() {

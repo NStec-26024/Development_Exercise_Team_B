@@ -1,6 +1,8 @@
 package com.example.fullness.stationary.repository;
 
 import com.example.fullness.stationary.entity.Product;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
@@ -26,6 +28,17 @@ class ProductRepositoryTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    // === HEAD ブランチのテスト ===
+
+    @Test
+    @DisplayName("selectAllWithPaging - 商品リストが返る")
+    void selectByCategoryWithPaging_returnsCategoryProducts() {
+        List<Product> products = productRepository.selectByCategoryWithPaging(1, 0, 10);
+
+        assertThat(products).hasSize(10);
+        assertThat(products).extracting(Product::getCategoryId).containsOnly(1);
+    }
 
     @Test
     void countAll_returnsTotalCount() {
@@ -128,4 +141,52 @@ class ProductRepositoryTest {
 
         assertThat(updatedCount).isEqualTo(0);
     }
+
+    // ============================================================
+    // 異常系：ID検索（存在しない ID）
+    // ============================================================
+    @Test
+    @DisplayName("selectById - null が返る（存在しない ID）")
+    void selectById_case02_NotFound() {
+
+        Product result = productRepository.selectById(99999);
+
+        assertThat(result).isNull();
+    }
+
+    // ============================================================
+    // 異常系：ID検索（null）
+    // ============================================================
+    @Test
+    @DisplayName("selectById - null が返る（ID = null）")
+    void selectById_case03_Null() {
+
+        Product result = productRepository.selectById(null);
+
+        assertThat(result).isNull();
+    }
+
+    // ============================================================
+    // 正常系：商品登録
+    // ============================================================
+    @Test
+    @Sql(scripts = { "/repository-schema.sql",
+            "/repository-data.sql" }, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+
+    void testInsertProduct() {
+
+        Product inputProduct = new Product();
+        inputProduct.setName("くまのぬいぐるみ<>限定</>");
+        inputProduct.setPrice(2300);
+
+        int count = productRepository.insertProduct(inputProduct);
+
+        // 挿入された行数が1
+        assertThat(count).isEqualTo(1);
+
+        // 自動採番されたIDが29か
+        assertThat(inputProduct.getId()).isEqualTo(29);
+
+    }
+
 }
