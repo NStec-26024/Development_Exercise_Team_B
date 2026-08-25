@@ -5,34 +5,23 @@
 
 <mapper namespace="com.example.fullness.stationary.repository.ProductRepository">
 
-    <resultMap id="productResultMap"
-           type="com.example.fullness.stationary.entity.Product">
-
-    <id property="id" column="id"/>
-
-    <result property="name" column="name"/>
-    <result property="price" column="price"/>
-    <result property="categoryId" column="product_category_id"/>
-    <result property="imageUrl" column="image_url"/>
-
-    <!-- カテゴリ名 -->
-    <result property="categoryName" column="category_name"/>
-
-    <!-- 在庫 -->
-    <result property="stock" column="stock_quantity"/>
-
-    <!-- 在庫詳細 -->
-    <association property="productStock"
-                 javaType="com.example.fullness.stationary.entity.ProductStock">
-
-        <id property="id" column="stock_id"/>
-        <result property="productId" column="stock_product_id"/>
-        <result property="quantity" column="stock_quantity"/>
-
-    </association>
-
-</resultMap>
-
+    <resultMap id="productResultMap" type="com.example.fullness.stationary.entity.Product">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="categoryId" column="product_category_id"/>
+        <result property="imageUrl" column="image_url"/>
+        <!-- カテゴリ名 -->
+        <result property="categoryName" column="category_name"/>
+        <!-- 在庫 -->
+        <result property="stock" column="stock_quantity"/>
+        <!-- 在庫詳細 -->
+        <association property="productStock" javaType="com.example.fullness.stationary.entity.ProductStock">
+            <id property="id" column="stock_id"/>
+            <result property="productId" column="stock_product_id"/>
+            <result property="quantity" column="stock_quantity"/>
+        </association>
+    </resultMap>    
 
     <!-- 全商品件数（削除済み除く） -->
     <select id="countAll" resultType="int">
@@ -119,10 +108,6 @@
         ]]>
     </select>
 
-  
-
-
-
     <!-- 論理削除 -->
     <update id="deleteById">
         <![CDATA[
@@ -131,7 +116,6 @@
             WHERE id = #{id}
         ]]>
     </update>
-
     
     <!-- 商品情報更新（商品名・単価・カテゴリ・画像URL） -->
     <update id="update" parameterType="com.example.fullness.stationary.entity.Product">
