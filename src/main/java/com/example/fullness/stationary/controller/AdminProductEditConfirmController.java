@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.entity.Product;
@@ -24,10 +25,13 @@ import jakarta.servlet.http.HttpSession;
 /**
  * 商品編集内容の確認画面表示および更新処理を担当する Controller。
  *
- * - 編集フォームで入力された内容を確認画面に表示する（GET）
- * - 確認画面から更新処理を実行する（POST）
- * - セッションに保持された編集内容が存在しない場合は一覧画面へリダイレクトする
- *
+ * <p>
+ * 以下の機能を提供する：
+ * <ul>
+ * <li>編集内容の確認画面表示（GET）</li>
+ * <li>戻る／完了ボタンによる遷移制御（POST）</li>
+ * <li>セッションに編集内容が存在しない場合は一覧画面へリダイレクト</li>
+ * </ul>
  */
 @Controller
 @RequestMapping("/admin/product/edit/confirm")
@@ -43,26 +47,18 @@ public class AdminProductEditConfirmController {
     private AdminProductModificationService adminProductModificationService;
 
     /**
-     * 商品編集内容の確認画面を表示する。
-     *
-     * 主な処理内容：
-     * - セッションから編集内容を取得する
-     * - 編集内容が存在しない場合は一覧画面へリダイレクトする
-     * - 編集内容をフォームオブジェクトに詰めて画面へ渡す
-     *
-     * @param session HTTP セッション
-     * @param model   画面へ渡すモデル
-     * @return 編集確認画面、または一覧画面へのリダイレクト
+     * 編集内容確認画面を表示する。
      */
     @GetMapping
     public String showConfirmPage(HttpSession session, Model model) {
 
+        // --- セッションから編集内容を取得 ---
         AdminProductForm form = (AdminProductForm) session.getAttribute("adminProductForm");
-
         if (form == null) {
             return "redirect:/admin/product";
         }
 
+        // --- カテゴリ名を補完 ---
         String categoryName = productQueryService.getCategoryName(form.getCategoryId());
         form.setCategoryName(categoryName);
 
@@ -82,63 +78,66 @@ public class AdminProductEditConfirmController {
     }
 
     /**
-     * 商品編集内容を更新処理サービスへ渡し、更新を実行する。
-     *
-     * 主な処理内容：
-     * - セッションから編集内容を取得する
-     * - 編集内容が存在しない場合は一覧画面へリダイレクトする
-     * - 更新処理サービスを呼び出して商品情報を更新する
-     * - 完了画面に表示するメッセージを設定する
-     * - セッション内容を破棄する
-     * - 完了画面へリダイレクトする
-     *
-     * @param session            HTTP セッション
-     * @param redirectAttributes 完了画面へ渡すメッセージ
-     * @return 完了画面へのリダイレクト
+     * 編集内容を更新する（戻る／完了ボタン）。
      */
     @PostMapping
     public String executeUpdate(
+            @RequestParam("action") String action,
             HttpSession session,
             RedirectAttributes redirectAttributes) throws IOException {
 
+        // --- セッションから編集内容を取得 ---
         AdminProductForm form = (AdminProductForm) session.getAttribute("adminProductForm");
-
         if (form == null) {
             return "redirect:/admin/product";
         }
 
-        Product product = adminProductHelper.fromToEntity(form);
-
-        if (form.getImageBytes() != null && form.getImageBytes().length > 0) {
-
-            // 保存先ディレクトリ
-            String uploadDir = "src/main/resources/static/images/";
-
-            // 新しいファイル名（元のファイル名）
-            String fileName = form.getImageFileName();
-
-            try {
-                java.nio.file.Files.write(
-                        java.nio.file.Paths.get(uploadDir + fileName),
-                        form.getImageBytes());
-            } catch (IOException e) {
-                throw new AdminIOException("test");
-            }
-
-            product.setImageUrl(fileName);
-
-        } else {
-            product.setImageUrl(form.getImagePath());
+        // --- 戻るボタン ---
+        if ("back".equals(action)) {
+            return "redirect:/admin/product/edit/" + form.getId();
         }
 
-        adminProductModificationService.updateProduct(product);
+        // --- 完了ボタン ---
+        if ("complete".equals(action)) {
 
-        redirectAttributes.addFlashAttribute("completed", true);
-        redirectAttributes.addFlashAttribute("productName", form.getName());
+            // Product 生成
+            Product product = adminProductHelper.fromToEntity(form);
 
-        session.removeAttribute("adminProductForm");
+            // 画像更新あり
+            if (form.getImageBytes() != null && form.getImageBytes().length > 0) {
 
-        return "redirect:/admin/product/edit/complete";
+                String uploadDir = "src/main/resources/static/images/";
+                String fileName = form.getImageFileName();
+
+                try {
+                    java.nio.file.Files.write(
+                            java.nio.file.Paths.get(uploadDir + fileName),
+                            form.getImageBytes());
+                } catch (IOException e) {
+                    throw new AdminIOException("画像保存に失敗しました", e);
+                }
+
+                product.setImageUrl(fileName);
+
+            } else {
+                // 画像更新なし → 既存画像を維持
+                product.setImageUrl(form.getImagePath());
+            }
+
+            // DB更新
+            adminProductModificationService.updateProduct(product);
+
+            redirectAttributes.addFlashAttribute("completed", true);
+            redirectAttributes.addFlashAttribute("productName", form.getName());
+
+            // セッション破棄
+            session.removeAttribute("adminProductForm");
+
+            return "redirect:/admin/product/edit/complete";
+        }
+
+        // --- 想定外の action ---
+        return "redirect:/admin/product";
     }
 
 }
