@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,8 +17,10 @@ import com.example.fullness.stationary.exception.AdminIOException;
 import com.example.fullness.stationary.form.AdminProductForm;
 import com.example.fullness.stationary.helper.AdminProductHelper;
 import com.example.fullness.stationary.service.AdminProductQueryService;
+import com.example.fullness.stationary.validator.AdminProductValidator;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -43,6 +46,9 @@ public class AdminProductEditFormController {
 
     @Autowired
     private MessageSource messageSource;
+
+    @Autowired
+    private AdminProductValidator adminProductValidator;
 
     /**
      * 商品編集フォームの初期表示処理。
@@ -100,21 +106,29 @@ public class AdminProductEditFormController {
     @PostMapping("/{id}")
     public String submitEditForm(
             @PathVariable Integer id,
-            @ModelAttribute("form") AdminProductForm form,
+            @Valid @ModelAttribute("form") AdminProductForm form,
+            BindingResult bindingResult,
             HttpSession session,
+            Model model,
             RedirectAttributes redirectAttributes) throws IOException {
 
-        Product current = productQueryService.getProductById(id);
-        if (current == null) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    messageSource.getMessage(
-                            "com.example.fullness.stationary.product.not_found",
-                            null,
-                            Locale.JAPAN));
-            return "redirect:/admin/product";
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", productQueryService.getAllCategories());
+            return "admin/product/edit_form";
         }
 
+        adminProductValidator.validate(form, bindingResult);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", productQueryService.getAllCategories());
+            return "admin/product/edit_form";
+        }
+
+        adminProductValidator.validate(form, bindingResult);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", productQueryService.getAllCategories());
+            return "admin/product/edit_form";
+        }
+        Product current = productQueryService.getProductById(id);
         form.setImagePath(current.getImageUrl());
 
         try {
