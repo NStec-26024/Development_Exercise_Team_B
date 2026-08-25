@@ -36,7 +36,7 @@ public class AdminProductModificationServiceImpl implements AdminProductModifica
     @Override
     public void updateProduct(Product product) {
 
-        Product current = productRepository.findById(product.getId());
+        Product current = productRepository.selectById(product.getId());
         if (current == null) {
             throw new AdminBusinessException(
                     messageSource.getMessage(
