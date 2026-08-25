@@ -12,13 +12,13 @@
         <result property="categoryId" column="product_category_id"/>
         <result property="imageUrl" column="image_url"/>
 
-        <!-- ★ ProductCategory にマッピング -->
+        <!--  ProductCategory にマッピング -->
         <association property="productCategory" javaType="com.example.fullness.stationary.entity.ProductCategory">
             <id property="id" column="product_category_id"/>
             <result property="name" column="category_name"/>
         </association>
 
-        <!-- ★ ProductStock にマッピング -->
+        <!--  ProductStock にマッピング -->
         <association property="productStock" javaType="com.example.fullness.stationary.entity.ProductStock">
             <id property="id" column="stock_id"/>
             <result property="productId" column="stock_product_id"/>
