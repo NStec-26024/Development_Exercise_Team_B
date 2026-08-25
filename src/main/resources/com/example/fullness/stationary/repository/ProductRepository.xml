@@ -37,7 +37,7 @@
     <!-- 全商品件数（削除済み除く） -->
     <select id="countAll" resultType="int">
         <![CDATA[
-        SELECT COUNT(*) FROM product WHERE delete_flg = 0
+            SELECT COUNT(*) FROM product WHERE delete_flg = 0
         ]]>
     </select>
 
@@ -136,12 +136,12 @@
         <![CDATA[
             UPDATE product
             SET
-                name = #{name},
-                price = #{price},
-                product_category_id = #{categoryId},
-                image_url = #{imageUrl}
+            name = #{name},
+            price = #{price},
+            product_category_id = #{categoryId},
+            image_url = #{imageUrl}
             WHERE id = #{id}
-              AND delete_flg = 0
+            AND delete_flg = 0
         ]]>
     </update>
 
