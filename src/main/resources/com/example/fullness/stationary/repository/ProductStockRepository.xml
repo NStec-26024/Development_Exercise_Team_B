@@ -5,6 +5,17 @@
 
 <mapper namespace="com.example.fullness.stationary.repository.ProductStockRepository">
 
+    <insert id="insertStock" useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+            INSERT INTO product_stock (
+            product_id,
+            quantity) 
+            VALUES (
+            #{productId},
+            #{quantity})
+        ]]>
+    </insert>
+    
     <!-- 在庫レコード新規登録 -->
     <insert id="insert">
         <![CDATA[

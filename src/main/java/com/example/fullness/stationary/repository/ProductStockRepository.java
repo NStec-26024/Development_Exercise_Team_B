@@ -1,6 +1,9 @@
 package com.example.fullness.stationary.repository;
 
 import org.apache.ibatis.annotations.Mapper;
+
+import com.example.fullness.stationary.entity.ProductStock;
+
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -26,4 +29,11 @@ public interface ProductStockRepository {
      * @return 更新件数
      */
     int updateByProductId(@Param("productId") Integer productId, @Param("quantity") Integer quantity);
+
+    /**
+     * 新しい在庫情報を登録する(UC010)
+     * 
+     * @param stock 登録する在庫情報（商品ID、初期在庫数が含まれる）
+     */
+    public int insertStock(ProductStock stock);
 }

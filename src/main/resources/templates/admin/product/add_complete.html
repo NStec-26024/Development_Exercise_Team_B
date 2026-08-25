@@ -14,7 +14,7 @@
     <main class="container">
         <div class="admin-panel p-4 mx-auto text-center" style="max-width: 480px;">
             <h1 class="mb-4">新商品登録(完了)</h1>
-            <p th:text="|商品名${productName}を登録しました。|"></p>
+            <p th:text="|商品名${form.name}を登録しました。|"></p>
             <div class="mt-4">
                 <a th:href="@{/admin}" class="btn btn-fs-solid px-4">メニューへ</a>
                 <a th:href="@{/admin/product}" class="btn btn-fs px-4">商品検索へ戻る</a>
