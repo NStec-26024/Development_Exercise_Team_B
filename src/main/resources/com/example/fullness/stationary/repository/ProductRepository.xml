@@ -5,24 +5,34 @@
 
 <mapper namespace="com.example.fullness.stationary.repository.ProductRepository">
 
-    <resultMap id="productResultMap" type="com.example.fullness.stationary.entity.Product">
-        <id property="id" column="id"/>
-        <result property="name" column="name"/>
-        <result property="price" column="price"/>
-        <result property="categoryId" column="product_category_id"/>
-        <result property="imageUrl" column="image_url"/>
+    <resultMap id="productResultMap"
+           type="com.example.fullness.stationary.entity.Product">
 
-        <association property="category" javaType="com.example.fullness.stationary.entity.ProductCategory">
-            <id property="id" column="product_category_id"/>
-            <result property="name" column="category_name"/>
-        </association>
+    <id property="id" column="id"/>
 
-        <association property="productStock" javaType="com.example.fullness.stationary.entity.ProductStock">
-            <id property="id" column="stock_id"/>
-            <result property="productId" column="stock_product_id"/>
-            <result property="quantity" column="stock_quantity"/>
-        </association>
-    </resultMap>
+    <result property="name" column="name"/>
+    <result property="price" column="price"/>
+    <result property="categoryId" column="product_category_id"/>
+    <result property="imageUrl" column="image_url"/>
+
+    <!-- カテゴリ名 -->
+    <result property="categoryName" column="category_name"/>
+
+    <!-- 在庫 -->
+    <result property="stock" column="stock_quantity"/>
+
+    <!-- 在庫詳細 -->
+    <association property="productStock"
+                 javaType="com.example.fullness.stationary.entity.ProductStock">
+
+        <id property="id" column="stock_id"/>
+        <result property="productId" column="stock_product_id"/>
+        <result property="quantity" column="stock_quantity"/>
+
+    </association>
+
+</resultMap>
+
 
     <!-- 全商品件数（削除済み除く） -->
     <select id="countAll" resultType="int">
@@ -44,7 +54,7 @@
     </select>
 
     <!-- 全商品ページング取得（カテゴリ名・在庫含む） -->
-    <select id="findAllWithPaging" resultMap="productResultMap">
+    <select id="selectAllWithPaging" resultMap="productResultMap">
         <![CDATA[
             SELECT
                 p.id,
@@ -66,7 +76,7 @@
     </select>
 
     <!-- カテゴリ別ページング取得（カテゴリ名・在庫含む） -->
-    <select id="findByCategoryWithPaging" resultMap="productResultMap">
+    <select id="selectByCategoryWithPaging" resultMap="productResultMap">
         <![CDATA[
             SELECT
                 p.id,
@@ -89,7 +99,7 @@
     </select>
 
     <!-- 商品 ID 取得（削除済み除く） -->
-    <select id="findById" resultMap="productResultMap">
+    <select id="selectById" resultMap="productResultMap">
         <![CDATA[
             SELECT
                 p.id,
@@ -109,15 +119,29 @@
         ]]>
     </select>
 
+  
+
+
+
+    <!-- 論理削除 -->
+    <update id="deleteById">
+        <![CDATA[
+            UPDATE product
+            SET delete_flg = 1
+            WHERE id = #{id}
+        ]]>
+    </update>
+
+    
     <!-- 商品情報更新（商品名・単価・カテゴリ・画像URL） -->
     <update id="update" parameterType="com.example.fullness.stationary.entity.Product">
         <![CDATA[
             UPDATE product
             SET
-                name = #{name},
-                price = #{price},
-                product_category_id = #{categoryId},
-                image_url = #{imageUrl}
+            name = #{name},
+            price = #{price},
+            product_category_id = #{categoryId},
+            image_url = #{imageUrl}
             WHERE id = #{id}
             AND delete_flg = 0
         ]]>

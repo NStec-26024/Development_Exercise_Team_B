@@ -23,7 +23,6 @@
                     <button type="submit" class="btn btn-fs btn-sm">ログアウト</button>
                 </form>
             </nav>
-
             <nav class="d-flex justify-content-center" sec:authorize="!isAuthenticated()">
                 <a th:href="@{/admin/login}" class="btn btn-fs btn-sm">ログイン</a>
             </nav>
