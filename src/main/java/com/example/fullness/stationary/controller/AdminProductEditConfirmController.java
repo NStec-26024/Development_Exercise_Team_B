@@ -1,17 +1,20 @@
 package com.example.fullness.stationary.controller;
 
+import java.io.IOError;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.entity.Product;
+import com.example.fullness.stationary.exception.AdminIOException;
 import com.example.fullness.stationary.form.AdminProductForm;
-import com.example.fullness.stationary.helper.AdminProductEntityHelper;
+import com.example.fullness.stationary.helper.AdminProductHelper;
 import com.example.fullness.stationary.service.AdminProductModificationService;
 import com.example.fullness.stationary.service.AdminProductQueryService;
 
@@ -30,7 +33,7 @@ import jakarta.servlet.http.HttpSession;
 public class AdminProductEditConfirmController {
 
     @Autowired
-    private AdminProductEntityHelper adminProductEntityHelper;
+    private AdminProductHelper adminProductHelper;
 
     @Autowired
     private AdminProductQueryService productQueryService;
@@ -62,6 +65,17 @@ public class AdminProductEditConfirmController {
         String categoryName = productQueryService.getCategoryName(form.getCategoryId());
         form.setCategoryName(categoryName);
 
+        // ★ 画像表示用のURLを生成
+        String imageUrl;
+
+        if (form.getImageBytes() != null && form.getImageBytes().length > 0) {
+            String base64 = java.util.Base64.getEncoder().encodeToString(form.getImageBytes());
+            imageUrl = "data:image/*;base64," + base64;
+        } else {
+            // 既存画像を使う
+            imageUrl = "/images/" + form.getImagePath();
+        }
+
         model.addAttribute("form", form);
         return "admin/product/edit_confirm";
     }
@@ -84,7 +98,7 @@ public class AdminProductEditConfirmController {
     @PostMapping
     public String executeUpdate(
             HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) throws IOException {
 
         AdminProductForm form = (AdminProductForm) session.getAttribute("adminProductForm");
 
@@ -92,7 +106,29 @@ public class AdminProductEditConfirmController {
             return "redirect:/admin/product";
         }
 
-        Product product = adminProductEntityHelper.toProduct(form);
+        Product product = adminProductHelper.fromToEntity(form);
+
+        if (form.getImageBytes() != null && form.getImageBytes().length > 0) {
+
+            // 保存先ディレクトリ
+            String uploadDir = "src/main/resources/static/images/";
+
+            // 新しいファイル名（元のファイル名）
+            String fileName = form.getImageFileName();
+
+            try {
+                java.nio.file.Files.write(
+                        java.nio.file.Paths.get(uploadDir + fileName),
+                        form.getImageBytes());
+            } catch (IOException e) {
+                throw new AdminIOException("test");
+            }
+
+            product.setImageUrl(fileName);
+
+        } else {
+            product.setImageUrl(form.getImagePath());
+        }
 
         adminProductModificationService.updateProduct(product);
 
@@ -103,5 +139,4 @@ public class AdminProductEditConfirmController {
 
         return "redirect:/admin/product/edit/complete";
     }
-
 }

@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.entity.Product;
+import com.example.fullness.stationary.exception.AdminIOException;
 import com.example.fullness.stationary.form.AdminProductForm;
-import com.example.fullness.stationary.helper.AdminProductFormHelper;
+import com.example.fullness.stationary.helper.AdminProductHelper;
 import com.example.fullness.stationary.service.AdminProductQueryService;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -37,7 +39,7 @@ public class AdminProductEditFormController {
     private AdminProductQueryService productQueryService;
 
     @Autowired
-    private AdminProductFormHelper ProductFormHelper;
+    private AdminProductHelper ProductFormHelper;
 
     @Autowired
     private MessageSource messageSource;
@@ -71,7 +73,7 @@ public class AdminProductEditFormController {
             return "redirect:/admin/product";
         }
 
-        AdminProductForm form = ProductFormHelper.fromProduct(product);
+        AdminProductForm form = ProductFormHelper.fromToForm(product);
 
         model.addAttribute("form", form);
         model.addAttribute("categories", productQueryService.getAllCategories());
@@ -100,7 +102,7 @@ public class AdminProductEditFormController {
             @PathVariable Integer id,
             @ModelAttribute("form") AdminProductForm form,
             HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) throws IOException {
 
         Product current = productQueryService.getProductById(id);
         if (current == null) {
@@ -114,6 +116,13 @@ public class AdminProductEditFormController {
         }
 
         form.setImagePath(current.getImageUrl());
+
+        try {
+            form.setImageBytes(form.getImage().getBytes());
+            form.setImageFileName(form.getImage().getOriginalFilename());
+        } catch (IOException e) {
+            throw new AdminIOException("test");
+        }
 
         session.setAttribute("adminProductForm", form);
 
