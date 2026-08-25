@@ -35,7 +35,7 @@
                     </tr>
                 </tbody>
             </table>
-            <img th:src="@{${product.imagePath}}" th:alt="${product.name}" class="img-fluid mb-4"
+            <img th:src="@{/images/{image}(image=${product.imageUrl})}" th:alt="${product.name}" class="img-fluid mb-4"
                 style="max-height: 180px;">
 
             <form th:action="@{/admin/product/delete/{id}(id=${product.id})}" method="post">

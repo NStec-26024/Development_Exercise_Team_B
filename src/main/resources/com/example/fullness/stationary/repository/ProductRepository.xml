@@ -28,20 +28,25 @@
 
     <!-- 全商品件数（削除済み除く） -->
     <select id="countAll" resultType="int">
-        SELECT COUNT(*) FROM product WHERE delete_flg = 0
+        <![CDATA[
+            SELECT COUNT(*) FROM product WHERE delete_flg = 0
+        ]]>
     </select>
 
     <!-- カテゴリ別商品件数（削除済み除く） -->
     <select id="countByCategory" resultType="int">
+        <![CDATA[
         SELECT COUNT(*)
         FROM product
         WHERE product_category_id = #{categoryId}
           AND delete_flg = 0
+          ]]>
     </select>
 
     <!-- 全商品ページング取得（カテゴリ名・在庫含む） -->
-    <select id="findAllWithPaging" resultMap="productResultMap">
-        SELECT
+    <select id="selectAllWithPaging" resultMap="productResultMap">
+        <![CDATA[
+            SELECT
             p.id,
             p.name,
             p.price,
@@ -51,17 +56,19 @@
             ps.id AS stock_id,
             ps.product_id AS stock_product_id,
             ps.quantity AS stock_quantity
-        FROM product p
-        LEFT JOIN product_category pc ON p.product_category_id = pc.id
-        LEFT JOIN product_stock ps ON p.id = ps.product_id
-        WHERE p.delete_flg = 0
-        ORDER BY p.id
-        LIMIT #{limit} OFFSET #{offset}
+            FROM product p
+            LEFT JOIN product_category pc ON p.product_category_id = pc.id
+            LEFT JOIN product_stock ps ON p.id = ps.product_id
+            WHERE p.delete_flg = 0
+            ORDER BY p.id
+            LIMIT #{limit} OFFSET #{offset}
+        ]]>
     </select>
 
     <!-- カテゴリ別ページング取得（カテゴリ名・在庫含む） -->
-    <select id="findByCategoryWithPaging" resultMap="productResultMap">
-        SELECT
+    <select id="selectByCategoryWithPaging" resultMap="productResultMap">
+        <![CDATA[
+            SELECT
             p.id,
             p.name,
             p.price,
@@ -71,18 +78,20 @@
             ps.id AS stock_id,
             ps.product_id AS stock_product_id,
             ps.quantity AS stock_quantity
-        FROM product p
-        LEFT JOIN product_category pc ON p.product_category_id = pc.id
-        LEFT JOIN product_stock ps ON p.id = ps.product_id
-        WHERE p.product_category_id = #{categoryId}
-          AND p.delete_flg = 0
-        ORDER BY p.id
-        LIMIT #{limit} OFFSET #{offset}
+            FROM product p
+            LEFT JOIN product_category pc ON p.product_category_id = pc.id
+            LEFT JOIN product_stock ps ON p.id = ps.product_id
+            WHERE p.product_category_id = #{categoryId}
+            AND p.delete_flg = 0
+            ORDER BY p.id
+            LIMIT #{limit} OFFSET #{offset}
+        ]]>
     </select>
 
     <!-- 商品 ID 取得（削除済み除く） -->
-    <select id="findById" resultMap="productResultMap">
-        SELECT
+    <select id="selectById" resultMap="productResultMap">
+        <![CDATA[
+            SELECT
             p.id,
             p.name,
             p.price,
@@ -92,24 +101,39 @@
             ps.id AS stock_id,
             ps.product_id AS stock_product_id,
             ps.quantity AS stock_quantity
-        FROM product p
-        LEFT JOIN product_category pc ON p.product_category_id = pc.id
-        LEFT JOIN product_stock ps ON p.id = ps.product_id
-        WHERE p.id = #{id}
-          AND p.delete_flg = 0
+            FROM product p
+            LEFT JOIN product_category pc ON p.product_category_id = pc.id
+            LEFT JOIN product_stock ps ON p.id = ps.product_id
+            WHERE p.id = #{id}
+            AND p.delete_flg = 0
+          ]]>
     </select>
 
+  
+
+
+
+    <!-- 論理削除 -->
+    <update id="deleteById">
+        <![CDATA[
+            UPDATE product
+            SET delete_flg = 1
+            WHERE id = #{id}
+        ]]>
+    </update>
+
+    
     <!-- 商品情報更新（商品名・単価・カテゴリ・画像URL） -->
     <update id="update" parameterType="com.example.fullness.stationary.entity.Product">
         <![CDATA[
             UPDATE product
             SET
-                name = #{name},
-                price = #{price},
-                product_category_id = #{categoryId},
-                image_url = #{imageUrl}
+            name = #{name},
+            price = #{price},
+            product_category_id = #{categoryId},
+            image_url = #{imageUrl}
             WHERE id = #{id}
-              AND delete_flg = 0
+            AND delete_flg = 0
         ]]>
     </update>
 
