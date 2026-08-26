@@ -83,18 +83,13 @@ public class AdminProductEditFormController {
         try {
             product = productQueryService.getProductById(id);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    messageSource.getMessage("product.info.failed", null, Locale.JAPAN)
-            );
-            return "redirect:/admin/product";
+            throw new AdminBusinessException(messageSource.getMessage("product.info.failed", null, Locale.JAPAN));
         }
 
         if (product == null) {
             redirectAttributes.addFlashAttribute(
                     "errorMessage",
-                    messageSource.getMessage("product.notfound", null, Locale.JAPAN)
-            );
+                    messageSource.getMessage("product.notfound", null, Locale.JAPAN));
             return "redirect:/admin/product";
         }
 
