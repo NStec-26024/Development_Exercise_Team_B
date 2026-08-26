@@ -35,8 +35,7 @@
                     </tr>
                 </tbody>
             </table>
-            <img th:if="${form.imagePath}" th:src="@{/images/{image}(image=${form.imagePath})}" th:alt="${form.name}"
-                class="img-fluid mb-4" style="max-height: 160px;">
+            <img th:src="${imageUrl}" th:alt="${form.name}" class="img-fluid mb-4" style="max-height: 160px;">
 
             <form th:action="@{/admin/product/edit/confirm}" method="post">
                 <button type="submit" name="action" value="cancel" class="btn btn-link link-fs">キャンセル</button>
