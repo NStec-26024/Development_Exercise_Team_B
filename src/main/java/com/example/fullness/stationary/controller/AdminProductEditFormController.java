@@ -127,15 +127,20 @@ public class AdminProductEditFormController {
             RedirectAttributes redirectAttributes) throws IOException {
 
         // --- 商品取得 ---
-        Product current = productQueryService.getProductById(id);
-        if (current == null) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    messageSource.getMessage(
-                            "com.example.fullness.stationary.product.not_found",
-                            null,
-                            Locale.JAPAN));
-            return "redirect:/admin/product";
+        Product current = null;
+        try {
+            current = productQueryService.getProductById(id);
+            if (current == null) {
+                redirectAttributes.addFlashAttribute(
+                        "errorMessage",
+                        messageSource.getMessage(
+                                "com.example.fullness.stationary.product.not_found",
+                                null,
+                                Locale.JAPAN));
+                return "redirect:/admin/product";
+            }
+        } catch (Exception e) {
+            throw new AdminBusinessException(messageSource.getMessage("product.info.failed", null, Locale.JAPAN));
         }
 
         // --- 既存画像パス設定（バリデーション前に必ずセット） ---
