@@ -52,4 +52,15 @@ public class AdminProductRegistrationForm implements Serializable {
      */
     private MultipartFile image;
 
+    private byte[] imageBytes;
+
+    private String imageFileName;
+
+    private String base64Image;
+
+    /**
+     * 確認画面表示用
+     */
+    private String imagePath;
+
 }
