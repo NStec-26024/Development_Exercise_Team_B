@@ -28,16 +28,18 @@ public class AdminProductAddFormController {
     }
 
     @GetMapping("/add")
+
     public String showInput(Model model, RedirectAttributes redirectAttributes) {
         try {
             List<ProductCategory> productCategoryList = adminProductService.getAllCategories();
             if (productCategoryList.isEmpty()) {
 
-                redirectAttributes.addFlashAttribute("errorMessages", "カテゴリ情報の取得に失敗しました");
+                model.addAttribute("errorMessages", "カテゴリ情報の取得に失敗しました");
             } else {
                 model.addAttribute("categories", productCategoryList);
             }
             return "admin/product/add_form";
+
         } catch (Exception e) {
             throw new AdminBusinessException("カテゴリ情報の取得に失敗しました");
         }
