@@ -49,4 +49,6 @@ public class AdminProductForm {
 
     /** 元のファイル名（拡張子・Content-Type判定用）。 */
     public String imageFileName;
+
+    private String base64Image;
 }
