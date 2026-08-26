@@ -82,17 +82,4 @@ public class AdminProductController {
         return "admin/product/search";
     }
 
-    /**
-     * 追加画面へのリダイレクトを行うエンドポイント。
-     *
-     * @param category カテゴリID の文字列（省略可）。指定がある場合はリダイレクト URL に付与する。
-     * @return 追加画面へのリダイレクト URL
-     */
-    @GetMapping("/product/add")
-    public String addProduct(
-            @RequestParam(name = "category", required = false, defaultValue = "") String category) {
-
-        Integer categoryId = parseCategoryId(category);
-        return "redirect:/admin/product/register?category=" + (categoryId != null ? categoryId : 0);
-    }
 }

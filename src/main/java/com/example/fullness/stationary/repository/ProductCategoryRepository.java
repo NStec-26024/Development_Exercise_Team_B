@@ -1,8 +1,9 @@
 package com.example.fullness.stationary.repository;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import org.springframework.data.repository.query.Param;
 
+import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.entity.ProductCategory;
 import java.util.List;
 
@@ -32,5 +33,7 @@ public interface ProductCategoryRepository {
      * @return カテゴリ情報
      */
     ProductCategory selectById(@Param("id") Integer id);
+
+    public void insertCategory(Product product);
 
 }

@@ -64,7 +64,7 @@
             WHERE p.delete_flg = 0
             ORDER BY p.id
             LIMIT #{limit} OFFSET #{offset}
-        ]]>
+            ]]>
     </select>
 
     <!-- カテゴリ別ページング取得（カテゴリ名・在庫含む） -->
@@ -133,5 +133,23 @@
             AND delete_flg = 0
         ]]>
     </update>
+
+    <insert id="insertProduct" useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+            INSERT INTO product (
+            product_category_id,
+            name,
+            price,
+            image_url) 
+
+            VALUES (
+            #{categoryId},
+            #{name},
+            #{price},
+            #{imageUrl})
+        ]]>
+    </insert>
+
+
 
 </mapper>

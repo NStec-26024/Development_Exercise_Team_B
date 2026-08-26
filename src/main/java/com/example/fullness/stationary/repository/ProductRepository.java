@@ -70,6 +70,14 @@ public interface ProductRepository {
         int deleteById(@Param("id") Integer id);
 
         /**
+         * 新商品をデータベースに登録(UC010)
+         * 
+         * @param product 登録する商品
+         * @return 挿入された行数（通常は1）
+         */
+        public int insertProduct(Product product);
+
+        /**
          * 商品情報更新（商品名・単価・カテゴリ・画像URL）
          *
          * @param product 更新内容（id必須）

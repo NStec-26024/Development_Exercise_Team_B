@@ -67,7 +67,7 @@ public class AdminProductEditFormController {
      */
     @GetMapping("/{id}")
     public String showEditForm(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             HttpSession session,
             Model model,
             RedirectAttributes redirectAttributes) {
