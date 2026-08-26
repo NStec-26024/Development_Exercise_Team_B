@@ -56,11 +56,17 @@ public class AdminProductEditConfirmController {
      * 編集内容確認画面を表示する。
      */
     @GetMapping
-    public String showConfirmPage(HttpSession session, Model model) {
+    public String showConfirmPage(
+            HttpSession session,
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
         // --- セッションから編集内容を取得 ---
         AdminProductForm form = (AdminProductForm) session.getAttribute("adminProductForm");
         if (form == null) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("product.null", null, Locale.JAPAN));
             return "redirect:/admin/product";
         }
 

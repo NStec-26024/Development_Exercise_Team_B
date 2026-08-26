@@ -15,7 +15,9 @@
     <main class="container">
         <div class="admin-panel p-4 mx-auto" style="max-width: 900px;">
             <h1 class="text-center mb-4">商品検索</h1>
-
+            <div th:if="${errorMessage}" class="alert alert-danger text-center mb-3">
+                <span th:text="${errorMessage}"></span>
+            </div>
             <form th:action="@{/admin/product}" method="get" class="d-flex justify-content-center gap-2 mb-4">
                 <select name="categoryId" class="form-select w-auto">
                     <option value="">すべて</option>

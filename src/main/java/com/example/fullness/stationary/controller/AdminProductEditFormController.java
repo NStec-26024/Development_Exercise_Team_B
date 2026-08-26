@@ -84,7 +84,7 @@ public class AdminProductEditFormController {
             redirectAttributes.addFlashAttribute(
                     "errorMessage",
                     messageSource.getMessage(
-                            "com.example.fullness.stationary.product.not_found",
+                            "product.notfound",
                             null,
                             Locale.JAPAN));
             return "redirect:/admin/product";
