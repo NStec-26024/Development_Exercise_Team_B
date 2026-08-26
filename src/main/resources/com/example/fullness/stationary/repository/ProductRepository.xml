@@ -86,7 +86,7 @@
             WHERE p.product_category_id = #{categoryId}
             AND p.delete_flg = 0
             ORDER BY p.id
-            LIMIT #{limit} OFFSET <div id="">offset</div>
+            LIMIT #{limit} OFFSET #{offset}
         ]]>
     </select>
 

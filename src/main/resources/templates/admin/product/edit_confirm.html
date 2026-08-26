@@ -35,11 +35,10 @@
                     </tr>
                 </tbody>
             </table>
-            <img th:if="${form.imagePath}" th:src="@{/images/{image}(image=${form.imagePath})}" th:alt="${form.name}"
-                class="img-fluid mb-4" style="max-height: 160px;">
+            <img th:src="${imageUrl}" th:alt="${form.name}" class="img-fluid mb-4" style="max-height: 160px;">
 
             <form th:action="@{/admin/product/edit/confirm}" method="post">
-                <a th:href="@{/admin/product}" class="btn btn-link link-fs">キャンセル</a>
+                <button type="submit" name="action" value="cancel" class="btn btn-link link-fs">キャンセル</button>
                 <button type="submit" name="action" value="back" class="btn btn-fs px-4">戻る</button>
                 <button type="submit" name="action" value="complete" class="btn btn-fs-solid px-4">完了</button>
             </form>
