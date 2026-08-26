@@ -1,13 +1,11 @@
 package com.example.fullness.stationary.controller;
 
-import java.io.IOError;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,28 +50,25 @@ public class AdminProductEditConfirmController {
     @GetMapping
     public String showConfirmPage(HttpSession session, Model model) {
 
-        // --- セッションから編集内容を取得 ---
         AdminProductForm form = (AdminProductForm) session.getAttribute("adminProductForm");
         if (form == null) {
             return "redirect:/admin/product";
         }
 
-        // --- カテゴリ名を補完 ---
         String categoryName = productQueryService.getCategoryName(form.getCategoryId());
         form.setCategoryName(categoryName);
 
-        // ★ 画像表示用のURLを生成
         String imageUrl;
 
         if (form.getImageBytes() != null && form.getImageBytes().length > 0) {
             String base64 = java.util.Base64.getEncoder().encodeToString(form.getImageBytes());
             imageUrl = "data:image/*;base64," + base64;
         } else {
-            // 既存画像を使う
             imageUrl = "/images/" + form.getImagePath();
         }
 
         model.addAttribute("form", form);
+        model.addAttribute("imageUrl", imageUrl);
         return "admin/product/edit_confirm";
     }
 
@@ -96,7 +91,13 @@ public class AdminProductEditConfirmController {
         if ("back".equals(action)) {
             return "redirect:/admin/product/edit/" + form.getId();
         }
+        // --- キャンセルボタン ---
+        if ("cancel".equals(action)) {
 
+            session.removeAttribute("adminProductForm");
+            System.out.println("キャンセルボタン");
+            return "redirect:/admin/product";
+        }
         // --- 完了ボタン ---
         if ("complete".equals(action)) {
 

@@ -68,8 +68,18 @@ public class AdminProductEditFormController {
     @GetMapping("/{id}")
     public String showEditForm(
             @PathVariable Integer id,
+            HttpSession session,
             Model model,
             RedirectAttributes redirectAttributes) {
+
+        AdminProductForm sessionForm = (AdminProductForm) session.getAttribute("adminProductForm");
+        if (sessionForm != null && id.equals(sessionForm.getId())) {
+
+            model.addAttribute("form", sessionForm);
+            model.addAttribute("categories", productQueryService.getAllCategories());
+            session.removeAttribute("adminProductForm");
+            return "admin/product/edit_form";
+        }
 
         Product product = productQueryService.getProductById(id);
         if (product == null) {
@@ -112,13 +122,6 @@ public class AdminProductEditFormController {
             Model model,
             RedirectAttributes redirectAttributes) throws IOException {
 
-        // --- バリデーション ---
-        adminProductValidator.validate(form, bindingResult);
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("categories", productQueryService.getAllCategories());
-            return "admin/product/edit_form";
-        }
-
         // --- 商品取得 ---
         Product current = productQueryService.getProductById(id);
         if (current == null) {
@@ -131,10 +134,10 @@ public class AdminProductEditFormController {
             return "redirect:/admin/product";
         }
 
-        // --- 既存画像パス設定 ---
+        // --- 既存画像パス設定（バリデーション前に必ずセット） ---
         form.setImagePath(current.getImageUrl());
 
-        // --- 新規画像アップロード ---
+        // --- 新規画像アップロード（バリデーション前に必ずセット） ---
         if (form.getImage() != null && !form.getImage().isEmpty()) {
             try {
                 form.setImageBytes(form.getImage().getBytes());
@@ -142,6 +145,13 @@ public class AdminProductEditFormController {
             } catch (IOException e) {
                 throw new AdminIOException("画像の読み込みに失敗しました");
             }
+        }
+
+        // --- バリデーション ---
+        adminProductValidator.validate(form, bindingResult);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", productQueryService.getAllCategories());
+            return "admin/product/edit_form";
         }
 
         // --- セッション保存 ---
