@@ -55,10 +55,7 @@ public class AdminProductAddConfirmController {
             RedirectAttributes redirectAttributes) {
 
         if (adminProductRegistrationForm.getName() == null
-                || adminProductRegistrationForm.getName().isEmpty() ||
-                adminProductRegistrationForm.getPrice() == null ||
-                adminProductRegistrationForm.getStock() == null ||
-                adminProductRegistrationForm.getCategoryId() == null) {
+                || adminProductRegistrationForm.getName().isEmpty()) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
             return "redirect:/admin/product/add";
