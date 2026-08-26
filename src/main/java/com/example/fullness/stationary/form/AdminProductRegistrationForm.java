@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.fullness.stationary.validator.ValidImage;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -50,6 +52,7 @@ public class AdminProductRegistrationForm implements Serializable {
     /**
      * 画像URL
      */
+    @ValidImage(message = "正しい画像形式でアップロードしてください")
     private MultipartFile image;
 
     private byte[] imageBytes;
