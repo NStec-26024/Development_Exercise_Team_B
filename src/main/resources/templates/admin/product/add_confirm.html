@@ -51,7 +51,12 @@
             <!-- <img th:src="${imageUrl}" th:alt="${form.name}" class="img-fluid mb-4" style="max-height: 160px;"> -->
 
 
-            <form th:action="@{/admin/product/add/confirm}" method="post">
+            <form th:action="@{/admin/product/add/postcomplete}" method="post">
+                <input type="hidden" name="name" th:value="${form.name}">
+                <input type="hidden" name="price" th:value="${form.price}">
+                <input type="hidden" name="stock" th:value="${form.stock}">
+                <input type="hidden" name="categoryId" th:value="${form.categoryId}">
+
                 <a th:href="@{/admin/product}" class="btn btn-link link-fs">キャンセル</a>
                 <button type="submit" name="action" value="back" class="btn btn-fs px-4">戻る</button>
                 <button type="submit" name="action" value="complete" class="btn btn-fs-solid px-4">完了</button>

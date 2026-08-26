@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
@@ -24,11 +25,18 @@ public class AdminProductAddCompleteController {
     }
 
     @PostMapping("/postcomplete")
-    public String regist(AdminProductRegistrationForm adminProductRegistrationForm,
+    public String regist(@RequestParam("action") String action,
+            AdminProductRegistrationForm adminProductRegistrationForm,
             RedirectAttributes redirectAttributes) {
         if (adminProductRegistrationForm.getName() == null
                 || adminProductRegistrationForm.getName().isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
+            return "redirect:/admin/product/add";
+        }
+
+        // --- 戻るボタン ---
+        if ("back".equals(action)) {
+            redirectAttributes.addFlashAttribute("form", adminProductRegistrationForm);
             return "redirect:/admin/product/add";
         }
 
