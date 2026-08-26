@@ -113,7 +113,7 @@ public class EmployeeAccountRepositoryTest {
     void findByNameTest_case01_Ok() {
 
         // 実行
-        EmployeeAccount result = adminEmployeeAccountRepository.findByName("yamadatarou1001");
+        EmployeeAccount result = adminEmployeeAccountRepository.selectByName("yamadatarou1001");
 
         // 検証：null ではない
         assertThat(result).isNotNull();
@@ -134,7 +134,7 @@ public class EmployeeAccountRepositoryTest {
     void findByNameTest_case02_Ok() {
 
         // 実行
-        EmployeeAccount result = adminEmployeeAccountRepository.findByName("unknown");
+        EmployeeAccount result = adminEmployeeAccountRepository.selectByName("unknown");
 
         // 検証：null が返る
         assertThat(result).isNull();

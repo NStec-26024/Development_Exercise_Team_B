@@ -1,8 +1,10 @@
 package com.example.fullness.stationary.controller;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.entity.Product;
+import com.example.fullness.stationary.exception.AdminBusinessException;
 import com.example.fullness.stationary.exception.AdminIOException;
 import com.example.fullness.stationary.form.AdminProductForm;
 import com.example.fullness.stationary.helper.AdminProductHelper;
@@ -44,14 +47,23 @@ public class AdminProductEditConfirmController {
     @Autowired
     private AdminProductModificationService adminProductModificationService;
 
+    @Autowired
+    private MessageSource messageSource;
+
     /**
      * 編集内容確認画面を表示する。
      */
     @GetMapping
-    public String showConfirmPage(HttpSession session, Model model) {
+    public String showConfirmPage(
+            HttpSession session,
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
         AdminProductForm form = (AdminProductForm) session.getAttribute("adminProductForm");
         if (form == null) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("product.null", null, Locale.JAPAN));
             return "redirect:/admin/product";
         }
 
@@ -125,8 +137,11 @@ public class AdminProductEditConfirmController {
                 product.setImageUrl(form.getImagePath());
             }
 
-            // DB更新
-            adminProductModificationService.updateProduct(product);
+            try {
+                adminProductModificationService.updateProduct(product);
+            } catch (Exception e) {
+                throw new AdminBusinessException(messageSource.getMessage("insert.failed", null, Locale.JAPAN));
+            }
 
             redirectAttributes.addFlashAttribute("completed", true);
             redirectAttributes.addFlashAttribute("productName", form.getName());

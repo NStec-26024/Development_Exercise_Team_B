@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.entity.Product;
+import com.example.fullness.stationary.exception.AdminBusinessException;
 import com.example.fullness.stationary.exception.AdminIOException;
 import com.example.fullness.stationary.form.AdminProductForm;
 import com.example.fullness.stationary.helper.AdminProductHelper;
@@ -74,14 +75,26 @@ public class AdminProductEditFormController {
             model.addAttribute("form", sessionForm);
             model.addAttribute("categories", productQueryService.getAllCategories());
             session.removeAttribute("adminProductForm");
+
             return "admin/product/edit_form";
         }
 
-        Product product = productQueryService.getProductById(id);
+        Product product = null;
+        try {
+            product = productQueryService.getProductById(id);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    messageSource.getMessage("product.info.failed", null, Locale.JAPAN)
+            );
+            return "redirect:/admin/product";
+        }
+
         if (product == null) {
             redirectAttributes.addFlashAttribute(
                     "errorMessage",
-                    messageSource.getMessage("com.example.fullness.stationary.product.not_found", null, Locale.JAPAN));
+                    messageSource.getMessage("product.notfound", null, Locale.JAPAN)
+            );
             return "redirect:/admin/product";
         }
 

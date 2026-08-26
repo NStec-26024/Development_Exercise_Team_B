@@ -40,7 +40,7 @@ class AdminUserDetailsServiceImplTest {
         account.setName("yamadatarou1001");
         account.setPassword("$2a$10$nOMKs31N.scADyHLn1KfyOagrb52vXDEokqGp4MueMbqAam1iaS1e");
 
-        when(mockRepository.findByName("yamadatarou1001"))
+        when(mockRepository.selectByName("yamadatarou1001"))
                 .thenReturn(account);
 
         when(mockLoginAttemptService.isBlocked("yamadatarou1001"))
@@ -61,7 +61,7 @@ class AdminUserDetailsServiceImplTest {
     @Test
     void loadUserByUsernameTest_case02_Ok() {
 
-        when(mockRepository.findByName("unknown"))
+        when(mockRepository.selectByName("unknown"))
                 .thenReturn(null);
 
         assertThrows(UsernameNotFoundException.class, () -> {
