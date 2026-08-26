@@ -17,7 +17,6 @@ import com.example.fullness.stationary.exception.AdminIOException;
 import com.example.fullness.stationary.form.AdminProductForm;
 import com.example.fullness.stationary.helper.AdminProductHelper;
 import com.example.fullness.stationary.service.AdminProductQueryService;
-import com.example.fullness.stationary.validator.AdminProductValidator;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -46,9 +45,6 @@ public class AdminProductEditFormController {
 
     @Autowired
     private MessageSource messageSource;
-
-    @Autowired
-    private AdminProductValidator adminProductValidator;
 
     /**
      * 商品編集フォームの初期表示処理。
@@ -89,7 +85,7 @@ public class AdminProductEditFormController {
             return "redirect:/admin/product";
         }
 
-        AdminProductForm form = ProductFormHelper.fromToForm(product);
+        AdminProductForm form = ProductFormHelper.EntityToForm(product);
 
         model.addAttribute("form", form);
         model.addAttribute("categories", productQueryService.getAllCategories());
@@ -115,7 +111,7 @@ public class AdminProductEditFormController {
      */
     @PostMapping("/{id}")
     public String submitEditForm(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @Valid @ModelAttribute("form") AdminProductForm form,
             BindingResult bindingResult,
             HttpSession session,
@@ -148,7 +144,6 @@ public class AdminProductEditFormController {
         }
 
         // --- バリデーション ---
-        adminProductValidator.validate(form, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", productQueryService.getAllCategories());
             return "admin/product/edit_form";

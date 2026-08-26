@@ -102,7 +102,7 @@ public class AdminProductEditConfirmController {
         if ("complete".equals(action)) {
 
             // Product 生成
-            Product product = adminProductHelper.fromToEntity(form);
+            Product product = adminProductHelper.formToEntity(form);
 
             // 画像更新あり
             if (form.getImageBytes() != null && form.getImageBytes().length > 0) {
