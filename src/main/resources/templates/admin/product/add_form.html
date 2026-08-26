@@ -99,6 +99,11 @@
                     </div>
                 </div>
 
+                <div th:classappend="${#fields.hasErrors('image')} ? 'has-error'">
+                    <span th:if="${#fields.hasErrors('image')}" th:errors="*{image}" class="error-message"
+                        role="alert"></span>
+                </div>
+
                 <div class="text-center mt-4">
                     <a th:href="@{/admin/product}" class="btn btn-link link-fs">キャンセル</a>
                     <button type="submit" class="btn btn-fs-solid px-4">完了</button>

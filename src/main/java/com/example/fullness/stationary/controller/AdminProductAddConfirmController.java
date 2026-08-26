@@ -1,7 +1,11 @@
 package com.example.fullness.stationary.controller;
 
+import java.io.IOException;
+import java.util.Base64;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.fullness.stationary.entity.ProductCategory;
+import com.example.fullness.stationary.exception.AdminIOException;
 import com.example.fullness.stationary.form.AdminProductRegistrationForm;
 import com.example.fullness.stationary.service.AdminProductCategoryService;
 
@@ -30,8 +35,18 @@ public class AdminProductAddConfirmController {
     public String validateInput(
             @Validated @ModelAttribute("form") AdminProductRegistrationForm adminProductRegistrationForm,
             BindingResult result,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) throws AdminIOException {
         redirectAttributes.addFlashAttribute("form", adminProductRegistrationForm);
+
+        if (adminProductRegistrationForm.getImage() != null && !adminProductRegistrationForm.getImage().isEmpty()) {
+            try {
+                adminProductRegistrationForm.setImageBytes(adminProductRegistrationForm.getImage().getBytes());
+                adminProductRegistrationForm
+                        .setImageFileName(adminProductRegistrationForm.getImage().getOriginalFilename());
+            } catch (IOException e) {
+                throw new AdminIOException("画像の読み込みに失敗しました");
+            }
+        }
 
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute(
@@ -52,18 +67,26 @@ public class AdminProductAddConfirmController {
     @GetMapping("/confirm")
     public String showConfirm(
             @ModelAttribute("form") AdminProductRegistrationForm adminProductRegistrationForm,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes, Model model) {
 
         if (adminProductRegistrationForm.getName() == null
-                || adminProductRegistrationForm.getName().isEmpty() ||
-                adminProductRegistrationForm.getPrice() == null ||
-                adminProductRegistrationForm.getStock() == null ||
-                adminProductRegistrationForm.getCategoryId() == null) {
+                || adminProductRegistrationForm.getName().isEmpty()) {
 
             redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
             return "redirect:/admin/product/add";
         }
 
+        String imageUrl;
+
+        if (adminProductRegistrationForm.getImageBytes() != null
+                && adminProductRegistrationForm.getImageBytes().length > 0) {
+            String base64 = Base64.getEncoder().encodeToString(adminProductRegistrationForm.getImageBytes());
+            imageUrl = "data:image/*;base64," + base64;
+        } else {
+            imageUrl = "/images/" + adminProductRegistrationForm.getImagePath();
+        }
+
+        model.addAttribute("imageUrl", imageUrl);
         return "/admin/product/add_confirm";
     }
 

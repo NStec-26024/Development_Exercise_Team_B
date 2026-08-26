@@ -2,7 +2,6 @@ package com.example.fullness.stationary.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,11 +26,9 @@ public class AdminProductAddCompleteController {
     @PostMapping("/postcomplete")
     public String regist(AdminProductRegistrationForm adminProductRegistrationForm,
             RedirectAttributes redirectAttributes) {
-        if (adminProductRegistrationForm.getName() == null || adminProductRegistrationForm.getName().isEmpty() ||
-                adminProductRegistrationForm.getPrice() == null ||
-                adminProductRegistrationForm.getStock() == null ||
-                adminProductRegistrationForm.getCategoryId() == null) {
-
+        if (adminProductRegistrationForm.getName() == null
+                || adminProductRegistrationForm.getName().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessages", "不正なアクセスです");
             return "redirect:/admin/product/add";
         }
 

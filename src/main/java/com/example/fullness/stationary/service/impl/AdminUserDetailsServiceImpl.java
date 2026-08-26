@@ -51,7 +51,7 @@ public class AdminUserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
 
-        EmployeeAccount employeeAccount = employeeAccountRepository.findByName(username);
+        EmployeeAccount employeeAccount = employeeAccountRepository.selectByName(username);
 
         if (employeeAccount == null) {
             throw new UsernameNotFoundException("User not found: " + username);

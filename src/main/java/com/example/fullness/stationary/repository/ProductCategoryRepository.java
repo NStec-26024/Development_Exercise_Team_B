@@ -15,8 +15,6 @@ public interface ProductCategoryRepository {
 
     public int insert(ProductCategory productCategory);
 
-    public ProductCategory selectById(int id);
-
     public ProductCategory selectByName(String name);
 
     /**

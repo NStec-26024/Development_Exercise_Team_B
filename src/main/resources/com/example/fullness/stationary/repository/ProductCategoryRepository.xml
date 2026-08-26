@@ -2,32 +2,46 @@
 <!DOCTYPE mapper PUBLIC
     "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.example.fullness.stationary.repository.ProductCategoryRepository">
-
-
     <resultMap id="productCategoryResultMap" type="com.example.fullness.stationary.entity.ProductCategory">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
     </resultMap>
 
+    <insert id="insert" parameterType="ProductCategory" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        <![CDATA[
+            INSERT INTO 
+            product_category (name)
+            VALUES(#{name})
+        ]]>
+    </insert>
+
+    <select id="selectById" resultMap="productCategoryResultMap">
+        <![CDATA[
+            SELECT name
+            FROM product_category
+            WHERE id=#{id}
+         ]]>
+    </select>
+
+    <select id="selectByName" resultType="ProductCategory">
+        <![CDATA[
+            SELECT *
+            FROM product_category
+            WHERE name=#{name}
+        ]]>
+    </select>
+
+    <!-- 全カテゴリ取得 -->
     <select id="selectAll" resultMap="productCategoryResultMap">
         <![CDATA[
-            SELECT 
-                id,
-                name
+            SELECT
+            id,
+            name
             FROM product_category
             ORDER BY id ASC
         ]]>
     </select>
-
-    <select id="selectById" resultMap="productCategoryResultMap">
-        <![CDATA[
-            SELECT
-                id,
-                name
-            FROM product_category
-            WHERE id = #{id}
-        ]]>
-    </select>
-
-</mapper>   
+   
+</mapper>

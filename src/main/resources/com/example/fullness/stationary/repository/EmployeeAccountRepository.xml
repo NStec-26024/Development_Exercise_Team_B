@@ -73,7 +73,7 @@
         </select>
 
         <!-- name で 1件取得（EmployeeAccount を返す） -->
-        <select id="findByName" resultType="com.example.fullness.stationary.entity.EmployeeAccount">
+        <select id="selectByName" resultType="com.example.fullness.stationary.entity.EmployeeAccount">
             <![CDATA[
                 SELECT 
                 id,
