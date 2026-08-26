@@ -144,7 +144,6 @@ public class AdminProductEditFormController {
         }
 
         // --- バリデーション ---
-        // adminProductValidator.validate(form, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", productQueryService.getAllCategories());
             return "admin/product/edit_form";
