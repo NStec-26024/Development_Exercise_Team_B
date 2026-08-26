@@ -57,6 +57,6 @@ public interface EmployeeAccountRepository {
      * @param name ユーザー名
      * @return パスワード（存在しない場合は null）
      */
-    EmployeeAccount findByName(String name);
+    EmployeeAccount selectByName(String name);
 
 }
